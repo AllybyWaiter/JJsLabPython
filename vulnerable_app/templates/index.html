@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Home - JJ's LAB{% endblock %}
+
+{% block content %}
+<h1>JJ's LAB -- Vulnerable Web Application</h1>
+<p class="text-muted mb">
+    Practice identifying and exploiting common web vulnerabilities in a safe, local environment.
+    Each endpoint below contains an intentional flaw. A matching <strong>/safe/*</strong> endpoint
+    shows the corrected implementation.
+</p>
+
+<h2>Vulnerable Endpoints</h2>
+
+<div class="card">
+    <h3>1. SQL Injection -- <a href="/login">/login</a></h3>
+    <p>
+        The login form builds its SQL query using Python string formatting.
+        Try logging in with a crafted username to bypass authentication.
+    </p>
+    <p class="text-muted mt">
+        <strong>Hint:</strong> <code>' OR 1=1 --</code> as the username, any password.
+    </p>
+    <p class="mt"><a href="/safe/login">View safe version &rarr;</a></p>
+</div>
+
+<div class="card">
+    <h3>2. Reflected XSS -- <a href="/search">/search</a></h3>
+    <p>
+        The search query is echoed back into the page without escaping.
+        Inject HTML or JavaScript via the <code>q</code> parameter.
+    </p>
+    <p class="text-muted mt">
+        <strong>Hint:</strong> <code>/search?q=&lt;script&gt;alert('XSS')&lt;/script&gt;</code>
+    </p>
+    <p class="mt"><a href="/safe/search">View safe version &rarr;</a></p>
+</div>
+
+<div class="card">
+    <h3>3. Stored XSS -- <a href="/comment">/comment</a></h3>
+    <p>
+        Comments are stored without sanitisation and rendered with <code>|safe</code>,
+        so embedded scripts execute for every visitor.
+    </p>
+    <p class="text-muted mt">
+        <strong>Hint:</strong> Post a comment containing <code>&lt;script&gt;alert('Stored XSS')&lt;/script&gt;</code>
+    </p>
+    <p class="mt"><a href="/safe/comment">View safe version &rarr;</a></p>
+</div>
+
+<div class="card">
+    <h3>4. IDOR -- <a href="/profile/1">/profile/&lt;id&gt;</a></h3>
+    <p>
+        User profiles are accessible by ID with no authorisation check.
+        Change the ID in the URL to view other users' private data.
+    </p>
+    <p class="text-muted mt">
+        <strong>Hint:</strong> Try <code>/profile/1</code>, <code>/profile/2</code>, <code>/profile/3</code> ...
+    </p>
+    <p class="mt"><a href="/safe/profile/1">View safe version &rarr;</a></p>
+</div>
+
+<div class="card">
+    <h3>5. Unrestricted File Upload -- <a href="/upload">/upload</a></h3>
+    <p>
+        The upload endpoint accepts any file type and uses the original filename.
+        An attacker could upload executable files or exploit path traversal.
+    </p>
+    <p class="text-muted mt">
+        <strong>Hint:</strong> Try uploading a <code>.php</code>, <code>.sh</code>, or <code>.exe</code> file.
+    </p>
+    <p class="mt"><a href="/safe/upload">View safe version &rarr;</a></p>
+</div>
+
+<div class="card">
+    <h3>6. Open Redirect -- <a href="/redirect?url=/">/redirect</a></h3>
+    <p>
+        The application redirects to any URL supplied in the <code>url</code> parameter
+        without validation.
+    </p>
+    <p class="text-muted mt">
+        <strong>Hint:</strong> <code>/redirect?url=https://example.com</code>
+    </p>
+    <p class="mt"><a href="/safe/redirect?url=/">View safe version &rarr;</a></p>
+</div>
+
+<div class="card">
+    <h3>7. Broken Access Control -- <a href="/api/users">/api/users</a></h3>
+    <p>
+        This API returns the full user list -- including passwords and emails --
+        with no authentication required.
+    </p>
+    <p class="text-muted mt">
+        <strong>Hint:</strong> Just visit <code>/api/users</code> in your browser or use <code>curl</code>.
+    </p>
+    <p class="mt"><a href="/safe/api/users">View safe version &rarr;</a></p>
+</div>
+
+<div class="card">
+    <h3>8. Hardcoded Credentials -- <a href="/admin">/admin</a></h3>
+    <p>
+        The admin page checks credentials that are hardcoded in the application source code.
+        Anyone who reads the source gains admin access.
+    </p>
+    <p class="text-muted mt">
+        <strong>Hint:</strong> Read the source code of <code>app.py</code> and look for <code>ADMIN_USERNAME</code> / <code>ADMIN_PASSWORD</code>.
+    </p>
+</div>
+
+{% endblock %}

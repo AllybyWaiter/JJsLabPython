@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Login (SQL Injection) - JJ's LAB{% endblock %}
+
+{% block content %}
+<h1>Login</h1>
+
+<div class="vuln-info">
+    <span class="label">Vulnerable</span>
+    <p>
+        <strong>SQL Injection:</strong> This login form constructs its SQL query using
+        Python f-string formatting. User input is inserted directly into the query,
+        allowing an attacker to manipulate the SQL logic.
+    </p>
+    <p class="mt">
+        <strong>Try:</strong> Username = <code>' OR 1=1 --</code> &nbsp; Password = <code>anything</code>
+    </p>
+    <p class="mt">
+        <strong>The vulnerable query looks like:</strong><br>
+        <code>SELECT * FROM users WHERE username = '{input}' AND password = '{input}'</code>
+    </p>
+</div>
+
+{% if error %}
+    <div class="flash flash-danger">{{ error }}</div>
+{% endif %}
+
+{% if user %}
+    <div class="card">
+        <h3 class="text-success">Authentication Successful</h3>
+        <table>
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>ID</td><td>{{ user.id }}</td></tr>
+            <tr><td>Username</td><td>{{ user.username }}</td></tr>
+            <tr><td>Email</td><td>{{ user.email }}</td></tr>
+            <tr><td>Role</td><td>{{ user.role }}</td></tr>
+        </table>
+    </div>
+{% endif %}
+
+<form method="POST" action="/login">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" placeholder="Enter username..." autofocus>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Enter password...">
+
+    <button type="submit">Log In</button>
+</form>
+
+<p class="text-muted">
+    <a href="/safe/login">View the safe (fixed) version of this page &rarr;</a>
+</p>
+{% endblock %}

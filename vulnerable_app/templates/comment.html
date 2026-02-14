@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Comments (Stored XSS) - JJ's LAB{% endblock %}
+
+{% block content %}
+<h1>Comment Board</h1>
+
+<div class="vuln-info">
+    <span class="label">Vulnerable</span>
+    <p>
+        <strong>Stored Cross-Site Scripting (XSS):</strong> Comments are saved to the
+        database without sanitisation and rendered using the <code>|safe</code> filter.
+        Malicious scripts embedded in a comment will execute every time the page is viewed.
+    </p>
+    <p class="mt">
+        <strong>Try posting:</strong> <code>&lt;script&gt;alert('Stored XSS')&lt;/script&gt;</code>
+    </p>
+    <p class="mt">
+        <strong>Or try:</strong> <code>&lt;b style="color:red;font-size:30px"&gt;HACKED&lt;/b&gt;</code>
+    </p>
+</div>
+
+<h2>Post a Comment</h2>
+<form method="POST" action="/comment">
+    <label for="author">Your Name</label>
+    <input type="text" id="author" name="author" placeholder="Your name..." value="anonymous">
+
+    <label for="content">Comment</label>
+    <textarea id="content" name="content" rows="4" placeholder="Write your comment..."></textarea>
+
+    <button type="submit">Post Comment</button>
+</form>
+
+<h2>Comments ({{ comments | length }})</h2>
+
+{% if comments %}
+    {% for c in comments %}
+    <div class="card">
+        <p><strong>{{ c.author }}</strong> <span class="text-muted">-- {{ c.created_at }}</span></p>
+        <!--
+            VULNERABILITY: The |safe filter below disables Jinja2's auto-escaping,
+            allowing any HTML/JS stored in the comment to execute in the browser.
+        -->
+        <p class="mt">{{ c.content | safe }}</p>
+    </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">No comments yet. Be the first to post!</p>
+{% endif %}
+
+<p class="text-muted mt">
+    <a href="/safe/comment">View the safe (fixed) version of this page &rarr;</a>
+</p>
+{% endblock %}

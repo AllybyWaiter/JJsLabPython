@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Search (Reflected XSS) - JJ's LAB{% endblock %}
+
+{% block content %}
+<h1>User Search</h1>
+
+<div class="vuln-info">
+    <span class="label">Vulnerable</span>
+    <p>
+        <strong>Reflected Cross-Site Scripting (XSS):</strong> The search query is echoed
+        back into the HTML page without escaping. Any HTML or JavaScript in the
+        <code>q</code> parameter will be rendered and executed by the browser.
+    </p>
+    <p class="mt">
+        <strong>Try:</strong> <code>/search?q=&lt;script&gt;alert('XSS')&lt;/script&gt;</code>
+    </p>
+    <p class="mt">
+        <strong>Or try:</strong> <code>/search?q=&lt;img src=x onerror=alert('XSS')&gt;</code>
+    </p>
+</div>
+
+<form method="GET" action="/search">
+    <label for="q">Search for a user</label>
+    <input type="text" id="q" name="q" placeholder="Enter a username..." value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+{% if query %}
+<div class="card">
+    <h3>Results for: {{ query | safe }}</h3>
+    <!--
+        VULNERABILITY: The line above uses |safe which tells Jinja2 NOT to escape
+        the output. This means any HTML/JS in the query will be rendered as-is.
+    -->
+
+    {% if results %}
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Bio</th>
+        </tr>
+        {% for row in results %}
+        <tr>
+            <td>{{ row.username }}</td>
+            <td>{{ row.email }}</td>
+            <td>{{ row.bio }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="text-muted">No users found matching your query.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<p class="text-muted mt">
+    <a href="/safe/search">View the safe (fixed) version of this page &rarr;</a>
+</p>
+{% endblock %}

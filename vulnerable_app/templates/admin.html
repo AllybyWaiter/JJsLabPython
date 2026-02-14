@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Admin (Hardcoded Credentials) - JJ's LAB{% endblock %}
+
+{% block content %}
+<h1>Admin Panel</h1>
+
+<div class="vuln-info">
+    <span class="label">Vulnerable</span>
+    <p>
+        <strong>Hardcoded Credentials:</strong> The admin username and password are
+        stored as plaintext constants directly in the application source code.
+        Anyone with access to the source (or who guesses common defaults) can
+        gain admin access.
+    </p>
+    <p class="mt">
+        <strong>Try:</strong> Read the source code of <code>app.py</code> and look for
+        <code>ADMIN_USERNAME</code> and <code>ADMIN_PASSWORD</code>.
+    </p>
+    <p class="mt">
+        <strong>Additional issues:</strong>
+    </p>
+    <ul style="margin:8px 0 0 20px; color:#e6c9a8; font-size:14px;">
+        <li>Password stored in plaintext (not hashed)</li>
+        <li>No rate limiting on login attempts</li>
+        <li>No account lockout mechanism</li>
+        <li>Weak secret key for session management</li>
+    </ul>
+</div>
+
+{% if error %}
+    <div class="flash flash-danger">{{ error }}</div>
+{% endif %}
+
+{% if authenticated %}
+    <div class="card">
+        <h3 class="text-success">Admin Access Granted</h3>
+        <p>You have successfully authenticated as the administrator.</p>
+
+        <h3 class="mt">Admin Dashboard</h3>
+        <table>
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Total Users</td><td>5</td></tr>
+            <tr><td>Total Comments</td><td>3+</td></tr>
+            <tr><td>Server</td><td>Flask / Werkzeug (Debug Mode)</td></tr>
+            <tr><td>Database</td><td>SQLite (in-memory)</td></tr>
+            <tr><td>Secret Key</td><td><code>supersecretkey123</code></td></tr>
+        </table>
+
+        <p class="text-muted mt">
+            In a real application, this dashboard would expose sensitive administrative
+            functionality such as user management, configuration, and logs.
+        </p>
+    </div>
+{% else %}
+    <h2>Admin Login</h2>
+    <form method="POST" action="/admin">
+        <label for="username">Admin Username</label>
+        <input type="text" id="username" name="username" placeholder="Username..." autofocus>
+
+        <label for="password">Admin Password</label>
+        <input type="password" id="password" name="password" placeholder="Password...">
+
+        <button type="submit" class="btn-danger">Authenticate</button>
+    </form>
+{% endif %}
+
+<div class="card mt">
+    <h3>What a safe implementation would do:</h3>
+    <ul style="margin:8px 0 0 20px; font-size:14px;">
+        <li>Store credentials in environment variables or a secrets manager</li>
+        <li>Hash passwords with bcrypt/argon2 (never store plaintext)</li>
+        <li>Use a strong, randomly generated secret key</li>
+        <li>Implement rate limiting and account lockout</li>
+        <li>Require multi-factor authentication for admin access</li>
+    </ul>
+</div>
+
+{% endblock %}

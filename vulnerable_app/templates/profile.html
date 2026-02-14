@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Profile (IDOR) - JJ's LAB{% endblock %}
+
+{% block content %}
+<h1>User Profile</h1>
+
+<div class="vuln-info">
+    <span class="label">Vulnerable</span>
+    <p>
+        <strong>Insecure Direct Object Reference (IDOR):</strong> This page displays
+        a user's full profile based solely on the <code>id</code> in the URL. There is
+        no authorisation check to verify that the requesting user is allowed to view
+        this profile.
+    </p>
+    <p class="mt">
+        <strong>Try:</strong> Change the number in the URL --
+        <a href="/profile/1">/profile/1</a>,
+        <a href="/profile/2">/profile/2</a>,
+        <a href="/profile/3">/profile/3</a>,
+        <a href="/profile/4">/profile/4</a>,
+        <a href="/profile/5">/profile/5</a>
+    </p>
+    <p class="mt">
+        <strong>Impact:</strong> An attacker can enumerate all user IDs and access
+        private data (emails, roles, bios) without being logged in.
+    </p>
+</div>
+
+<div class="card">
+    <h3>{{ user.username }}</h3>
+    <table>
+        <tr><th>Field</th><th>Value</th></tr>
+        <tr><td>User ID</td><td>{{ user.id }}</td></tr>
+        <tr><td>Username</td><td>{{ user.username }}</td></tr>
+        <tr><td>Email</td><td>{{ user.email }}</td></tr>
+        <tr><td>Role</td><td>
+            {% if user.role == 'admin' %}
+                <span class="text-danger">{{ user.role }}</span>
+            {% else %}
+                {{ user.role }}
+            {% endif %}
+        </td></tr>
+        <tr><td>Bio</td><td>{{ user.bio }}</td></tr>
+    </table>
+</div>
+
+<div class="mt">
+    <a href="/profile/{{ user.id - 1 }}" class="btn" style="margin-right:8px;">&larr; Previous User</a>
+    <a href="/profile/{{ user.id + 1 }}" class="btn">Next User &rarr;</a>
+</div>
+
+<p class="text-muted mt">
+    <a href="/safe/profile/{{ user.id }}">View the safe (fixed) version of this page &rarr;</a>
+</p>
+{% endblock %}

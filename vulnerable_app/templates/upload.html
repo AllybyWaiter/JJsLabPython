@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Upload (Unrestricted) - JJ's LAB{% endblock %}
+
+{% block content %}
+<h1>File Upload</h1>
+
+<div class="vuln-info">
+    <span class="label">Vulnerable</span>
+    <p>
+        <strong>Unrestricted File Upload:</strong> This endpoint accepts any file type
+        with no validation. It uses the original filename (not <code>secure_filename()</code>),
+        has no size limit, and does not check the file extension or MIME type.
+    </p>
+    <p class="mt">
+        <strong>Risks:</strong>
+    </p>
+    <ul style="margin:8px 0 0 20px; color:#e6c9a8; font-size:14px;">
+        <li>Upload a web shell (<code>.php</code>, <code>.jsp</code>, <code>.py</code>)</li>
+        <li>Upload an executable (<code>.exe</code>, <code>.sh</code>, <code>.bat</code>)</li>
+        <li>Path traversal via filename (<code>../../etc/cron.d/backdoor</code>)</li>
+        <li>Denial of service with extremely large files</li>
+    </ul>
+    <p class="mt">
+        <strong>Try:</strong> Upload a file named <code>test.php</code> or <code>shell.sh</code>.
+    </p>
+</div>
+
+{% if message %}
+    <div class="flash flash-success">{{ message }}</div>
+{% endif %}
+
+<form method="POST" action="/upload" enctype="multipart/form-data">
+    <label for="file">Choose a file to upload</label>
+    <input type="file" id="file" name="file">
+    <button type="submit">Upload</button>
+</form>
+
+<div class="card mt">
+    <h3>What a safe implementation would check:</h3>
+    <ul style="margin:8px 0 0 20px; font-size:14px;">
+        <li>Allow-list of permitted file extensions (e.g., <code>.png</code>, <code>.jpg</code>, <code>.pdf</code>)</li>
+        <li>Maximum file size limit</li>
+        <li>Use <code>werkzeug.utils.secure_filename()</code> to sanitise the filename</li>
+        <li>Store files outside the web root</li>
+        <li>Validate MIME type server-side</li>
+    </ul>
+</div>
+
+<p class="text-muted mt">
+    <a href="/safe/upload">View the safe (fixed) version of this page &rarr;</a>
+</p>
+{% endblock %}
