@@ -9,6 +9,22 @@ from datetime import datetime
 
 PROGRESS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "progress.json")
 
+DEFAULT_MISSIONS = {
+    "mission1": {"completed": False, "score": 0, "max_score": 100},
+    "mission2": {"completed": False, "score": 0, "max_score": 100},
+    "mission3": {"completed": False, "score": 0, "max_score": 100},
+    "mission4": {"completed": False, "score": 0, "max_score": 100},
+    "mission5": {"completed": False, "score": 0, "max_score": 100},
+}
+
+MISSION_NAMES = {
+    "mission1": "Operation Broken Gate",
+    "mission2": "Shadow on the Wire",
+    "mission3": "The Vault",
+    "mission4": "Ghost Protocol",
+    "mission5": "Code Red",
+}
+
 DEFAULT_PROGRESS = {
     "user": "",
     "started": "",
@@ -24,6 +40,7 @@ DEFAULT_PROGRESS = {
         "module7": {"completed_lessons": [], "quiz_scores": {}, "challenges_done": []},
         "module8": {"completed_lessons": [], "quiz_scores": {}, "challenges_done": []},
     },
+    "missions": DEFAULT_MISSIONS.copy(),
     "difficulty": "beginner",
     "audit_checklists_generated": 0,
     "site_tests_run": 0,
@@ -69,6 +86,16 @@ def load_progress() -> dict:
                 progress.setdefault("modules", {})[mod_key] = {
                     "completed_lessons": [], "quiz_scores": {}, "challenges_done": []
                 }
+        # Backfill missions for existing users
+        if "missions" not in progress:
+            progress["missions"] = {
+                k: {"completed": False, "score": 0, "max_score": 100}
+                for k in MISSION_NAMES
+            }
+        else:
+            for mk in MISSION_NAMES:
+                if mk not in progress["missions"]:
+                    progress["missions"][mk] = {"completed": False, "score": 0, "max_score": 100}
         return progress
     return DEFAULT_PROGRESS.copy()
 
@@ -88,6 +115,10 @@ def init_progress(username: str) -> dict:
     progress["modules"] = {
         k: {"completed_lessons": [], "quiz_scores": {}, "challenges_done": []}
         for k in MODULE_NAMES
+    }
+    progress["missions"] = {
+        k: {"completed": False, "score": 0, "max_score": 100}
+        for k in MISSION_NAMES
     }
     save_progress(progress)
     return progress
@@ -111,6 +142,17 @@ def record_quiz_score(progress: dict, module_key: str, quiz_id: str, score: int,
 def mark_challenge_complete(progress: dict, module_key: str, challenge_id: str):
     if challenge_id not in progress["modules"][module_key]["challenges_done"]:
         progress["modules"][module_key]["challenges_done"].append(challenge_id)
+    save_progress(progress)
+
+
+def mark_mission_complete(progress: dict, mission_key: str, score: int, max_score: int):
+    """Record a completed mission with its score."""
+    progress.setdefault("missions", {})[mission_key] = {
+        "completed": True,
+        "score": score,
+        "max_score": max_score,
+        "date": datetime.now().isoformat(),
+    }
     save_progress(progress)
 
 

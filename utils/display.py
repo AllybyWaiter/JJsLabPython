@@ -208,3 +208,80 @@ def progress_bar(current: int, total: int, label: str = ""):
     filled = int(pct * 30)
     bar = f"{'█' * filled}{'░' * (30 - filled)}"
     print(f"  {label} [{G}{bar}{RESET}] {current}/{total} ({pct:.0%})")
+
+
+# ---------------------------------------------------------------------------
+# Story Mode display helpers
+# ---------------------------------------------------------------------------
+
+def mission_briefing(mission_num: int, title: str, client: str, objective: str):
+    """Display a dramatic mission briefing screen."""
+    import time
+    clear_screen()
+    width = TERM_WIDTH
+    print(f"\n{R}{BRIGHT}")
+    print(f"  {'▄' * (width - 4)}")
+    print(f"  █{' ' * (width - 6)}█")
+    label = f"MISSION {mission_num}"
+    pad = width - 6 - len(label)
+    print(f"  █  {label}{' ' * max(0, pad)}█")
+    pad2 = width - 6 - len(title)
+    print(f"  █  {title.upper()}{' ' * max(0, pad2)}█")
+    print(f"  █{' ' * (width - 6)}█")
+    print(f"  {'▀' * (width - 4)}")
+    print(f"{RESET}")
+    time.sleep(0.5)
+    print(f"  {C}{BRIGHT}CLIENT:{RESET}    {client}")
+    print(f"  {C}{BRIGHT}OBJECTIVE:{RESET} {objective}")
+    print()
+    print(f"  {DIM}{'─' * (width - 4)}{RESET}")
+    press_enter()
+
+
+def narrator(text: str):
+    """Print green story narration text with wrapping."""
+    wrapped = textwrap.fill(text, width=TERM_WIDTH - 6)
+    for line in wrapped.split("\n"):
+        print(f"  {G}{line}{RESET}")
+    print()
+
+
+def terminal_prompt(text: str):
+    """Print a simulated terminal prompt line."""
+    print(f"  {G}{BRIGHT}root@target:~${RESET} {text}")
+
+
+def mission_complete(mission_num: int, title: str, score: int, max_score: int):
+    """Display the victory screen with score and rating."""
+    clear_screen()
+    pct = (score / max_score * 100) if max_score else 0
+
+    if pct >= 90:
+        rating = "ELITE HACKER"
+        rating_color = R
+    elif pct >= 70:
+        rating = "SKILLED OPERATIVE"
+        rating_color = Y
+    elif pct >= 50:
+        rating = "JUNIOR ANALYST"
+        rating_color = C
+    else:
+        rating = "SCRIPT KIDDIE"
+        rating_color = DIM
+
+    width = TERM_WIDTH
+    print(f"\n{G}{BRIGHT}")
+    print(f"  {'═' * (width - 4)}")
+    print(f"  MISSION {mission_num} COMPLETE")
+    print(f"  {title}")
+    print(f"  {'═' * (width - 4)}")
+    print(f"{RESET}")
+    print(f"  {C}SCORE:{RESET}  {score} / {max_score}  ({pct:.0f}%)")
+    filled = int(pct / 100 * 30)
+    bar = f"{'█' * filled}{'░' * (30 - filled)}"
+    print(f"  [{G}{bar}{RESET}]")
+    print()
+    print(f"  {rating_color}{BRIGHT}RATING: {rating}{RESET}")
+    print()
+    print(f"  {DIM}{'─' * (width - 4)}{RESET}")
+    press_enter()

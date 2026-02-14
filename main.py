@@ -279,6 +279,7 @@ def main():
 
         choice = show_menu("Main Menu", [
             ("modules", "Learning Modules  (start here!)"),
+            ("missions", "Story Mode Missions"),
             ("exercises", "Practice Challenges"),
             ("vuln_app", "Start Vulnerable Practice App"),
             ("site_test", "Test Your Own Site"),
@@ -292,6 +293,10 @@ def main():
 
         elif choice == "modules":
             modules_menu(progress)
+
+        elif choice == "missions":
+            from missions.mission_menu import missions_menu
+            missions_menu(progress)
 
         elif choice == "exercises":
             exercises_menu(progress)
