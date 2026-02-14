@@ -18,7 +18,8 @@ import string
 from utils.display import (
     section_header, sub_header, lesson_block, code_block, scenario_block,
     why_it_matters, info, success, warning, press_enter, show_menu,
-    disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM
+    disclaimer, hint_text, ask_yes_no, pace, learning_goal, nice_work, tip,
+    C, G, Y, R, RESET, BRIGHT, DIM
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
@@ -62,69 +63,84 @@ def run(progress):
 
 def lesson_hashing(progress, module_key):
     section_header("Lesson 1: Hashing Algorithms")
+    learning_goal([
+        "Understand what hash functions are and their key properties",
+        "Learn why MD5 and SHA-1 are not safe for passwords",
+        "Know why bcrypt and Argon2 are the recommended choices",
+        "See hashing in action with live demos",
+    ])
     disclaimer()
 
     lesson_block(
-        "A hash function takes an arbitrary input and produces a fixed-size "
-        "output (the hash or digest). Cryptographic hash functions have three "
-        "essential properties: (1) deterministic — the same input always produces "
-        "the same output, (2) one-way — it is computationally infeasible to "
-        "reverse the hash back to the input, and (3) collision-resistant — it is "
-        "extremely difficult to find two different inputs that produce the same hash."
+        "A hash function takes any input and produces a fixed-size output (the "
+        "hash or digest). Cryptographic hash functions have three key properties:"
+    )
+    pace()
+
+    lesson_block(
+        "(1) Deterministic -- the same input always gives the same output. "
+        "(2) One-way -- you cannot reverse the hash back to the input. "
+        "(3) Collision-resistant -- it is very hard to find two different inputs "
+        "that produce the same hash."
     )
 
     why_it_matters(
         "Passwords should NEVER be stored in plaintext. If a database is breached, "
-        "properly hashed passwords buy time for users to change their credentials. "
-        "The choice of hashing algorithm is critical — fast algorithms like MD5 "
-        "and SHA-1 can be cracked at billions of attempts per second on modern "
-        "hardware, while slow algorithms like bcrypt and argon2 are specifically "
-        "designed to resist brute-force attacks."
+        "properly hashed passwords buy time for users to change credentials. "
+        "Fast algorithms like MD5 can be cracked at billions of attempts per "
+        "second, while slow algorithms like bcrypt are designed to resist this."
     )
 
+    pace()
     press_enter()
 
     # ── MD5 ──
-    sub_header("MD5 — Fast and Broken")
+    sub_header("MD5 -- Fast and Broken")
     lesson_block(
-        "MD5 produces a 128-bit (16-byte) hash, typically displayed as a 32-"
-        "character hexadecimal string. It was designed for speed and is used in "
-        "checksums and file verification. However, MD5 is CRYPTOGRAPHICALLY "
-        "BROKEN — practical collision attacks have been demonstrated since 2004, "
-        "and rainbow tables for MD5 are widely available. NEVER use MD5 for "
-        "password hashing."
+        "MD5 produces a 128-bit hash displayed as a 32-character hex string. "
+        "It was designed for speed and is used in checksums. However, MD5 is "
+        "CRYPTOGRAPHICALLY BROKEN -- collision attacks have been practical since "
+        "2004. NEVER use MD5 for password hashing."
     )
+    pace()
 
     # ── SHA-1 ──
-    sub_header("SHA-1 — Deprecated")
+    sub_header("SHA-1 -- Deprecated")
     lesson_block(
-        "SHA-1 produces a 160-bit hash. While stronger than MD5, practical "
-        "collision attacks were demonstrated by Google's SHAttered project in "
-        "2017. SHA-1 has been deprecated by all major browsers and certificate "
-        "authorities. Like MD5, it is far too fast for password hashing."
+        "SHA-1 produces a 160-bit hash. While stronger than MD5, collision "
+        "attacks were demonstrated by Google's SHAttered project in 2017. Like "
+        "MD5, it is far too fast for password hashing."
     )
+    pace()
 
     # ── SHA-256 ──
-    sub_header("SHA-256 — Secure for Integrity, Not for Passwords")
+    sub_header("SHA-256 -- Secure for Integrity, Not for Passwords")
     lesson_block(
-        "SHA-256 (part of the SHA-2 family) produces a 256-bit hash and is "
-        "currently considered secure against collision attacks. It is used in "
-        "TLS certificates, blockchain, and digital signatures. However, SHA-256 "
-        "is still a fast hash — it can compute billions of hashes per second on "
-        "a GPU. For password hashing, you need an intentionally SLOW algorithm."
+        "SHA-256 produces a 256-bit hash and is secure against collision attacks. "
+        "It is used in TLS certificates and digital signatures."
     )
+    lesson_block(
+        "However, SHA-256 is still a fast hash -- billions of hashes per second "
+        "on a GPU. For passwords, you need an intentionally SLOW algorithm."
+    )
+    tip("Speed is great for file verification but terrible for password storage.")
+    pace()
 
     press_enter()
 
     # ── bcrypt ──
-    sub_header("bcrypt — Purpose-Built for Passwords")
+    sub_header("bcrypt -- Purpose-Built for Passwords")
     lesson_block(
-        "bcrypt is a password hashing function designed to be computationally "
-        "expensive. It includes a configurable 'work factor' (cost parameter) "
-        "that controls how slow the hash is to compute. As hardware gets faster, "
-        "you increase the work factor. bcrypt also automatically generates and "
-        "includes a random salt, preventing rainbow table attacks."
+        "bcrypt is a password hashing function designed to be slow on purpose. "
+        "It has a configurable 'work factor' that controls how expensive it is "
+        "to compute. As hardware gets faster, you increase the work factor."
     )
+    lesson_block(
+        "bcrypt also automatically generates and includes a random salt, "
+        "preventing rainbow table attacks."
+    )
+    pace()
+
     code_block(
         "# bcrypt hash structure:\n"
         "# $2b$12$LJ3m4ys3Lf.Zy2W3YKhxqOJz1jD6vHvyd5QzE8Wm9sBhY2jNGXDC\n"
@@ -135,30 +151,40 @@ def lesson_hashing(progress, module_key):
         "#  +-- prefix ($2b$ = bcrypt)                                  |",
         "text"
     )
+    pace()
+
+    nice_work("bcrypt is a great choice -- now let's see the newest option.")
 
     # ── Argon2 ──
-    sub_header("Argon2 — The Modern Gold Standard")
+    sub_header("Argon2 -- The Modern Gold Standard")
     lesson_block(
         "Argon2 won the 2015 Password Hashing Competition and is the recommended "
-        "algorithm for new projects. It is memory-hard, meaning it requires a "
-        "significant amount of RAM to compute, making it resistant to GPU and "
-        "ASIC-based cracking. Argon2 has three variants: Argon2d (data-dependent, "
-        "resists GPU attacks), Argon2i (data-independent, resists side-channel "
-        "attacks), and Argon2id (hybrid, recommended for password hashing)."
+        "algorithm for new projects. It is memory-hard, meaning it needs a lot "
+        "of RAM to compute, making it resistant to GPU and ASIC-based cracking."
     )
+    lesson_block(
+        "Argon2 has three variants: Argon2d (resists GPU attacks), Argon2i "
+        "(resists side-channel attacks), and Argon2id (hybrid -- recommended "
+        "for password hashing)."
+    )
+    pace()
 
     press_enter()
 
     # ── Salting explained ──
     sub_header("What Is a Salt and Why It Matters")
     lesson_block(
-        "A salt is a random value that is combined with the password before "
-        "hashing. Each user gets a unique salt, so even if two users have the "
-        "same password, their hashes will be different. Salting defeats "
-        "pre-computed attacks like rainbow tables (massive lookup tables of "
-        "hash-to-password mappings). The salt does not need to be secret — it is "
-        "stored alongside the hash. Its purpose is to ensure uniqueness."
+        "A salt is a random value combined with the password before hashing. "
+        "Each user gets a unique salt, so even if two users have the same "
+        "password, their hashes will be different."
     )
+    lesson_block(
+        "Salting defeats rainbow tables (massive lookup tables of hash-to-password "
+        "mappings). The salt does not need to be secret -- it is stored alongside "
+        "the hash. Its purpose is to ensure uniqueness."
+    )
+    pace()
+
     code_block(
         '# Without salt — identical passwords produce identical hashes:\n'
         '#   hash("password123") -> 482c811da5d5b4bc6d497ffa...\n'
@@ -169,12 +195,15 @@ def lesson_hashing(progress, module_key):
         '#   hash("password123" + "x7y8z9") -> 3d7a8b2e1c9f4d6a...  (different!)',
         "text"
     )
+    tip("bcrypt and Argon2 handle salting automatically -- you do not need to manage salts yourself.")
+    pace()
 
     press_enter()
 
     # ── Live demo ──
     sub_header("Live Demo: Hashing in Action")
     info("Let's see each algorithm hash the same input in real time.\n")
+    pace()
 
     demo_password = "JJsLab2025!"
     info(f"Test password: {Y}{demo_password}{RESET}\n")
@@ -216,6 +245,8 @@ def lesson_hashing(progress, module_key):
     print(f"          Time: {sha256s_time*1_000_000:.1f} microseconds")
     print(f"          Status: {C}Better, but still too fast for passwords{RESET}\n")
 
+    pace()
+
     # bcrypt (if available)
     try:
         import bcrypt as bcrypt_lib
@@ -243,6 +274,8 @@ def lesson_hashing(progress, module_key):
         print(f"  {Y}Argon2{RESET}  [Not installed — run: pip install argon2-cffi]")
         print(f"          Status: {G}GOLD STANDARD — memory-hard, GPU-resistant{RESET}\n")
 
+    nice_work("See the speed difference? That slowness is what protects passwords!")
+    pace()
     press_enter()
 
     # ── Interactive hashing ──
@@ -266,6 +299,8 @@ def lesson_hashing(progress, module_key):
 
     press_enter()
 
+    pace()
+
     # ── Comparison table ──
     sub_header("Algorithm Comparison Summary")
     print(f"  {'Algorithm':<12} {'Output':<10} {'Speed':<14} {'Password Use':<16} {'Status'}")
@@ -276,9 +311,11 @@ def lesson_hashing(progress, module_key):
     print(f"  {'bcrypt':<12} {'184 bit':<10} {'Slow (tunable)':<14} {G}{'RECOMMENDED':<16}{RESET} {'Proven'}")
     print(f"  {'Argon2id':<12} {'Variable':<10} {'Slow (tunable)':<14} {G}{'BEST':<16}{RESET} {'Gold standard'}")
     print()
+    pace()
 
     # ── Code example for proper storage ──
     sub_header("Proper Password Storage Code")
+    lesson_block("Here is how to hash and verify passwords with bcrypt in Python:")
     code_block(
         'import bcrypt\n'
         '\n'
@@ -293,8 +330,12 @@ def lesson_hashing(progress, module_key):
         '    return bcrypt.checkpw(\n'
         '        plain_password.encode("utf-8"),\n'
         '        hashed_password.encode("utf-8")\n'
-        '    )\n'
-        '\n'
+        '    )',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# Usage:\n'
         'stored_hash = hash_password("my_secure_password")\n'
         'print(f"Stored: {stored_hash}")\n'
@@ -303,6 +344,8 @@ def lesson_hashing(progress, module_key):
         'print(verify_password("wrong_password", stored_hash))        # False',
         "python"
     )
+    tip("This pattern works for any web app -- just store the hash and verify on login.")
+    pace()
 
     press_enter()
 
@@ -316,6 +359,7 @@ def lesson_hashing(progress, module_key):
         "cracked within 72 hours. Had LinkedIn used bcrypt with proper salting, "
         "cracking would have taken years instead of hours."
     )
+    pace()
 
     # ── Practice challenge ──
     sub_header("Practice Challenge: Hash and Compare")
@@ -343,6 +387,11 @@ def lesson_hashing(progress, module_key):
 
 def lesson_cracking(progress, module_key):
     section_header("Lesson 2: Password Cracking Concepts")
+    learning_goal([
+        "Understand brute-force, dictionary, and rainbow table attacks",
+        "See the math behind password cracking speed",
+        "Build and run a simple password cracker",
+    ])
     disclaimer()
 
     warning("IMPORTANT: Only crack hashes you generated yourself for learning.")
@@ -351,32 +400,37 @@ def lesson_cracking(progress, module_key):
 
     lesson_block(
         "Password cracking is the process of recovering plaintext passwords from "
-        "their hashes. Security professionals study cracking techniques to "
-        "understand how attackers work, evaluate the strength of hashing schemes, "
-        "and test organizational password policies. There are three primary "
-        "approaches: brute-force, dictionary attacks, and rainbow tables."
+        "their hashes. Security professionals study cracking to understand how "
+        "attackers work and to test password policies."
+    )
+    pace()
+
+    lesson_block(
+        "There are three primary approaches: brute-force, dictionary attacks, "
+        "and rainbow tables."
     )
 
     why_it_matters(
-        "Understanding how passwords are cracked helps you design better password "
-        "policies, choose appropriate hashing algorithms, and assess risk when a "
-        "database of hashes is leaked. If you know how long it takes to crack "
-        "passwords of various lengths and complexities, you can set informed "
-        "minimum requirements."
+        "Understanding how passwords are cracked helps you design better "
+        "policies, choose good hashing algorithms, and assess risk when a "
+        "database of hashes is leaked."
     )
 
+    pace()
     press_enter()
 
     # ── Brute-force ──
     sub_header("Brute-Force Attacks")
     lesson_block(
-        "A brute-force attack systematically tries every possible combination of "
-        "characters until the correct password is found. For a password using "
-        "lowercase letters only (26 characters), a 6-character password has "
-        "26^6 = 308 million possible combinations. Adding uppercase, digits, and "
-        "symbols expands the character set to 95+, making longer passwords "
-        "exponentially harder to crack."
+        "A brute-force attack tries every possible combination of characters "
+        "until the correct password is found. For lowercase letters only, a "
+        "6-character password has 26^6 = 308 million combinations."
     )
+    lesson_block(
+        "Adding uppercase, digits, and symbols expands the character set to 95+, "
+        "making longer passwords exponentially harder to crack."
+    )
+    pace()
 
     # ── Brute-force math ──
     sub_header("The Math of Brute-Force")
@@ -395,6 +449,8 @@ def lesson_cracking(progress, module_key):
         c12 = size ** 12
         print(f"  {name:<30} {c6:<16,} {c8:<16,} {c12:<20,}")
     print()
+    pace()
+
     info("At 10 billion hashes/sec (modern GPU with MD5):")
     for name, size in charsets:
         c8 = size ** 8
@@ -413,20 +469,25 @@ def lesson_cracking(progress, module_key):
             time_str = f"{seconds/31536000:.1f} years"
         print(f"    8-char {name:<30} -> {time_str}")
     print()
+    tip("Notice how adding character types makes a huge difference in cracking time.")
+    pace()
 
     press_enter()
 
     # ── Dictionary attacks ──
     sub_header("Dictionary Attacks")
     lesson_block(
-        "A dictionary attack uses a pre-compiled list of likely passwords — "
-        "common words, known leaked passwords, and variations. This is much "
-        "faster than brute-force because humans tend to use predictable passwords. "
-        "Popular wordlists include RockYou (14 million passwords from a 2009 "
-        "breach), SecLists, and CrackStation's dictionary. Attackers also apply "
-        "rules like appending numbers, replacing letters with numbers (l33tspeak), "
-        "and capitalizing the first letter."
+        "A dictionary attack uses a pre-compiled list of likely passwords -- "
+        "common words, leaked passwords, and variations. This is much faster "
+        "than brute-force because humans use predictable passwords."
     )
+    lesson_block(
+        "Popular wordlists include RockYou (14 million passwords), SecLists, and "
+        "CrackStation's dictionary. Attackers also apply rules like appending "
+        "numbers and l33tspeak substitutions."
+    )
+    pace()
+
     code_block(
         '# Common password variations that dictionary attacks try:\n'
         '# Base word: "password"\n'
@@ -439,19 +500,25 @@ def lesson_cracking(progress, module_key):
         "text"
     )
 
+    nice_work("You can see why common passwords fall so quickly!")
+    pace()
     press_enter()
 
     # ── Rainbow tables ──
     sub_header("Rainbow Tables")
     lesson_block(
         "A rainbow table is a precomputed lookup table that maps hashes back to "
-        "their plaintext inputs. Instead of hashing each guess at crack-time, the "
-        "attacker looks up the target hash in the table. Rainbow tables can be "
-        "enormous (hundreds of gigabytes) but allow near-instant password "
-        "recovery. The key defense against rainbow tables is SALTING — because "
-        "a salt makes each hash unique, the attacker would need a separate rainbow "
-        "table for every possible salt value, which is infeasible."
+        "their plaintext inputs. Instead of hashing each guess at crack-time, "
+        "the attacker just looks up the target hash. This allows near-instant "
+        "password recovery."
     )
+    lesson_block(
+        "The key defense against rainbow tables is SALTING -- a salt makes each "
+        "hash unique, so the attacker would need a separate table for every "
+        "possible salt value, which is infeasible."
+    )
+    pace()
+
     code_block(
         '# Rainbow table concept:\n'
         '# Precomputed table (unsalted MD5):\n'
@@ -467,6 +534,7 @@ def lesson_cracking(progress, module_key):
         '#   Different salt = different hash = rainbow table is useless',
         "text"
     )
+    pace()
 
     press_enter()
 
@@ -476,9 +544,8 @@ def lesson_cracking(progress, module_key):
     print()
 
     lesson_block(
-        "Let's build a simple cracker that demonstrates both dictionary and "
-        "brute-force approaches. First, we will generate a test hash, then "
-        "try to crack it."
+        "Let's build a simple cracker that shows both dictionary and brute-force "
+        "approaches. First, the dictionary attack:"
     )
 
     code_block(
@@ -498,8 +565,12 @@ def lesson_cracking(progress, module_key):
         '    for word in wordlist:\n'
         '        if hashlib.sha256(word.encode()).hexdigest() == target_hash:\n'
         '            return word\n'
-        '    return None\n'
-        '\n'
+        '    return None',
+        "python"
+    )
+    pace()
+
+    code_block(
         'mini_wordlist = [\n'
         '    "password", "123456", "admin", "letmein", "welcome",\n'
         '    "monkey", "dragon", "master", "cat42", "abc123",\n'
@@ -512,8 +583,13 @@ def lesson_cracking(progress, module_key):
         'if result:\n'
         '    print(f"[+] Dictionary attack found: {result} in {elapsed:.4f}s")\n'
         'else:\n'
-        '    print(f"[-] Not found in dictionary ({elapsed:.4f}s)")\n'
-        '\n'
+        '    print(f"[-] Not found in dictionary ({elapsed:.4f}s)")',
+        "python"
+    )
+    pace()
+
+    lesson_block("Now the brute-force approach, which tries every combination:")
+    code_block(
         '# ─── Brute-force attack (short passwords only) ───\n'
         'def brute_force_attack(target_hash, charset, max_length=4):\n'
         '    """Try all combinations up to max_length."""\n'
@@ -524,8 +600,12 @@ def lesson_cracking(progress, module_key):
         '            candidate = "".join(combo)\n'
         '            if hashlib.sha256(candidate.encode()).hexdigest() == target_hash:\n'
         '                return candidate, attempts\n'
-        '    return None, attempts\n'
-        '\n'
+        '    return None, attempts',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# Try brute-forcing a short password\n'
         'short_pw = "zap"\n'
         'short_hash = hashlib.sha256(short_pw.encode()).hexdigest()\n'
@@ -538,12 +618,14 @@ def lesson_cracking(progress, module_key):
         '    print(f"[-] Not found in {attempts:,} attempts ({elapsed:.2f}s)")',
         "python"
     )
+    pace()
 
     press_enter()
 
     # ── Live mini-cracker demo ──
     sub_header("Live Demo: Mini Dictionary Cracker")
     info("We will hash a test password and try to crack it with a small wordlist.\n")
+    pace()
 
     # Generate a test hash
     test_passwords = ["sunshine", "dragon", "master", "hello", "shadow"]
@@ -582,20 +664,22 @@ def lesson_cracking(progress, module_key):
     print()
     info(f"Hash rate: ~{int(attempts / elapsed):,} hashes/second (single-threaded Python)")
     info("A GPU-based tool like Hashcat achieves billions of hashes/second on MD5.")
-    info("Even SHA-256 can be cracked at billions/sec with specialized hardware.")
-    print()
+    pace()
+
     lesson_block(
-        "This demonstrates why password complexity matters — a common dictionary "
-        "word is cracked instantly. Combine this speed with massive wordlists "
-        "(millions of entries) and GPU acceleration, and you see why simple "
-        "passwords do not survive a breach."
+        "This shows why password complexity matters -- a common dictionary word "
+        "is cracked instantly. With massive wordlists and GPU acceleration, "
+        "simple passwords do not survive a breach."
     )
 
+    nice_work("You just saw a dictionary attack in action!")
+    pace()
     press_enter()
 
     # ── Live brute-force demo ──
     sub_header("Live Demo: Mini Brute-Force Cracker")
     info("Now let's brute-force a short password to show how time scales.\n")
+    pace()
 
     import itertools
     bf_password = "hi"
@@ -628,6 +712,8 @@ def lesson_cracking(progress, module_key):
     total_combos = sum(26**i for i in range(1, 4))
     print(f"\n  Total combinations tried: {bf_attempts:,} / {total_combos:,}")
     info("With full printable ASCII and longer passwords, the search space explodes.")
+    tip("Even adding just a few more characters makes brute-force take exponentially longer.")
+    pace()
 
     press_enter()
 
@@ -641,6 +727,7 @@ def lesson_cracking(progress, module_key):
         "'password', and 'iloveyou'. This wordlist is now the most widely used "
         "dictionary for password cracking research."
     )
+    pace()
 
     # ── Practice challenge ──
     sub_header("Practice Challenge: Crack Your Own Test Hashes")
@@ -672,34 +759,45 @@ def lesson_cracking(progress, module_key):
 
 def lesson_strength_checker(progress, module_key):
     section_header("Lesson 3: Building a Password Strength Checker")
+    learning_goal([
+        "Understand password entropy and what makes a password strong",
+        "Build a strength checker with scoring and feedback",
+        "Try the live checker with your own passwords",
+    ])
     disclaimer()
 
     lesson_block(
         "A password strength checker evaluates how resistant a password is to "
-        "cracking. Good checkers go beyond simple rules (uppercase + digit + "
-        "symbol) and consider entropy, dictionary words, common patterns, and "
-        "keyboard sequences. In this lesson, we will build a comprehensive "
-        "strength checker from scratch."
+        "cracking. Good checkers go beyond simple rules and consider entropy, "
+        "dictionary words, and common patterns."
+    )
+    pace()
+
+    lesson_block(
+        "In this lesson, we will build a comprehensive strength checker from "
+        "scratch."
     )
 
     why_it_matters(
-        "Users consistently choose weak passwords unless guided by feedback. A "
-        "real-time strength meter educates users and nudges them toward stronger "
-        "passwords. Tools like zxcvbn (by Dropbox) have shown that pattern-based "
-        "analysis is far more accurate than rigid complexity rules."
+        "Users choose weak passwords unless guided by feedback. A real-time "
+        "strength meter nudges them toward stronger passwords. Tools like zxcvbn "
+        "(by Dropbox) have shown that pattern-based analysis is far more accurate "
+        "than rigid complexity rules."
     )
 
+    pace()
     press_enter()
 
     # ── Entropy ──
     sub_header("Entropy: Measuring Password Randomness")
     lesson_block(
-        "Entropy measures the number of possible combinations expressed as a "
-        "power of 2 (in bits). A password with N bits of entropy has 2^N possible "
-        "values. The formula for a random password is: entropy = length * log2("
-        "charset_size). For example, a 10-character password using lowercase "
-        "letters (26 chars) has 10 * log2(26) = 47 bits of entropy."
+        "Entropy measures the number of possible combinations, expressed in bits. "
+        "A password with N bits of entropy has 2^N possible values. The formula: "
+        "entropy = length * log2(charset_size)."
     )
+    tip("Example: 10 lowercase letters = 10 * log2(26) = about 47 bits of entropy.")
+    pace()
+
     code_block(
         'import math\n'
         'import string\n'
@@ -715,10 +813,13 @@ def lesson_strength_checker(progress, module_key):
         '        charset_size += 10\n'
         '    if any(c in string.punctuation for c in password):\n'
         '        charset_size += 32\n'
-        '    # Handle spaces and other characters\n'
         '    if any(c == " " for c in password):\n'
-        '        charset_size += 1\n'
-        '\n'
+        '        charset_size += 1',
+        "python"
+    )
+    pace()
+
+    code_block(
         '    if charset_size == 0:\n'
         '        return 0.0\n'
         '\n'
@@ -731,17 +832,19 @@ def lesson_strength_checker(progress, module_key):
         'print(calculate_entropy("correct horse battery staple"))  # ~148 bits (strong)',
         "python"
     )
+    pace()
 
     press_enter()
 
     # ── Common password check ──
     sub_header("Checking Against Common Passwords")
     lesson_block(
-        "Even a password with high theoretical entropy is weak if it appears in "
-        "a list of commonly used passwords. The top 10,000 most common passwords "
-        "account for a significant percentage of all passwords in breaches. A "
-        "good strength checker compares the candidate against such a list."
+        "Even a password with high theoretical entropy is weak if it appears "
+        "in a list of commonly used passwords. A good strength checker compares "
+        "the candidate against such a list."
     )
+    pace()
+
     code_block(
         '# A small sample of the most common passwords\n'
         'COMMON_PASSWORDS = {\n'
@@ -754,18 +857,26 @@ def lesson_strength_checker(progress, module_key):
         '    "football", "shadow", "master", "michael", "trustno1",\n'
         '    "batman", "access", "hello", "charlie", "thunder",\n'
         '    "Summer2024", "P@ssw0rd", "Baseball1", "Football1",\n'
-        '}\n'
-        '\n'
+        '}',
+        "python"
+    )
+    pace()
+
+    code_block(
         'def is_common_password(password: str) -> bool:\n'
         '    """Check if the password is in the common passwords list."""\n'
         '    return password.lower() in {p.lower() for p in COMMON_PASSWORDS}',
         "python"
     )
 
+    nice_work("Two key building blocks done -- entropy and common password check!")
+    pace()
     press_enter()
 
     # ── Pattern detection ──
     sub_header("Pattern and Complexity Detection")
+    lesson_block("Now let's detect common weak patterns like keyboard sequences and repeated characters:")
+
     code_block(
         'import re\n'
         '\n'
@@ -787,8 +898,12 @@ def lesson_strength_checker(progress, module_key):
         '    if not re.search(r"[0-9]", password):\n'
         '        issues.append("No digits")\n'
         '    if not re.search(r"[!@#$%^&*()_+\\-=\\[\\]{}|;:,.<>?/~`]", password):\n'
-        '        issues.append("No special characters")\n'
-        '\n'
+        '        issues.append("No special characters")',
+        "python"
+    )
+    pace()
+
+    code_block(
         '    # Repeated characters\n'
         '    if re.search(r"(.)\\1{2,}", password):\n'
         '        issues.append("Contains repeated characters (e.g., aaa)")\n'
@@ -810,6 +925,7 @@ def lesson_strength_checker(progress, module_key):
         '    return issues',
         "python"
     )
+    pace()
 
     press_enter()
 
@@ -817,9 +933,10 @@ def lesson_strength_checker(progress, module_key):
     sub_header("Complete Scoring System")
     lesson_block(
         "Let's combine entropy, common password checks, and pattern detection "
-        "into a unified scoring system. The score ranges from 0 (terrible) to "
-        "100 (excellent)."
+        "into a unified scoring system (0 to 100)."
     )
+    pace()
+
     code_block(
         'def score_password(password: str) -> dict:\n'
         '    """Score a password from 0 to 100 with detailed feedback."""\n'
@@ -835,8 +952,12 @@ def lesson_strength_checker(progress, module_key):
         '    # --- Length scoring (up to 25 points) ---\n'
         '    length_score = min(25, len(password) * 25 // 20)  # 20+ chars = full marks\n'
         '    score += length_score\n'
-        '    feedback.append(f"Length: {len(password)} chars ({length_score}/25 points)")\n'
-        '\n'
+        '    feedback.append(f"Length: {len(password)} chars ({length_score}/25 points)")',
+        "python"
+    )
+    pace()
+
+    code_block(
         '    # --- Character variety (up to 20 points) ---\n'
         '    variety = 0\n'
         '    if re.search(r"[a-z]", password): variety += 1\n'
@@ -855,8 +976,12 @@ def lesson_strength_checker(progress, module_key):
         '    issues = detect_patterns(password)\n'
         '    penalties += min(15, len(issues) * 3)\n'
         '    for issue in issues:\n'
-        '        feedback.append(f"Issue: {issue}")\n'
-        '\n'
+        '        feedback.append(f"Issue: {issue}")',
+        "python"
+    )
+    pace()
+
+    code_block(
         '    # --- No bonus points beyond 15 (prevents gaming) ---\n'
         '    bonus = 0\n'
         '    if len(password) >= 16 and variety >= 3:\n'
@@ -884,6 +1009,8 @@ def lesson_strength_checker(progress, module_key):
         "python"
     )
 
+    nice_work("You have built a complete password scoring system!")
+    pace()
     press_enter()
 
     # ── Live strength checker ──

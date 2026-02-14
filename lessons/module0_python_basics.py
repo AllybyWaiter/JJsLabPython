@@ -8,7 +8,8 @@ foundation needed for all subsequent security modules.
 from utils.display import (
     section_header, sub_header, lesson_block, code_block,
     scenario_block, why_it_matters, info, success, warning, press_enter,
-    show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM
+    show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM,
+    pace, learning_goal, nice_work, tip
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
@@ -26,21 +27,37 @@ MODULE_KEY = "module0"
 def lesson_variables_and_types(progress):
     section_header("Lesson 1: Getting Started -- Variables & Data Types")
 
+    learning_goal([
+        "Understand what variables are and how to create them",
+        "Know the four basic data types: int, float, str, bool",
+        "Convert between data types",
+        "Work with strings and get input from the user",
+    ])
+
+    pace()
+
     lesson_block(
         "Welcome to Python! Python is one of the most popular programming "
         "languages in the world, and it is the number one language used in "
-        "cybersecurity. Whether you want to automate tasks, analyze log files, "
+        "cybersecurity."
+    )
+
+    lesson_block(
+        "Whether you want to automate tasks, analyze log files, "
         "write security tools, or understand how hackers think, Python is where "
         "you start. It was designed to be easy to read and write, which makes "
         "it perfect for beginners."
     )
 
+    pace()
+
     lesson_block(
         "A program is simply a set of instructions that tells a computer what "
         "to do. Think of it like a recipe: you write down the steps, and the "
-        "computer follows them one by one, from top to bottom. Python lets you "
-        "write those instructions in a language that looks almost like English."
+        "computer follows them one by one, from top to bottom."
     )
+
+    pace()
 
     why_it_matters(
         "Python is the go-to language for security professionals. It is used "
@@ -58,23 +75,29 @@ def lesson_variables_and_types(progress):
     lesson_block(
         "Before we write any real code, let's learn about comments. A comment "
         "is a note you leave in your code for yourself or other people. The "
-        "computer completely ignores comments. They start with the # symbol. "
-        "Good comments explain WHY you did something, not what the code does."
+        "computer completely ignores comments. They start with the # symbol."
     )
+
+    pace()
 
     code_block("""\
 # This is a comment -- Python ignores this line completely
 # Comments help you (and others) understand your code later
 
 # You can also put comments at the end of a line:
-x = 10  # This stores the number 10 in a variable called x
+x = 10  # This stores the number 10 in a variable called x""")
 
+    pace()
+
+    code_block("""\
 # Multi-line comments use triple quotes (also called docstrings):
 \"\"\"
 This is a multi-line comment.
 It can span as many lines as you need.
 Often used to describe what a function or file does.
 \"\"\"""")
+
+    tip("Good comments explain WHY you did something, not what the code does.")
 
     press_enter()
 
@@ -84,10 +107,17 @@ Often used to describe what a function or file does.
     lesson_block(
         "A variable is like a labeled box where you store information. You give "
         "the box a name, put something inside it, and later you can look inside "
-        "the box to see what is there. In Python, you create a variable by "
-        "choosing a name, typing an equals sign, and then the value you want "
-        "to store."
+        "the box to see what is there."
     )
+
+    pace()
+
+    lesson_block(
+        "In Python, you create a variable by choosing a name, typing an equals "
+        "sign, and then the value you want to store."
+    )
+
+    pace()
 
     code_block("""\
 # Creating variables -- think of each as a labeled box
@@ -102,14 +132,24 @@ print(age)              # Output: 25
 print(temperature)      # Output: 98.6
 print(is_admin)         # Output: True""")
 
+    pace()
+
     lesson_block(
         "Variable naming rules: (1) Names can contain letters, numbers, and "
         "underscores, but must start with a letter or underscore, never a "
         "number. (2) Names are case-sensitive -- 'Age' and 'age' are different "
-        "variables. (3) You cannot use Python keywords like 'if', 'for', "
+        "variables."
+    )
+
+    pace()
+
+    lesson_block(
+        "(3) You cannot use Python keywords like 'if', 'for', "
         "'while', 'class', etc. as variable names. (4) Use descriptive names: "
         "'user_age' is better than 'x'."
     )
+
+    pace()
 
     code_block("""\
 # Good variable names -- clear and descriptive
@@ -124,6 +164,8 @@ n = 3                  # Unclear
 # 3attempts = 5        # ERROR: cannot start with a number
 # my-var = 10          # ERROR: hyphens are not allowed, use underscores""")
 
+    nice_work("You just learned about variables! That is a huge first step.")
+
     press_enter()
 
     # ── Data Types ──
@@ -132,9 +174,17 @@ n = 3                  # Unclear
     lesson_block(
         "Not all information is the same. A person's name is text, their age "
         "is a whole number, their weight might have decimals, and whether they "
-        "are logged in is either yes or no. Python has different data types for "
-        "each kind of information."
+        "are logged in is either yes or no."
     )
+
+    pace()
+
+    lesson_block(
+        "Python has different data types for each kind of information. "
+        "Let's look at the four basic types."
+    )
+
+    pace()
 
     code_block("""\
 # int -- whole numbers (no decimal point)
@@ -145,8 +195,11 @@ year = 2025
 # float -- decimal numbers
 success_rate = 99.7
 pi = 3.14159
-temperature = -40.0
+temperature = -40.0""")
 
+    pace()
+
+    code_block("""\
 # str -- strings of text (always in quotes)
 hostname = "server01.company.com"
 greeting = 'Hello, World!'     # Single or double quotes both work
@@ -154,13 +207,18 @@ ip_address = "192.168.1.1"
 
 # bool -- True or False (only two possible values)
 is_connected = True
-has_firewall = False
+has_firewall = False""")
 
+    pace()
+
+    code_block("""\
 # Check the type of any variable using type()
 print(type(port_number))    # Output: <class 'int'>
 print(type(success_rate))   # Output: <class 'float'>
 print(type(hostname))       # Output: <class 'str'>
 print(type(is_connected))   # Output: <class 'bool'>""")
+
+    tip("You can always check a variable's type with type(). It is great for debugging!")
 
     press_enter()
 
@@ -170,9 +228,17 @@ print(type(is_connected))   # Output: <class 'bool'>""")
     lesson_block(
         "Sometimes you need to convert one type to another. For example, when "
         "you read input from a user, Python always gives you a string, even if "
-        "the user typed a number. You need to convert it to an integer before "
+        "the user typed a number."
+    )
+
+    pace()
+
+    lesson_block(
+        "You need to convert it to an integer before "
         "you can do math with it."
     )
+
+    pace()
 
     code_block("""\
 # Converting between types
@@ -181,8 +247,11 @@ age_number = int("25")    # Now it is an integer: 25
 print(age_number + 5)     # Output: 30
 
 price = float("19.99")    # Convert string to decimal: 19.99
-count = str(42)            # Convert number to string: "42"
+count = str(42)            # Convert number to string: "42" """)
 
+    pace()
+
+    code_block("""\
 # Be careful -- not everything can be converted!
 # int("hello")  # ERROR: Python cannot turn "hello" into a number
 # int("3.14")   # ERROR: Use float() first, then int()
@@ -192,6 +261,8 @@ value = "3.14"
 as_float = float(value)   # "3.14" -> 3.14
 as_int = int(as_float)    # 3.14 -> 3 (drops the decimal part)
 print(as_int)             # Output: 3""")
+
+    nice_work("Data types and type conversion down. You are doing great!")
 
     press_enter()
 
@@ -209,8 +280,11 @@ print(a * b)    # Multiplication: 30
 print(a / b)    # Division:       3.3333... (always returns a float)
 print(a // b)   # Floor division: 3 (rounds down to whole number)
 print(a % b)    # Modulo:         1 (remainder of 10 / 3)
-print(a ** b)   # Exponent:       1000 (10 to the power of 3)
+print(a ** b)   # Exponent:       1000 (10 to the power of 3)""")
 
+    pace()
+
+    code_block("""\
 # Order of operations works like regular math: PEMDAS
 result = 2 + 3 * 4     # 3 * 4 happens first = 14, not 20
 result = (2 + 3) * 4   # Parentheses first = 20
@@ -230,9 +304,10 @@ count *= 3      # Same as: count = count * 3    -> count is now 12""")
     lesson_block(
         "Strings are one of the most important data types, especially in "
         "security work where you are constantly dealing with usernames, "
-        "passwords, IP addresses, log entries, URLs, and more. Python gives "
-        "you powerful tools for working with strings."
+        "passwords, IP addresses, log entries, URLs, and more."
     )
+
+    pace()
 
     code_block("""\
 # String concatenation (joining strings together)
@@ -249,15 +324,21 @@ print(f"User {name} has the role: {role}")
 
 # You can put any expression inside the curly braces
 port = 443
-print(f"Connecting to port {port + 1}")  # Output: Connecting to port 444
+print(f"Connecting to port {port + 1}")  # Output: Connecting to port 444""")
 
+    pace()
+
+    code_block("""\
 # Useful string methods
 message = "Hello, World!"
 print(message.upper())        # "HELLO, WORLD!"
 print(message.lower())        # "hello, world!"
 print(message.replace("World", "Hacker"))  # "Hello, Hacker!"
-print(len(message))           # 13 (length of the string)
+print(len(message))           # 13 (length of the string)""")
 
+    pace()
+
+    code_block("""\
 # Checking contents
 email = "admin@company.com"
 print(email.startswith("admin"))   # True
@@ -268,6 +349,8 @@ print("@" in email)                # True (checks if @ appears anywhere)
 raw_input = "  hello  "
 clean = raw_input.strip()     # "hello" (removes spaces from both sides)""")
 
+    nice_work("You now know how to work with strings. That skill comes up everywhere!")
+
     press_enter()
 
     # ── User Input ──
@@ -275,9 +358,10 @@ clean = raw_input.strip()     # "hello" (removes spaces from both sides)""")
 
     lesson_block(
         "The input() function pauses your program and waits for the user to "
-        "type something. Whatever they type is returned as a string. This is "
-        "how you make interactive programs."
+        "type something. Whatever they type is returned as a string."
     )
+
+    pace()
 
     code_block("""\
 # Getting input from the user
@@ -294,6 +378,8 @@ print(f"In 10 years you will be {age + 10}")
 port = int(input("Enter a port number: "))
 print(f"Scanning port {port}...")""")
 
+    pace()
+
     scenario_block("Social Engineering Awareness Tool", (
         "You are building a quick training tool that asks employees to enter "
         "their email address and then checks if it follows the company format. "
@@ -302,6 +388,8 @@ print(f"Scanning port {port}...")""")
         "it is valid. This simple script helps train employees to recognize "
         "phishing emails that use look-alike domains."
     ))
+
+    tip("You can always come back and re-read this lesson later!")
 
     press_enter()
 
@@ -360,20 +448,31 @@ if result is not None:
 def lesson_control_flow(progress):
     section_header("Lesson 2: Control Flow -- Making Decisions")
 
+    learning_goal([
+        "Use comparison operators to ask True/False questions",
+        "Write if/elif/else blocks to make decisions",
+        "Combine conditions with and, or, not",
+        "Understand truthiness and falsy values",
+    ])
+
+    pace()
+
     lesson_block(
         "So far, our programs run every line from top to bottom without making "
         "any choices. But real programs need to make decisions: Is the password "
-        "correct? Is this IP address on the blocklist? Did the user enter valid "
-        "data? Control flow lets your program choose different paths depending "
-        "on conditions."
+        "correct? Is this IP address on the blocklist?"
     )
 
+    pace()
+
     lesson_block(
-        "Think of it like a security guard at a door. The guard checks your "
-        "badge: if the badge is valid, you get in; if it is expired, you are "
-        "redirected; otherwise, you are turned away. Python uses if, elif "
-        "(short for 'else if'), and else to make these kinds of decisions."
+        "Control flow lets your program choose different paths depending "
+        "on conditions. Think of it like a security guard at a door. The guard "
+        "checks your badge: if the badge is valid, you get in; if it is expired, "
+        "you are redirected; otherwise, you are turned away."
     )
+
+    pace()
 
     why_it_matters(
         "Almost every security tool relies on decision-making. Firewalls "
@@ -390,9 +489,10 @@ def lesson_control_flow(progress):
 
     lesson_block(
         "Before you can make decisions, you need to ask questions. Comparison "
-        "operators compare two values and return True or False (a boolean). "
-        "Think of each operator as asking a yes/no question."
+        "operators compare two values and return True or False (a boolean)."
     )
+
+    pace()
 
     code_block("""\
 # Comparison operators return True or False
@@ -404,8 +504,11 @@ print(x != y)     # Not equal to?       True
 print(x < y)      # Less than?          True
 print(x > y)      # Greater than?       False
 print(x <= 10)    # Less than or equal? True
-print(x >= 15)    # Greater or equal?   False
+print(x >= 15)    # Greater or equal?   False""")
 
+    pace()
+
+    code_block("""\
 # Works with strings too!
 name = "Alice"
 print(name == "Alice")     # True
@@ -415,6 +518,8 @@ print(name != "Bob")       # True
 # COMMON MISTAKE: == vs =
 # x = 10     means "store 10 in x" (assignment)
 # x == 10    means "is x equal to 10?" (comparison)""")
+
+    tip("A single = assigns a value. A double == compares two values. Mix them up and you will get bugs!")
 
     press_enter()
 
@@ -439,8 +544,11 @@ if len(password) >= 8:
     print("Password length is acceptable.")
 else:
     print("Password is too short! Must be at least 8 characters.")
-# Output: Password length is acceptable.
+# Output: Password length is acceptable.""")
 
+    pace()
+
+    code_block("""\
 # if/elif/else -- multiple paths
 score = 75
 
@@ -457,13 +565,15 @@ else:
 
 print(f"Your grade: {grade}")  # Output: Your grade: C""")
 
+    pace()
+
     lesson_block(
         "Important: Notice the indentation (the spaces at the beginning of "
         "lines). Python uses indentation to know which lines belong inside "
-        "the if block. Every line that is indented under the 'if' will only "
-        "run when the condition is True. Standard practice is to use 4 spaces "
-        "for each level of indentation."
+        "the if block. Standard practice is to use 4 spaces for each level."
     )
+
+    nice_work("You can now write programs that make decisions. That is a big deal!")
 
     press_enter()
 
@@ -473,9 +583,10 @@ print(f"Your grade: {grade}")  # Output: Your grade: C""")
     lesson_block(
         "Sometimes one condition is not enough. You might need to check if "
         "a user is BOTH logged in AND an admin. Or you might want to allow "
-        "access if the user provides a valid password OR a valid token. "
-        "Logical operators let you combine multiple conditions."
+        "access if the user provides a valid password OR a valid token."
     )
+
+    pace()
 
     code_block("""\
 # 'and' -- BOTH conditions must be True
@@ -492,8 +603,11 @@ is_admin = False
 has_override_key = True
 
 if is_admin or has_override_key:
-    print("Elevated access granted")  # This runs
+    print("Elevated access granted")  # This runs""")
 
+    pace()
+
+    code_block("""\
 # 'not' -- reverses True to False and vice versa
 is_blocked = False
 
@@ -517,11 +631,18 @@ else:
 
     lesson_block(
         "In Python, every value can be treated as True or False, even if it "
-        "is not a boolean. This is called 'truthiness'. The following values "
-        "are considered False (falsy): False, 0, 0.0, empty string '', empty "
-        "list [], empty dict {}, and None. Everything else is True (truthy). "
-        "This is very useful for quick checks."
+        "is not a boolean. This is called 'truthiness'."
     )
+
+    pace()
+
+    lesson_block(
+        "The following values "
+        "are considered False (falsy): False, 0, 0.0, empty string '', empty "
+        "list [], empty dict {}, and None. Everything else is True (truthy)."
+    )
+
+    pace()
 
     code_block("""\
 # Falsy values -- these all act as False in an if statement
@@ -532,8 +653,11 @@ if not "":
 if not []:
     print("Empty list is falsy")       # Prints
 if not None:
-    print("None is falsy")             # Prints
+    print("None is falsy")             # Prints""")
 
+    pace()
+
+    code_block("""\
 # Truthy values -- these all act as True
 if "hello":
     print("Non-empty string is truthy")  # Prints
@@ -550,6 +674,8 @@ if username:
 else:
     print("Error: No username entered!")
 # If the user presses Enter without typing, username is "" (falsy)""")
+
+    nice_work("Truthiness is a tricky concept and you just nailed it!")
 
     press_enter()
 
@@ -573,12 +699,17 @@ if role == "admin":
     else:
         print("MFA required for admin accounts. Access denied.")
 else:
-    print("Standard user access.")
+    print("Standard user access.")""")
 
+    pace()
+
+    code_block("""\
 # Tip: Deeply nested code (3+ levels) can be hard to read.
 # Consider using 'and' to flatten conditions when possible:
 if role == "admin" and mfa_verified and ip_address.startswith("192.168."):
     print("Internal admin with MFA -- full access.")""")
+
+    tip("If your code is indented more than 3 levels deep, try to simplify with 'and'.")
 
     press_enter()
 
@@ -590,6 +721,8 @@ if role == "admin" and mfa_verified and ip_address.startswith("192.168."):
         "statement in other languages. It is useful when you have many "
         "possible values to check against."
     )
+
+    pace()
 
     code_block("""\
 # match/case for clean multi-way branching
@@ -607,6 +740,8 @@ match command:
     case _:
         print(f"Unknown command: {command}")
 # The underscore _ is a wildcard that matches anything (like 'else')""")
+
+    pace()
 
     scenario_block("Access Control Decision Engine", (
         "You are writing the logic for a company's internal portal. When an "
@@ -706,20 +841,30 @@ for pw in test_passwords:
 def lesson_loops(progress):
     section_header("Lesson 3: Loops & Iteration")
 
+    learning_goal([
+        "Write for loops and while loops",
+        "Use break, continue, and else on loops",
+        "Loop with enumerate() and zip()",
+        "Write list comprehensions for compact code",
+    ])
+
+    pace()
+
     lesson_block(
         "Imagine you need to check 1000 IP addresses to see which ones are "
         "online. You would not write 1000 separate lines of code. Instead, "
-        "you use a loop -- a way to repeat a block of code over and over. "
-        "Loops are one of the most powerful concepts in programming because "
-        "they let a few lines of code do the work of thousands."
+        "you use a loop -- a way to repeat a block of code over and over."
     )
+
+    pace()
 
     lesson_block(
         "Python has two main types of loops. A 'for' loop repeats a fixed "
-        "number of times -- you know in advance how many iterations there "
-        "will be. A 'while' loop keeps repeating as long as a condition is "
-        "True -- you might not know in advance when it will stop."
+        "number of times. A 'while' loop keeps repeating as long as a "
+        "condition is True."
     )
+
+    pace()
 
     why_it_matters(
         "Security work is full of repetitive tasks: scanning every port on a "
@@ -745,8 +890,11 @@ for port in ports:
 #   Scanning port 80...
 #   Scanning port 443...
 #   Scanning port 8080...
-#   Scanning port 8443...
+#   Scanning port 8443...""")
 
+    pace()
+
+    code_block("""\
 # range() generates a sequence of numbers
 for i in range(5):
     print(f"Attempt {i}")
@@ -756,8 +904,11 @@ for i in range(5):
 # range() with start, stop, and step
 for i in range(1, 11):        # 1 through 10
     print(i, end=" ")
-print()  # Output: 1 2 3 4 5 6 7 8 9 10
+print()  # Output: 1 2 3 4 5 6 7 8 9 10""")
 
+    pace()
+
+    code_block("""\
 for i in range(0, 100, 10):   # 0, 10, 20, ... 90
     print(i, end=" ")
 print()  # Output: 0 10 20 30 40 50 60 70 80 90
@@ -767,6 +918,8 @@ password = "S3cur3!"
 for char in password:
     print(f"  Character: {char}")""")
 
+    nice_work("For loops are one of the most useful things in all of programming!")
+
     press_enter()
 
     # ── while loops ──
@@ -775,9 +928,12 @@ for char in password:
     lesson_block(
         "A while loop checks a condition before each iteration. If the "
         "condition is True, it runs the code inside. Then it checks again. "
-        "This continues until the condition becomes False. Be careful: if "
-        "the condition never becomes False, you get an infinite loop!"
+        "This continues until the condition becomes False."
     )
+
+    tip("Be careful: if the condition never becomes False, you get an infinite loop!")
+
+    pace()
 
     code_block("""\
 # Basic while loop -- counting up
@@ -785,8 +941,11 @@ count = 0
 while count < 5:
     print(f"Count is {count}")
     count += 1  # IMPORTANT: change the variable so the loop eventually stops
-# Output: Count is 0, Count is 1, Count is 2, Count is 3, Count is 4
+# Output: Count is 0, Count is 1, Count is 2, Count is 3, Count is 4""")
 
+    pace()
+
+    code_block("""\
 # Practical example: retry logic for a network connection
 import time
 max_retries = 3
@@ -801,8 +960,11 @@ while attempt < max_retries and not connected:
         connected = True
         print("Connected!")
     else:
-        print("Failed. Retrying...")
+        print("Failed. Retrying...")""")
 
+    pace()
+
+    code_block("""\
 # User input validation loop
 while True:
     user_input = input("Enter a port (1-65535): ")
@@ -820,10 +982,17 @@ while True:
 
     lesson_block(
         "'break' immediately exits the loop -- the loop is done. 'continue' "
-        "skips the rest of the current iteration and jumps to the next one. "
+        "skips the rest of the current iteration and jumps to the next one."
+    )
+
+    pace()
+
+    lesson_block(
         "The 'else' clause on a loop runs only if the loop finished normally "
         "(was not interrupted by break)."
     )
+
+    pace()
 
     code_block("""\
 # break -- stop the loop early
@@ -838,8 +1007,11 @@ for num in numbers:
 #   Checking 1...
 #   Checking 5...
 #   Checking 3...
-#   Found a number greater than 7: 8
+#   Found a number greater than 7: 8""")
 
+    pace()
+
+    code_block("""\
 # continue -- skip this iteration
 log_lines = ["INFO: User logged in", "ERROR: Disk full",
              "INFO: File saved", "ERROR: Connection lost"]
@@ -851,8 +1023,11 @@ for line in log_lines:
     print(f"  {line}")
 # Output:
 #   ERROR: Disk full
-#   ERROR: Connection lost
+#   ERROR: Connection lost""")
 
+    pace()
+
+    code_block("""\
 # else on a loop -- runs only if loop completed without break
 target_ip = "10.0.0.5"
 suspicious_ips = ["192.168.1.100", "10.0.0.99", "172.16.0.50"]
@@ -864,6 +1039,8 @@ for ip in suspicious_ips:
 else:
     print(f"{target_ip} is not on the suspicious list.")
 # Output: 10.0.0.5 is not on the suspicious list.""")
+
+    nice_work("break, continue, and else give you fine-grained control over your loops!")
 
     press_enter()
 
@@ -879,8 +1056,11 @@ for host in hosts:
     print(f"\\nScanning {host}:")
     for port in ports:
         print(f"  Checking port {port}...")
-# Each host gets all three ports checked
+# Each host gets all three ports checked""")
 
+    pace()
+
+    code_block("""\
 # Generating a multiplication table (just to illustrate)
 for row in range(1, 4):
     for col in range(1, 4):
@@ -910,8 +1090,11 @@ for index, server in enumerate(servers):
 
 # enumerate with a custom start number
 for num, server in enumerate(servers, start=1):
-    print(f"  {num}. {server}")
+    print(f"  {num}. {server}")""")
 
+    pace()
+
+    code_block("""\
 # zip() -- loop through two lists in parallel
 usernames = ["alice", "bob", "charlie"]
 roles = ["admin", "user", "auditor"]
@@ -931,9 +1114,10 @@ for user, role in zip(usernames, roles):
     lesson_block(
         "A list comprehension is a shorthand way to create a new list by "
         "transforming or filtering items from another list. It puts a for "
-        "loop and an optional if condition inside square brackets. It is "
-        "more compact and often faster than a regular for loop."
+        "loop and an optional if condition inside square brackets."
     )
+
+    pace()
 
     code_block("""\
 # Regular loop to create a list
@@ -944,8 +1128,11 @@ print(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
 # Same thing as a list comprehension (one line!)
 squares = [i ** 2 for i in range(10)]
-print(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+print(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]""")
 
+    pace()
+
+    code_block("""\
 # With a filter condition
 numbers = [1, -2, 3, -4, 5, -6, 7]
 positive = [n for n in numbers if n > 0]
@@ -961,6 +1148,8 @@ words = ["hello", "WORLD", "Python"]
 lower_words = [w.lower() for w in words]
 print(lower_words)  # ['hello', 'world', 'python']""")
 
+    pace()
+
     scenario_block("Automated Port Scanning", (
         "A penetration tester needs to check which of the 65,535 TCP ports "
         "are open on a target server. Using a for loop with range(1, 65536), "
@@ -970,6 +1159,8 @@ print(lower_words)  # ['hello', 'world', 'python']""")
         "associated with vulnerable services). The entire scan is just 15 lines "
         "of Python."
     ))
+
+    nice_work("Loops and list comprehensions are now in your toolkit!")
 
     press_enter()
 
@@ -1036,13 +1227,22 @@ else:
 def lesson_data_structures(progress):
     section_header("Lesson 4: Data Structures -- Lists, Dicts, Sets, Tuples")
 
+    learning_goal([
+        "Use lists to store ordered collections of items",
+        "Use dictionaries for key-value lookups",
+        "Use sets for unique items and set operations",
+        "Know when to use each data structure",
+    ])
+
+    pace()
+
     lesson_block(
         "So far, each variable has held a single value. But in the real world, "
         "you need to work with collections of data: a list of IP addresses, a "
-        "mapping of usernames to roles, a set of unique ports, and more. Python "
-        "gives you four built-in data structures for organizing collections: "
-        "lists, dictionaries, sets, and tuples."
+        "mapping of usernames to roles, a set of unique ports, and more."
     )
+
+    pace()
 
     why_it_matters(
         "Security tools process large amounts of structured data. A port "
@@ -1060,9 +1260,12 @@ def lesson_data_structures(progress):
     lesson_block(
         "A list is an ordered collection of items. You can add, remove, and "
         "change items. Lists are created with square brackets [] and items "
-        "are separated by commas. Lists are the most commonly used data "
-        "structure in Python."
+        "are separated by commas."
     )
+
+    tip("Lists are the most commonly used data structure in Python.")
+
+    pace()
 
     code_block("""\
 # Creating lists
@@ -1082,6 +1285,8 @@ print(ports[1:3])   # [80, 443]  (index 1 up to but not including 3)
 print(ports[:2])    # [22, 80]   (from start to index 2)
 print(ports[2:])    # [443, 8080] (from index 2 to end)""")
 
+    pace()
+
     code_block("""\
 # Modifying lists
 servers = ["web01", "db01", "app01"]
@@ -1093,8 +1298,11 @@ servers.insert(1, "proxy01")        # Insert at index 1: ['web01', 'proxy01', 'd
 # Removing items
 servers.remove("db01")              # Remove by value
 last = servers.pop()                # Remove and return last item
-specific = servers.pop(0)           # Remove and return item at index 0
+specific = servers.pop(0)           # Remove and return item at index 0""")
 
+    pace()
+
+    code_block("""\
 # Other useful operations
 numbers = [3, 1, 4, 1, 5, 9, 2, 6]
 numbers.sort()                      # Sort in place: [1, 1, 2, 3, 4, 5, 6, 9]
@@ -1104,6 +1312,8 @@ print(5 in numbers)                 # True (is 5 in the list?)
 print(numbers.count(1))             # 2 (how many times does 1 appear?)
 print(numbers.index(5))             # Index of first occurrence of 5""")
 
+    nice_work("Lists are incredibly versatile. You will use them all the time!")
+
     press_enter()
 
     # ── Dictionaries ──
@@ -1111,11 +1321,18 @@ print(numbers.index(5))             # Index of first occurrence of 5""")
 
     lesson_block(
         "A dictionary (dict) stores data as key-value pairs, like a real "
-        "dictionary where each word (key) has a definition (value). "
+        "dictionary where each word (key) has a definition (value)."
+    )
+
+    pace()
+
+    lesson_block(
         "Dictionaries are created with curly braces {} and use colons to "
         "separate keys from values. They are incredibly useful for "
         "representing structured data."
     )
+
+    pace()
 
     code_block("""\
 # Creating dictionaries
@@ -1132,8 +1349,11 @@ print(user["role"])           # "admin"
 
 # Using .get() is safer -- returns None (or a default) if key doesn't exist
 print(user.get("email"))           # None (no error)
-print(user.get("email", "N/A"))    # "N/A" (custom default)
+print(user.get("email", "N/A"))    # "N/A" (custom default)""")
 
+    pace()
+
+    code_block("""\
 # Adding and modifying entries
 user["email"] = "alice@company.com"   # Add a new key-value pair
 user["login_count"] = 43              # Update an existing value
@@ -1146,6 +1366,8 @@ removed_role = user.pop("role")        # Remove and return the value
 print(user.keys())     # dict_keys(['username', 'login_count', 'email'])
 print(user.values())   # dict_values(['alice', 43, 'alice@company.com'])
 print(user.items())    # dict_items([('username', 'alice'), ...])""")
+
+    pace()
 
     code_block("""\
 # Looping through dictionaries
@@ -1163,8 +1385,11 @@ for server in server_status:
 # Loop through key-value pairs (preferred)
 for server, status in server_status.items():
     if status != "running":
-        print(f"  ALERT: {server} is {status}!")
+        print(f"  ALERT: {server} is {status}!")""")
 
+    pace()
+
+    code_block("""\
 # Nested dictionaries
 employees = {
     "alice": {"role": "admin", "department": "IT Security"},
@@ -1172,6 +1397,8 @@ employees = {
     "charlie": {"role": "engineer", "department": "DevOps"}
 }
 print(employees["alice"]["department"])  # "IT Security" """)
+
+    nice_work("Dictionaries are a powerhouse. You just unlocked key-value storage!")
 
     press_enter()
 
@@ -1184,6 +1411,8 @@ print(employees["alice"]["department"])  # "IT Security" """)
         "mathematical set operations like union, intersection, and difference."
     )
 
+    pace()
+
     code_block("""\
 # Creating sets
 open_ports = {22, 80, 443, 80, 22}  # Duplicates are removed automatically
@@ -1193,8 +1422,11 @@ print(open_ports)                    # {80, 443, 22} (order may vary)
 ip_list = ["10.0.0.1", "10.0.0.2", "10.0.0.1", "10.0.0.3", "10.0.0.2"]
 unique_ips = set(ip_list)
 print(unique_ips)       # {'10.0.0.1', '10.0.0.2', '10.0.0.3'}
-print(len(unique_ips))  # 3
+print(len(unique_ips))  # 3""")
 
+    pace()
+
+    code_block("""\
 # Set operations
 set_a = {22, 80, 443, 8080}
 set_b = {80, 443, 3306, 5432}
@@ -1218,9 +1450,17 @@ print(f"New ports detected: {new_ports}")  # {3306, 8080}""")
     lesson_block(
         "A tuple is like a list, but it cannot be changed after creation "
         "(it is immutable). Tuples use parentheses () instead of square "
-        "brackets. Use tuples for data that should not be modified, like "
+        "brackets."
+    )
+
+    pace()
+
+    lesson_block(
+        "Use tuples for data that should not be modified, like "
         "coordinates, database records, or function return values."
     )
+
+    pace()
 
     code_block("""\
 # Creating tuples
@@ -1234,8 +1474,11 @@ print(server_info[2])   # 443
 
 # Tuple unpacking -- assign multiple variables at once
 host, ip, port = server_info
-print(f"Host: {host}, IP: {ip}, Port: {port}")
+print(f"Host: {host}, IP: {ip}, Port: {port}")""")
 
+    pace()
+
+    code_block("""\
 # You cannot modify a tuple:
 # coordinates[0] = 50.0   # ERROR: tuples do not support assignment
 
@@ -1243,6 +1486,8 @@ print(f"Host: {host}, IP: {ip}, Port: {port}")
 # divmod() returns a tuple of (quotient, remainder)
 quotient, remainder = divmod(17, 5)
 print(f"17 / 5 = {quotient} remainder {remainder}")  # 3 remainder 2""")
+
+    nice_work("You now know all four Python data structures!")
 
     press_enter()
 
@@ -1266,6 +1511,8 @@ blocked_ips = {"10.0.0.1", "10.0.0.2"}
 #   Use for: coordinates, database rows, function returns
 address = ("192.168.1.1", 443)""", language="text")
 
+    pace()
+
     scenario_block("Intrusion Detection Data Model", (
         "You are building a simple intrusion detection system. You use a "
         "dictionary to store alerts, where each key is a timestamp and the "
@@ -1274,6 +1521,8 @@ address = ("192.168.1.1", 443)""", language="text")
         "maintain the chronological order of events. Choosing the right "
         "data structure for each job makes your code clean and efficient."
     ))
+
+    tip("When in doubt, start with a list. You can always switch later if needed.")
 
     press_enter()
 
@@ -1361,22 +1610,31 @@ contact_book()""")
 def lesson_functions_modules(progress):
     section_header("Lesson 5: Functions & Modules")
 
+    learning_goal([
+        "Define and call your own functions",
+        "Use return values, default parameters, and keyword arguments",
+        "Understand variable scope (local vs global)",
+        "Import and use Python's built-in modules",
+    ])
+
+    pace()
+
     lesson_block(
         "As your programs get bigger, you need a way to organize your code "
         "into reusable pieces. A function is a named block of code that "
         "performs a specific task. You define it once and can call it as many "
-        "times as you want. Think of a function like a tool in a toolbox: you "
-        "build the tool once, and then use it whenever you need it."
+        "times as you want."
     )
 
+    pace()
+
     lesson_block(
-        "Functions have three big benefits. First, they avoid repetition: "
-        "instead of copying the same code in 10 places, you write it once "
-        "in a function. Second, they make code readable: a well-named "
-        "function tells you what a block of code does without reading every "
-        "line. Third, they make testing easier: you can test each function "
-        "independently."
+        "Functions have three big benefits. First, they avoid repetition. "
+        "Second, they make code readable. Third, they make testing easier: "
+        "you can test each function independently."
     )
+
+    pace()
 
     why_it_matters(
         "Professional security tools are built from functions and modules. "
@@ -1399,8 +1657,11 @@ def greet():
 
 # Call (use) the function
 greet()           # Output: Hello, welcome to JJ's LAB!
-greet()           # You can call it as many times as you want
+greet()           # You can call it as many times as you want""")
 
+    pace()
+
+    code_block("""\
 # A function with a parameter (input)
 def greet_user(name):
     print(f"Hello, {name}! Welcome to JJ's LAB.")
@@ -1415,6 +1676,8 @@ def check_port(host, port):
 check_port("192.168.1.1", 80)
 check_port("10.0.0.5", 443)""")
 
+    nice_work("You just wrote your first functions!")
+
     press_enter()
 
     # ── Return Values ──
@@ -1423,9 +1686,10 @@ check_port("10.0.0.5", 443)""")
     lesson_block(
         "A function can send a result back to the code that called it using "
         "the 'return' statement. Think of it as the function handing you an "
-        "answer. Without return, a function does its work but gives you "
-        "nothing back (technically it returns None)."
+        "answer."
     )
+
+    pace()
 
     code_block("""\
 # A function that returns a value
@@ -1442,8 +1706,11 @@ def is_valid_port(port):
     return 1 <= port <= 65535
 
 print(is_valid_port(80))       # True
-print(is_valid_port(99999))    # False
+print(is_valid_port(99999))    # False""")
 
+    pace()
+
+    code_block("""\
 # A function can return multiple values (as a tuple)
 def analyze_password(password):
     \"\"\"Return length and whether it has digits.\"\"\"
@@ -1453,8 +1720,11 @@ def analyze_password(password):
 
 pw_length, pw_has_digits = analyze_password("Hello123")
 print(f"Length: {pw_length}, Has digits: {pw_has_digits}")
-# Output: Length: 8, Has digits: True
+# Output: Length: 8, Has digits: True""")
 
+    pace()
+
+    code_block("""\
 # Early return -- exit a function immediately
 def divide(a, b):
     if b == 0:
@@ -1485,6 +1755,8 @@ scan_host("192.168.1.1", timeout=2, port=8080)
 # Mixing positional and keyword arguments
 scan_host("10.0.0.1", 22, timeout=3)""")
 
+    tip("Default parameters are great for making functions easy to call with common settings.")
+
     press_enter()
 
     # ── Scope ──
@@ -1492,11 +1764,18 @@ scan_host("10.0.0.1", 22, timeout=3)""")
 
     lesson_block(
         "A variable created inside a function only exists inside that "
-        "function. This is called 'local scope'. A variable created outside "
-        "all functions exists everywhere and is called 'global scope'. This "
-        "separation prevents functions from accidentally changing each other's "
-        "data."
+        "function. This is called 'local scope'."
     )
+
+    pace()
+
+    lesson_block(
+        "A variable created outside all functions exists everywhere and is "
+        "called 'global scope'. This separation prevents functions from "
+        "accidentally changing each other's data."
+    )
+
+    pace()
 
     code_block("""\
 # Global vs local scope
@@ -1509,8 +1788,11 @@ def my_function():
 
 my_function()
 print(message)              # "I am global" (unchanged!)
-# print(secret)             # ERROR: secret does not exist outside the function
+# print(secret)             # ERROR: secret does not exist outside the function""")
 
+    pace()
+
+    code_block("""\
 # Accessing global variables inside a function (read only)
 app_name = "JJ's LAB"
 
@@ -1518,6 +1800,8 @@ def show_app():
     print(f"App: {app_name}")  # Can READ the global variable
 
 show_app()  # Output: App: JJ's LAB""")
+
+    nice_work("Scope can be confusing at first, but you handled it!")
 
     press_enter()
 
@@ -1533,8 +1817,11 @@ def scan_ports(host, *ports):
         print(f"  Scanning port {port}...")
 
 scan_ports("192.168.1.1", 22, 80, 443, 8080)
-# ports becomes a tuple: (22, 80, 443, 8080)
+# ports becomes a tuple: (22, 80, 443, 8080)""")
 
+    pace()
+
+    code_block("""\
 # **kwargs -- accept any number of keyword arguments
 def create_user(**kwargs):
     \"\"\"Create a user from keyword arguments.\"\"\"
@@ -1578,9 +1865,10 @@ for s in servers:
     lesson_block(
         "Python comes with a huge standard library -- hundreds of modules "
         "that provide pre-built functionality. Instead of writing everything "
-        "from scratch, you import what you need. This is one of Python's "
-        "biggest strengths: there is a module for almost everything."
+        "from scratch, you import what you need."
     )
+
+    pace()
 
     code_block("""\
 # Different ways to import
@@ -1595,8 +1883,11 @@ now = datetime.now()
 print(f"Current time: {now}")
 
 import random as rng           # Import with an alias (nickname)
-print(rng.randint(1, 100))
+print(rng.randint(1, 100))""")
 
+    pace()
+
+    code_block("""\
 # Common modules for security work:
 import os          # Operating system interface (files, paths, env vars)
 import sys         # System info (Python version, command line args)
@@ -1608,6 +1899,8 @@ import json        # JSON parsing and creation
 import re          # Regular expressions (pattern matching)
 import socket      # Network connections""")
 
+    pace()
+
     code_block("""\
 # Quick examples of common modules
 
@@ -1615,8 +1908,11 @@ import socket      # Network connections""")
 import os
 print(f"Current directory: {os.getcwd()}")
 print(f"Home directory: {os.path.expanduser('~')}")
-print(f"File exists: {os.path.exists('/etc/passwd')}")
+print(f"File exists: {os.path.exists('/etc/passwd')}")""")
 
+    pace()
+
+    code_block("""\
 # math -- mathematical operations
 import math
 print(f"Square root of 144: {math.sqrt(144)}")     # 12.0
@@ -1626,14 +1922,19 @@ print(f"Log base 2 of 256: {math.log2(256)}")      # 8.0
 # random -- generating random values
 import random
 print(f"Random int 1-100: {random.randint(1, 100)}")
-print(f"Random choice: {random.choice(['red', 'blue', 'green'])}")
+print(f"Random choice: {random.choice(['red', 'blue', 'green'])}")""")
 
+    pace()
+
+    code_block("""\
 # datetime -- working with dates and times
 from datetime import datetime, timedelta
 now = datetime.now()
 print(f"Now: {now.strftime('%Y-%m-%d %H:%M:%S')}")
 yesterday = now - timedelta(days=1)
 print(f"Yesterday: {yesterday.strftime('%Y-%m-%d')}")""")
+
+    pace()
 
     scenario_block("Building a Security Toolkit", (
         "A security analyst creates a Python file called sec_utils.py that "
@@ -1644,6 +1945,8 @@ print(f"Yesterday: {yesterday.strftime('%Y-%m-%d')}")""")
         "hash_string, validate_ip'. This modular approach means the team "
         "writes each utility once and reuses it across dozens of scripts."
     ))
+
+    nice_work("Functions and modules are how real software is built. Great job!")
 
     press_enter()
 
@@ -1741,22 +2044,39 @@ print(format_bytes(2_500_000_000))    # "2.3 GB" """)
 def lesson_error_handling_files(progress):
     section_header("Lesson 6: Error Handling & File Basics")
 
+    learning_goal([
+        "Use try/except to catch and handle errors",
+        "Know the most common exception types",
+        "Read and write files safely with the 'with' statement",
+        "Work with file paths using os.path",
+    ])
+
+    pace()
+
     lesson_block(
         "Things go wrong. A lot. The file you are trying to read does not "
         "exist. The user types 'abc' when you expected a number. The network "
-        "connection times out. A dictionary key is missing. Good programs "
-        "do not crash when things go wrong -- they handle errors gracefully. "
-        "Python's try/except system lets you catch errors and decide what to "
-        "do about them."
+        "connection times out."
     )
+
+    pace()
+
+    lesson_block(
+        "Good programs do not crash when things go wrong -- they handle errors "
+        "gracefully. Python's try/except system lets you catch errors and "
+        "decide what to do about them."
+    )
+
+    pace()
 
     lesson_block(
         "In Python, errors are called 'exceptions'. When an error occurs, "
         "Python 'raises' (throws) an exception. If you do not catch it, your "
-        "program crashes with an error message. But if you wrap the risky "
-        "code in a try/except block, you can catch the exception and handle "
-        "it -- maybe print a friendly error message, retry, or log the issue."
+        "program crashes. But if you wrap the risky code in a try/except block, "
+        "you can catch the exception and handle it."
     )
+
+    pace()
 
     why_it_matters(
         "Security tools MUST handle errors well. A port scanner that crashes "
@@ -1785,8 +2105,11 @@ except ValueError:
 # Output: That is not a valid number!
 
 # The program continues running after the except block
-print("Program continues...")
+print("Program continues...")""")
 
+    pace()
+
+    code_block("""\
 # Catching the error details
 try:
     result = 10 / 0
@@ -1802,6 +2125,8 @@ except KeyError as e:
     print(f"Missing key: {e}")
 except TypeError as e:
     print(f"Type error: {e}")""")
+
+    nice_work("You can now prevent your programs from crashing!")
 
     press_enter()
 
@@ -1826,8 +2151,11 @@ try:
     user = {"name": "Alice"}
     print(user["email"])
 except KeyError:
-    print("KeyError: 'email' not found in dictionary")
+    print("KeyError: 'email' not found in dictionary")""")
 
+    pace()
+
+    code_block("""\
 # IndexError -- list index out of range
 try:
     items = [1, 2, 3]
@@ -1848,6 +2176,8 @@ try:
     x = 1 / 0
 except Exception as e:
     print(f"Something went wrong: {type(e).__name__}: {e}")""")
+
+    tip("Always catch specific exceptions when you can. Catching everything with 'except Exception' can hide real bugs.")
 
     press_enter()
 
@@ -1872,15 +2202,23 @@ else:
 finally:
     # ALWAYS runs, whether there was an exception or not
     # Great for cleanup (closing files, network connections, etc.)
-    print("Operation complete.")
+    print("Operation complete.")""")
 
-# Example flow if user enters "5":
-#   try block runs, no error -> else block runs -> finally block runs
-#   Output: Result: 20.0  \\n  Operation complete.
+    pace()
 
-# Example flow if user enters "abc":
-#   try block raises ValueError -> except block runs -> finally block runs
-#   Output: Error: Please enter a valid number.  \\n  Operation complete.""")
+    lesson_block(
+        "Example flow if user enters '5': "
+        "try block runs, no error, then else block runs, then finally runs. "
+        "Output: Result: 20.0, Operation complete."
+    )
+
+    pace()
+
+    lesson_block(
+        "Example flow if user enters 'abc': "
+        "try block raises ValueError, except block runs, then finally runs. "
+        "Output: Error: Please enter a valid number. Operation complete."
+    )
 
     press_enter()
 
@@ -1901,8 +2239,11 @@ try:
     set_port(80)         # Works fine
     set_port(99999)      # Raises ValueError
 except ValueError as e:
-    print(f"Invalid port: {e}")
+    print(f"Invalid port: {e}")""")
 
+    pace()
+
+    code_block("""\
 # Custom exceptions (brief introduction)
 class AuthenticationError(Exception):
     \"\"\"Raised when authentication fails.\"\"\"
@@ -1918,6 +2259,8 @@ try:
 except AuthenticationError as e:
     print(f"Auth error: {e}")""")
 
+    nice_work("You can now raise your own exceptions and create custom error types!")
+
     press_enter()
 
     # ── Reading Files ──
@@ -1927,8 +2270,10 @@ except AuthenticationError as e:
         "Python makes it easy to read and write files. The most important "
         "thing to remember is to use the 'with' statement (called a context "
         "manager). It automatically closes the file when you are done, even "
-        "if an error occurs. Forgetting to close files is a common bug."
+        "if an error occurs."
     )
+
+    pace()
 
     code_block("""\
 # Reading an entire file at once
@@ -1940,8 +2285,11 @@ with open("example.txt", "r") as f:
 # Reading line by line (memory-efficient for large files)
 with open("log.txt", "r") as f:
     for line in f:
-        print(line.strip())  # strip() removes the newline at the end
+        print(line.strip())  # strip() removes the newline at the end""")
 
+    pace()
+
+    code_block("""\
 # Reading all lines into a list
 with open("targets.txt", "r") as f:
     lines = f.readlines()
@@ -1973,8 +2321,11 @@ with open("report.txt", "w") as f:
 
     ports = [22, 80, 443]
     for port in ports:
-        f.write(f"  - Port {port}\\n")
+        f.write(f"  - Port {port}\\n")""")
 
+    pace()
+
+    code_block("""\
 # Appending to a file (adds to the end, doesn't overwrite)
 with open("report.txt", "a") as f:
     f.write("\\n--- Scan Complete ---\\n")
@@ -1984,10 +2335,17 @@ lines = ["Line 1\\n", "Line 2\\n", "Line 3\\n"]
 with open("output.txt", "w") as f:
     f.writelines(lines)""")
 
+    pace()
+
     lesson_block(
         "File modes explained: 'r' = read (file must exist), 'w' = write "
         "(creates new or overwrites existing), 'a' = append (adds to end "
-        "of existing file), 'x' = exclusive create (fails if file exists). "
+        "of existing file), 'x' = exclusive create (fails if file exists)."
+    )
+
+    pace()
+
+    lesson_block(
         "Add 'b' for binary mode: 'rb' reads binary files, 'wb' writes them."
     )
 
@@ -1998,10 +2356,10 @@ with open("output.txt", "w") as f:
 
     lesson_block(
         "The 'with' statement is not just for files. It is a general pattern "
-        "for managing resources that need to be cleaned up. When you use "
-        "'with', Python guarantees the cleanup happens, even if an exception "
-        "occurs. For files, 'cleanup' means closing the file."
+        "for managing resources that need to be cleaned up."
     )
+
+    pace()
 
     code_block("""\
 # WITHOUT 'with' -- you must close manually (error-prone)
@@ -2014,12 +2372,17 @@ finally:
 # WITH 'with' -- automatic cleanup (recommended!)
 with open("data.txt", "r") as f:
     content = f.read()
-# File is closed automatically here, even if an error occurred
+# File is closed automatically here, even if an error occurred""")
 
+    pace()
+
+    code_block("""\
 # You can open multiple files at once
 with open("input.txt", "r") as infile, open("output.txt", "w") as outfile:
     for line in infile:
         outfile.write(line.upper())  # Convert each line to uppercase""")
+
+    tip("Always use 'with' when working with files. It is the safest and cleanest approach.")
 
     press_enter()
 
@@ -2038,8 +2401,11 @@ print(f"Report path: {report}")
 # Checking if files and directories exist
 print(os.path.exists("/tmp"))            # True (on macOS/Linux)
 print(os.path.isfile("/etc/passwd"))     # True if it is a file
-print(os.path.isdir("/tmp"))             # True if it is a directory
+print(os.path.isdir("/tmp"))             # True if it is a directory""")
 
+    pace()
+
+    code_block("""\
 # Getting file information
 if os.path.exists(report):
     size = os.path.getsize(report)       # Size in bytes
@@ -2050,13 +2416,18 @@ path = "/var/log/auth.log"
 directory = os.path.dirname(path)        # "/var/log"
 filename = os.path.basename(path)        # "auth.log"
 name, ext = os.path.splitext(filename)   # ("auth", ".log")
-print(f"Dir: {directory}, File: {filename}, Extension: {ext}")
+print(f"Dir: {directory}, File: {filename}, Extension: {ext}")""")
 
+    pace()
+
+    code_block("""\
 # Listing files in a directory
 for item in os.listdir("/tmp"):
     full_path = os.path.join("/tmp", item)
     if os.path.isfile(full_path):
         print(f"  File: {item}")""")
+
+    pace()
 
     scenario_block("Log File Analysis During Incident Response", (
         "During a security incident at 2 AM, you need to quickly analyze "
@@ -2067,6 +2438,8 @@ for item in os.listdir("/tmp"):
         "does not crash the entire analysis. The with statement guarantees "
         "all files are properly closed even under pressure."
     ))
+
+    nice_work("Error handling and file I/O are essential skills. You have got them both now!")
 
     press_enter()
 

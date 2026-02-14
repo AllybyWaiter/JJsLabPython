@@ -11,7 +11,8 @@ written authorization to test.
 from utils.display import (
     section_header, sub_header, lesson_block, code_block,
     scenario_block, why_it_matters, info, success, warning, press_enter,
-    show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM
+    show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM,
+    pace, learning_goal, nice_work, tip
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
@@ -25,6 +26,11 @@ def _lesson_dns_lookups(progress):
     lesson_id = "dns_lookups"
 
     section_header("Lesson 1: DNS Lookups")
+    learning_goal([
+        "Understand how DNS translates domain names to IP addresses",
+        "Know the most common DNS record types and what they reveal",
+        "Perform DNS lookups in Python using socket and dnspython",
+    ])
     disclaimer()
 
     # ---------- Conceptual explanation ----------
@@ -35,59 +41,77 @@ def _lesson_dns_lookups(progress):
         "DNS resolver to translate that human-readable name into a numeric IP "
         "address (like 93.184.216.34). This process is called DNS resolution."
     )
+    pace()
+
     lesson_block(
         "DNS operates as a hierarchical, distributed database. Your query "
         "travels from a recursive resolver to root name servers, then to the "
         "TLD (.com, .org, etc.) name servers, and finally to the authoritative "
-        "name server for the specific domain. Each level caches answers to "
-        "speed up future lookups."
+        "name server for the specific domain."
     )
-    press_enter()
+    lesson_block(
+        "Each level caches answers to speed up future lookups."
+    )
+    tip("Think of DNS like asking for directions: you ask one person, they point you to the next, until someone knows the exact address.")
+    pace()
 
     # ---------- Record types ----------
     sub_header("Common DNS Record Types")
     lesson_block(
         "DNS stores different kinds of records, each serving a specific "
-        "purpose. Understanding these is essential for reconnaissance:"
+        "purpose. Understanding these is essential for reconnaissance."
     )
+    pace()
 
     info(f"{BRIGHT}A Record{RESET}      — Maps a domain to an IPv4 address (e.g., 93.184.216.34).")
     info(f"{BRIGHT}AAAA Record{RESET}   — Maps a domain to an IPv6 address.")
     info(f"{BRIGHT}MX Record{RESET}     — Specifies the mail server(s) for the domain.")
     info(f"{BRIGHT}NS Record{RESET}     — Identifies the authoritative name servers for the domain.")
+    print()
+    pace()
+
     info(f"{BRIGHT}TXT Record{RESET}    — Holds arbitrary text; commonly used for SPF, DKIM, and domain verification.")
     info(f"{BRIGHT}CNAME Record{RESET}  — An alias that points one domain name to another.")
     info(f"{BRIGHT}SOA Record{RESET}    — Start of Authority — administrative information about the zone.")
     print()
+    pace()
 
     lesson_block(
         "During reconnaissance, each record type reveals different things. "
         "MX records tell you which email provider a company uses. TXT records "
-        "may expose SPF policies, third-party service verifications, or even "
-        "internal notes. NS records reveal the hosting infrastructure."
+        "may expose SPF policies or third-party service verifications."
     )
-    press_enter()
+    lesson_block(
+        "NS records reveal the hosting infrastructure."
+    )
+    pace()
 
     # ---------- Why it matters ----------
     why_it_matters(
         "A security assessor uses DNS lookups as the very first step of an "
         "engagement. Knowing the mail servers, hosting providers, and IP "
         "ranges of a target allows you to map the attack surface before "
-        "touching a single port. Defensively, auditing your own DNS records "
-        "helps ensure you have not leaked internal hostnames, left stale "
-        "records pointing to decommissioned servers, or misconfigured SPF "
-        "policies that allow email spoofing."
+        "touching a single port."
     )
-    press_enter()
+    pace()
+
+    lesson_block(
+        "Defensively, auditing your own DNS records helps ensure you have "
+        "not leaked internal hostnames, left stale records pointing to "
+        "decommissioned servers, or misconfigured SPF policies that allow "
+        "email spoofing."
+    )
+    nice_work("You now understand why DNS is the starting point for recon!")
+    pace()
 
     # ---------- Python code ----------
     sub_header("DNS Resolution in Python")
     lesson_block(
         "Python's built-in 'socket' module can perform basic DNS lookups "
-        "without any third-party libraries. The socket.getaddrinfo() function "
-        "returns address information for a given hostname, including IPv4 and "
-        "IPv6 addresses."
+        "without any third-party libraries."
     )
+    tip("You do not need to install anything extra to try this code.")
+    pace()
 
     code_block(
         """import socket
@@ -109,12 +133,14 @@ def resolve_domain(domain):
 for version, ip in resolve_domain("example.com"):
     print(f"  {version}: {ip}")""", "python"
     )
+    pace()
 
     lesson_block(
         "For more advanced lookups (MX, NS, TXT, SOA), you would typically "
         "use the 'dnspython' library (import dns.resolver). Here is an "
-        "example that queries multiple record types:"
+        "example that queries multiple record types."
     )
+    pace()
 
     code_block(
         """import dns.resolver
@@ -139,22 +165,28 @@ def dns_enum(domain):
 # Only run against domains you own
 dns_enum("yourdomain.com")""", "python"
     )
-    press_enter()
+    nice_work("You can now look up DNS records with Python -- great progress!")
+    pace()
 
     # ---------- What DNS reveals ----------
     sub_header("What DNS Reveals About a Target")
     lesson_block(
         "Even simple DNS lookups can expose a surprising amount of "
-        "information about an organization:"
+        "information about an organization."
     )
+    pace()
+
     info("IP ranges and hosting provider (cloud vs. on-premises).")
     info("Email infrastructure (Google Workspace, Microsoft 365, self-hosted).")
     info("Third-party services via TXT verification records.")
+    print()
+    pace()
+
     info("Internal naming conventions if hostnames are descriptive.")
     info("Geographic distribution if IPs map to multiple data centers.")
     info("Potential subdomain takeover targets if CNAME records point to decommissioned services.")
     print()
-    press_enter()
+    pace()
 
     # ---------- Real-world scenario ----------
     scenario_block(
@@ -166,18 +198,22 @@ dns_enum("yourdomain.com")""", "python"
         "the subdomain, and served a convincing phishing page at "
         "blog.company.com. Regular DNS audits would have caught the stale record."
     )
-    press_enter()
+    tip("Always clean up DNS records when you stop using a third-party service.")
+    pace()
 
     # ---------- Practice challenge ----------
     sub_header("Practice Challenge")
     lesson_block(
         "Write a Python script that takes a domain name as input and uses "
         "socket.getaddrinfo() to resolve it. Print each unique IP address "
-        "along with whether it is IPv4 or IPv6. Then add reverse DNS lookup "
-        "using socket.gethostbyaddr() for each IP."
+        "along with whether it is IPv4 or IPv6."
+    )
+    lesson_block(
+        "Then add reverse DNS lookup using socket.gethostbyaddr() for each IP."
     )
     hint_text("socket.gethostbyaddr(ip) returns (hostname, aliases, addresses).")
     hint_text("Wrap the reverse lookup in a try/except for socket.herror.")
+    pace()
 
     code_block(
         """import socket
@@ -224,52 +260,73 @@ def _lesson_whois(progress):
     lesson_id = "whois_queries"
 
     section_header("Lesson 2: WHOIS Queries")
+    learning_goal([
+        "Understand what WHOIS data is and where it comes from",
+        "Know what fields are in a WHOIS response and what they mean",
+        "Perform WHOIS lookups in Python",
+    ])
     disclaimer()
 
     # ---------- What is WHOIS ----------
     sub_header("What is WHOIS?")
     lesson_block(
         "WHOIS is a query/response protocol used to look up information about "
-        "the registered owner of a domain name or IP address block. When a "
-        "domain is registered, the registrar collects contact information and "
-        "publishes it (or a redacted version) in a WHOIS database."
+        "the registered owner of a domain name or IP address block."
     )
+    lesson_block(
+        "When a domain is registered, the registrar collects contact "
+        "information and publishes it (or a redacted version) in a WHOIS "
+        "database."
+    )
+    pace()
+
     lesson_block(
         "WHOIS data is maintained by domain registrars and Regional Internet "
         "Registries (RIRs) such as ARIN (North America), RIPE NCC (Europe), "
         "and APNIC (Asia-Pacific). Each registry operates its own WHOIS server."
     )
-    press_enter()
+    tip("You can try WHOIS lookups from the command line too: just type 'whois example.com' in a terminal.")
+    pace()
 
     # ---------- What WHOIS contains ----------
     sub_header("What WHOIS Data Contains")
     lesson_block(
         "A typical WHOIS response for a domain includes several categories "
-        "of information:"
+        "of information."
     )
+    pace()
+
     info(f"{BRIGHT}Registrant{RESET}     — The person or organization that registered the domain.")
     info(f"{BRIGHT}Admin Contact{RESET}  — Administrative contact for the domain.")
     info(f"{BRIGHT}Tech Contact{RESET}   — Technical contact responsible for DNS.")
     info(f"{BRIGHT}Registrar{RESET}      — The company through which the domain was registered.")
+    print()
+    pace()
+
     info(f"{BRIGHT}Name Servers{RESET}   — The authoritative DNS servers for the domain.")
     info(f"{BRIGHT}Creation Date{RESET}  — When the domain was first registered.")
     info(f"{BRIGHT}Expiration{RESET}     — When the registration expires.")
     info(f"{BRIGHT}Updated Date{RESET}   — When the record was last modified.")
     info(f"{BRIGHT}Status Codes{RESET}   — Domain status flags (clientTransferProhibited, etc.).")
     print()
-    press_enter()
+    pace()
 
     # ---------- Why it matters ----------
     why_it_matters(
         "WHOIS data helps security professionals identify who owns a domain, "
         "when it was created (newly created domains are often suspicious), and "
-        "what infrastructure supports it. Defenders can monitor WHOIS records "
-        "for their own domains to detect unauthorized transfers or expiration "
-        "risks. Attackers use WHOIS to map out an organization's digital "
-        "footprint, find related domains, and identify employee names and "
-        "email addresses for social engineering."
+        "what infrastructure supports it."
     )
-    press_enter()
+    pace()
+
+    lesson_block(
+        "Defenders can monitor WHOIS records for their own domains to detect "
+        "unauthorized transfers or expiration risks. Attackers use WHOIS to "
+        "map out an organization's digital footprint, find related domains, "
+        "and identify employee names and email addresses for social engineering."
+    )
+    nice_work("You understand what WHOIS data contains and why it matters!")
+    pace()
 
     # ---------- Privacy considerations ----------
     sub_header("Privacy Considerations")
@@ -277,24 +334,29 @@ def _lesson_whois(progress):
         "Since GDPR and similar privacy regulations took effect, many "
         "registrars now redact personal information from public WHOIS results. "
         "You will often see 'REDACTED FOR PRIVACY' in place of names, emails, "
-        "and phone numbers. Some registrars offer 'WHOIS privacy' or 'domain "
-        "privacy' services that replace registrant details with the proxy "
-        "service's information."
+        "and phone numbers."
+    )
+    pace()
+
+    lesson_block(
+        "Some registrars offer 'WHOIS privacy' or 'domain privacy' services "
+        "that replace registrant details with the proxy service's information."
     )
     lesson_block(
         "Even with redacted WHOIS data, you can still extract useful "
         "information: the registrar name, creation/expiration dates, name "
         "servers, and domain status codes are almost always visible."
     )
-    press_enter()
+    pace()
 
     # ---------- Python code ----------
     sub_header("Querying WHOIS in Python")
     lesson_block(
         "The 'python-whois' library provides a simple interface for WHOIS "
         "lookups. Below is an example that queries a domain and parses the "
-        "key fields from the response:"
+        "key fields from the response."
     )
+    pace()
 
     code_block(
         """import whois  # pip install python-whois
@@ -323,16 +385,19 @@ def whois_lookup(domain):
 # Only query domains you own or have permission to investigate
 whois_lookup("yourdomain.com")""", "python"
     )
-    press_enter()
+    pace()
 
     # ---------- Raw WHOIS parsing ----------
     sub_header("Parsing Raw WHOIS Responses")
     lesson_block(
         "Sometimes you need to parse raw WHOIS text yourself — for example, "
-        "when the python-whois library does not handle a particular TLD well. "
-        "WHOIS responses are plain text with 'Key: Value' lines. Here is a "
-        "simple parser:"
+        "when the python-whois library does not handle a particular TLD well."
     )
+    lesson_block(
+        "WHOIS responses are plain text with 'Key: Value' lines. Here is a "
+        "simple parser."
+    )
+    pace()
 
     code_block(
         """import subprocess
@@ -358,16 +423,20 @@ def raw_whois(domain):
         return {}
     except subprocess.TimeoutExpired:
         print("  WHOIS query timed out.")
-        return {}
+        return {}""", "python"
+    )
+    pace()
 
-# Example
+    code_block(
+        """# Example usage
 parsed = raw_whois("example.com")
 for key in ["registrar", "creation date", "name server"]:
     if key in parsed:
         for val in parsed[key]:
             print(f"  {key}: {val}")""", "python"
     )
-    press_enter()
+    nice_work("You can query WHOIS from Python in two different ways now!")
+    pace()
 
     # ---------- Real-world scenario ----------
     scenario_block(
@@ -379,18 +448,22 @@ for key in ["registrar", "creation date", "name server"]:
         "Monitoring WHOIS expiration dates for critical domains is a basic but "
         "essential defensive practice."
     )
-    press_enter()
+    tip("Set calendar reminders well before your domain expiration dates!")
+    pace()
 
     # ---------- Practice challenge ----------
     sub_header("Practice Challenge")
     lesson_block(
         "Write a Python script that performs a WHOIS lookup on a domain, "
-        "extracts the creation date and expiration date, calculates how many "
-        "days until expiration, and prints a warning if the domain expires "
-        "within 90 days."
+        "extracts the creation date and expiration date, and calculates how "
+        "many days until expiration."
+    )
+    lesson_block(
+        "Print a warning if the domain expires within 90 days."
     )
     hint_text("Use the 'whois' library and datetime.datetime for date math.")
     hint_text("creation_date and expiration_date may be lists; handle both cases.")
+    pace()
 
     code_block(
         """import whois
@@ -438,6 +511,11 @@ def _lesson_subdomain_enum(progress):
     lesson_id = "subdomain_enum"
 
     section_header("Lesson 3: Subdomain Enumeration")
+    learning_goal([
+        "Understand why subdomains are a big part of the attack surface",
+        "Learn three techniques for finding subdomains",
+        "Build a simple subdomain enumerator in Python",
+    ])
     disclaimer()
 
     # ---------- Introduction ----------
@@ -446,28 +524,33 @@ def _lesson_subdomain_enum(progress):
         "Subdomains are a critical part of an organization's attack surface. "
         "While the main domain (example.com) is typically well-secured, "
         "subdomains often host forgotten development servers, staging "
-        "environments, internal tools, or legacy applications that may not "
-        "receive the same level of security attention."
+        "environments, or legacy applications."
     )
+    pace()
+
     lesson_block(
         "Common subdomain examples include: mail.example.com, vpn.example.com, "
-        "dev.example.com, staging.example.com, api.example.com, "
-        "jenkins.example.com, jira.example.com, and admin.example.com. Each "
-        "of these represents a potential entry point for an attacker."
+        "dev.example.com, staging.example.com, api.example.com, and "
+        "admin.example.com. Each of these represents a potential entry point."
     )
-    press_enter()
+    tip("Subdomains are one of the first things a penetration tester looks for.")
+    pace()
 
     # ---------- Enumeration techniques ----------
     sub_header("Subdomain Enumeration Techniques")
     lesson_block(
-        "There are several approaches to discovering subdomains:"
+        "There are several approaches to discovering subdomains."
     )
+    pace()
 
     info(f"{BRIGHT}1. Brute-Force / Wordlist{RESET} — Try resolving common subdomain names "
          f"from a wordlist (admin, mail, vpn, dev, staging, etc.).")
     info(f"{BRIGHT}2. Certificate Transparency{RESET} — SSL certificates are logged in "
          f"public CT logs. Querying sites like crt.sh reveals subdomains that "
          f"have had certificates issued.")
+    print()
+    pace()
+
     info(f"{BRIGHT}3. DNS Zone Transfers{RESET} — If misconfigured, a DNS server may "
          f"return all records in a zone via AXFR queries. This is rare today "
          f"but still worth checking.")
@@ -476,26 +559,32 @@ def _lesson_subdomain_enum(progress):
     info(f"{BRIGHT}5. Passive DNS Databases{RESET} — Services like VirusTotal, "
          f"SecurityTrails, and Shodan aggregate historical DNS data.")
     print()
-    press_enter()
+    pace()
 
     # ---------- Why it matters ----------
     why_it_matters(
         "Subdomain enumeration is one of the highest-value reconnaissance "
         "activities. Forgotten subdomains running outdated software are one of "
-        "the most common initial access vectors in real-world breaches. By "
-        "enumerating your own subdomains regularly, you can identify shadow IT, "
-        "decommission unused services, and ensure every externally-facing "
-        "system meets your security standards."
+        "the most common initial access vectors in real-world breaches."
     )
-    press_enter()
+    pace()
+
+    lesson_block(
+        "By enumerating your own subdomains regularly, you can identify "
+        "shadow IT, decommission unused services, and ensure every "
+        "externally-facing system meets your security standards."
+    )
+    nice_work("You know the main techniques for finding subdomains!")
+    pace()
 
     # ---------- Wordlist-based enumeration ----------
     sub_header("Wordlist-Based Subdomain Enumeration")
     lesson_block(
         "The simplest enumeration technique is to take a list of common "
         "subdomain names and attempt to resolve each one. If DNS returns an "
-        "IP address, the subdomain exists. This is brute-force enumeration."
+        "IP address, the subdomain exists."
     )
+    pace()
 
     code_block(
         """import socket
@@ -507,9 +596,12 @@ COMMON_SUBDOMAINS = [
     "cdn", "media", "static", "docs", "wiki", "git", "jenkins",
     "jira", "confluence", "grafana", "monitor", "status", "beta",
     "internal", "intranet", "helpdesk", "support", "crm", "erp",
-]
+]""", "python"
+    )
+    pace()
 
-def enumerate_subdomains(domain, wordlist=None):
+    code_block(
+        """def enumerate_subdomains(domain, wordlist=None):
     \"\"\"Brute-force subdomain enumeration via DNS resolution.\"\"\"
     wordlist = wordlist or COMMON_SUBDOMAINS
     found = []
@@ -528,16 +620,20 @@ def enumerate_subdomains(domain, wordlist=None):
 # ONLY run against domains you own!
 # enumerate_subdomains("yourdomain.com")""", "python"
     )
-    press_enter()
+    pace()
 
     # ---------- Certificate Transparency ----------
     sub_header("Certificate Transparency Lookup")
     lesson_block(
         "Certificate Transparency (CT) logs are public records of SSL/TLS "
         "certificates. When a certificate authority issues a certificate, it "
-        "is logged. We can query these logs to find subdomains that have been "
-        "issued certificates — even internal ones."
+        "is logged."
     )
+    lesson_block(
+        "We can query these logs to find subdomains that have been issued "
+        "certificates — even internal ones."
+    )
+    pace()
 
     code_block(
         """import requests
@@ -567,7 +663,8 @@ def ct_subdomain_search(domain):
 # ONLY use on domains you own
 # ct_subdomain_search("yourdomain.com")""", "python"
     )
-    press_enter()
+    nice_work("Two enumeration methods down -- you are building a solid toolkit!")
+    pace()
 
     # ---------- Zone transfer check ----------
     sub_header("DNS Zone Transfer Check")
@@ -575,8 +672,10 @@ def ct_subdomain_search(domain):
         "A DNS zone transfer (AXFR) is a mechanism for replicating DNS "
         "databases between servers. If a DNS server is misconfigured to allow "
         "zone transfers to anyone, an attacker can obtain every DNS record in "
-        "the zone — a complete inventory of subdomains."
+        "the zone."
     )
+    tip("Zone transfer misconfigurations are rare these days, but still worth checking on your own domains.")
+    pace()
 
     code_block(
         """import dns.zone
@@ -609,7 +708,7 @@ def attempt_zone_transfer(domain):
 # ONLY test on your own domains
 # attempt_zone_transfer("yourdomain.com")""", "python"
     )
-    press_enter()
+    pace()
 
     # ---------- Real-world scenario ----------
     scenario_block(
@@ -621,19 +720,22 @@ def attempt_zone_transfer(domain):
         "access within minutes. The staging server had been set up two years "
         "prior for a demo and was never decommissioned."
     )
-    press_enter()
+    pace()
 
     # ---------- Practice challenge ----------
     sub_header("Practice Challenge")
     lesson_block(
         "Build a combined subdomain enumerator that: (1) performs wordlist-"
-        "based brute forcing using DNS resolution, (2) queries crt.sh for "
-        "Certificate Transparency data, and (3) merges the results into a "
-        "single deduplicated list sorted alphabetically. Include a flag to "
-        "write results to a file."
+        "based brute forcing using DNS resolution, and (2) queries crt.sh for "
+        "Certificate Transparency data."
+    )
+    lesson_block(
+        "Merge the results into a single deduplicated list sorted "
+        "alphabetically. Include a flag to write results to a file."
     )
     hint_text("Use a set() to merge results from both techniques.")
     hint_text("Use argparse for the domain input and optional --output flag.")
+    pace()
 
     code_block(
         """import socket
@@ -665,9 +767,12 @@ def ct_search(domain):
                     found.add(name)
     except Exception:
         pass
-    return found
+    return found""", "python"
+    )
+    pace()
 
-def main():
+    code_block(
+        """def main():
     parser = argparse.ArgumentParser(description="Subdomain enumerator")
     parser.add_argument("domain", help="Target domain (you must own it)")
     parser.add_argument("--output", "-o", help="Output file path")
@@ -706,6 +811,11 @@ def _lesson_google_dorking(progress):
     lesson_id = "google_dorking"
 
     section_header("Lesson 4: Google Dorking Theory")
+    learning_goal([
+        "Understand what Google Dorking is and why it works",
+        "Learn the essential search operators",
+        "Know how to defend against accidental data exposure",
+    ])
     disclaimer()
 
     # ---------- Introduction ----------
@@ -713,17 +823,20 @@ def _lesson_google_dorking(progress):
     lesson_block(
         "Google Dorking (also called Google Hacking) is the practice of using "
         "advanced search engine operators to find information that is publicly "
-        "indexed but not easily discoverable through normal searches. These "
-        "operators filter results by domain, URL path, file type, page title, "
-        "and more."
+        "indexed but not easily discoverable through normal searches."
     )
+    pace()
+
     lesson_block(
         "Google Dorking is not 'hacking' Google itself — it simply leverages "
         "the search engine's own features to find data that website owners may "
-        "not have intended to be publicly accessible. The information was "
-        "already public; the dork just makes it findable."
+        "not have intended to be publicly accessible."
     )
-    press_enter()
+    lesson_block(
+        "The information was already public; the dork just makes it findable."
+    )
+    tip("Think of it like using a library's advanced search to find a specific book -- the book was always there.")
+    pace()
 
     # ---------- Search operators ----------
     sub_header("Essential Search Operators")
@@ -737,6 +850,8 @@ def _lesson_google_dorking(progress):
     info(f"{BRIGHT}intitle:{RESET}    — Find pages with a specific string in the title.")
     info(f"  Example: intitle:\"login page\"")
     print()
+    pace()
+
     info(f"{BRIGHT}filetype:{RESET}   — Find specific file types.")
     info(f"  Example: filetype:pdf site:example.com")
     print()
@@ -746,21 +861,25 @@ def _lesson_google_dorking(progress):
     info(f"{BRIGHT}cache:{RESET}      — View Google's cached version of a page.")
     info(f"  Example: cache:example.com/page")
     print()
+    pace()
+
     info(f"{BRIGHT}ext:{RESET}        — Alias for filetype.")
     info(f"  Example: ext:sql site:example.com")
     print()
     info(f"{BRIGHT}- (minus){RESET}   — Exclude results matching a term.")
     info(f"  Example: site:example.com -www")
     print()
-    press_enter()
+    nice_work("You now know the core search operators -- these are powerful tools!")
+    pace()
 
     # ---------- Attacker use cases ----------
     sub_header("How Attackers Use Search Engines")
     lesson_block(
         "Attackers combine these operators to find sensitive data that has been "
         "accidentally exposed. Here are common patterns (shown for educational "
-        "awareness so you can defend against them):"
+        "awareness so you can defend against them)."
     )
+    pace()
 
     info(f"{BRIGHT}Finding login pages:{RESET}")
     info(f"  site:example.com inurl:login OR inurl:admin OR inurl:signin")
@@ -771,6 +890,8 @@ def _lesson_google_dorking(progress):
     info(f"{BRIGHT}Finding database dumps:{RESET}")
     info(f"  site:example.com filetype:sql OR filetype:bak OR filetype:dump")
     print()
+    pace()
+
     info(f"{BRIGHT}Finding directory listings:{RESET}")
     info(f"  site:example.com intitle:\"index of /\"")
     print()
@@ -783,26 +904,34 @@ def _lesson_google_dorking(progress):
 
     warning("These examples are for DEFENSIVE awareness only. Never use dorks "
             "to access data you are not authorized to view.")
-    press_enter()
+    pace()
 
     # ---------- Why it matters ----------
     why_it_matters(
         "Organizations frequently leak sensitive information without realizing "
         "it is being indexed by search engines. Configuration files, database "
-        "backups, internal documents, API keys embedded in JavaScript files, "
-        "and employee directories can all end up in search results. Running "
-        "Google Dorks against your own domain is one of the simplest and most "
-        "effective ways to discover accidental exposures before an attacker does."
+        "backups, API keys, and employee directories can all end up in search "
+        "results."
     )
-    press_enter()
+    pace()
+
+    lesson_block(
+        "Running Google Dorks against your own domain is one of the simplest "
+        "and most effective ways to discover accidental exposures before an "
+        "attacker does."
+    )
+    nice_work("You understand both the offensive and defensive sides of dorking!")
+    pace()
 
     # ---------- The Google Hacking Database ----------
     sub_header("The Google Hacking Database (GHDB)")
     lesson_block(
         "The Google Hacking Database (GHDB), maintained by Offensive Security "
         "at exploit-db.com, is a collection of thousands of documented Google "
-        "dorks organized by category. Categories include:"
+        "dorks organized by category."
     )
+    pace()
+
     info("Sensitive directories and files")
     info("Error messages revealing server information")
     info("Files containing usernames and passwords")
@@ -811,19 +940,22 @@ def _lesson_google_dorking(progress):
     info("Pages containing login portals")
     info("Web server detection queries")
     print()
+    pace()
+
     lesson_block(
         "Security teams should periodically review the GHDB for new dorks "
         "relevant to their technology stack and test them against their own "
         "domains."
     )
-    press_enter()
+    pace()
 
     # ---------- Defensive measures ----------
     sub_header("Defensive Measures Against Google Dorking")
     lesson_block(
         "Protecting your organization from information exposure via search "
-        "engines requires multiple layers of defense:"
+        "engines requires multiple layers of defense."
     )
+    pace()
 
     info(f"{BRIGHT}1. robots.txt{RESET} — Use the Robots Exclusion Protocol to tell search "
          f"engine crawlers not to index sensitive directories. Note: this is a "
@@ -832,6 +964,9 @@ def _lesson_google_dorking(progress):
          f"pages you do not want indexed.")
     info(f"{BRIGHT}3. Authentication{RESET} — Require authentication for all sensitive pages. "
          f"Search engines cannot index what they cannot access.")
+    print()
+    pace()
+
     info(f"{BRIGHT}4. Access Controls{RESET} — Use firewalls and network rules to restrict "
          f"access to internal tools and staging environments.")
     info(f"{BRIGHT}5. Regular Auditing{RESET} — Periodically run Google dorks against your "
@@ -841,15 +976,17 @@ def _lesson_google_dorking(progress):
     info(f"{BRIGHT}7. .htaccess / Server Config{RESET} — Configure your web server to "
          f"return 403 Forbidden for sensitive file types (.env, .sql, .bak).")
     print()
-    press_enter()
+    tip("The most reliable defense is authentication -- if a page requires a login, search engines cannot index it.")
+    pace()
 
     # ---------- Building a dork scanner ----------
     sub_header("Building a Dork Awareness Scanner")
     lesson_block(
         "While we should not automate Google searches (it violates their ToS), "
         "we can build a tool that generates relevant dorks for a given domain "
-        "so a security analyst can manually review them:"
+        "so a security analyst can manually review them."
     )
+    pace()
 
     code_block(
         """def generate_dorks(domain):
@@ -869,6 +1006,13 @@ def _lesson_google_dorking(progress):
         f'site:{domain} inurl:admin',
         f'site:{domain} inurl:dashboard',
         f'site:{domain} intitle:"admin" OR intitle:"login"',
+    ]""", "python"
+    )
+    pace()
+
+    code_block(
+        """    # (continued from above)
+    dorks += [
         # Directory listings
         f'site:{domain} intitle:"index of /"',
         f'site:{domain} intitle:"directory listing"',
@@ -890,7 +1034,8 @@ def _lesson_google_dorking(progress):
 # Generate dorks for your own domain only
 # generate_dorks("yourdomain.com")""", "python"
     )
-    press_enter()
+    nice_work("You can now generate a full set of recon dorks for any domain!")
+    pace()
 
     # ---------- Real-world scenario ----------
     scenario_block(
@@ -903,18 +1048,22 @@ def _lesson_google_dorking(progress):
         "accessed the production database. Proper .htaccess rules blocking "
         "access to dotfiles would have prevented the exposure."
     )
-    press_enter()
+    pace()
 
     # ---------- Practice challenge ----------
     sub_header("Practice Challenge")
     lesson_block(
         "Create a Python script that: (1) accepts a domain as input, "
         "(2) generates a comprehensive list of Google dorks organized by "
-        "category, (3) outputs them to a text file, and (4) also checks "
-        "whether the domain's robots.txt file disallows sensitive paths."
+        "category, and (3) outputs them to a text file."
+    )
+    lesson_block(
+        "Also check whether the domain's robots.txt file disallows "
+        "sensitive paths."
     )
     hint_text("Use requests to fetch https://domain/robots.txt and parse Disallow lines.")
     hint_text("Compare the disallowed paths against common sensitive paths.")
+    pace()
 
     code_block(
         """import requests
@@ -937,8 +1086,12 @@ def check_robots_txt(domain):
                 if line.lower().startswith("disallow:"):
                     path = line.split(":", 1)[1].strip()
                     disallowed.append(path)
-                    print(f"    Disallow: {path}")
+                    print(f"    Disallow: {path}")""", "python"
+    )
+    pace()
 
+    code_block(
+        """            # (continued from above)
             print(f"\\n  Checking for missing protections:")
             for sensitive in sensitive_paths:
                 if not any(sensitive.startswith(d) or d == "/"

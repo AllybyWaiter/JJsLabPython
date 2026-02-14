@@ -7,7 +7,8 @@ from a security perspective. Builds practical tools alongside the theory.
 from utils.display import (
     section_header, sub_header, lesson_block, code_block,
     scenario_block, why_it_matters, info, success, warning, press_enter,
-    show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM
+    show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM,
+    pace, learning_goal, nice_work, tip
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
@@ -25,23 +26,35 @@ MODULE_KEY = "module2"
 def lesson_tcp_udp(progress):
     section_header("Lesson 1: TCP/UDP Deep Dive")
 
+    learning_goal([
+        "Understand the TCP three-way handshake step by step",
+        "Know the key differences between TCP and UDP",
+        "Recognize common port numbers and their services",
+        "See how TCP connection states relate to security work",
+    ])
+
     lesson_block(
-        "Every network interaction you will ever analyze, attack, or defend involves "
-        "either TCP or UDP at the transport layer. These two protocols ride on top "
-        "of IP (Internet Protocol) and serve fundamentally different purposes. "
-        "Understanding their mechanics at a deep level is not optional for security "
-        "professionals — it is the foundation everything else is built on."
+        "Every network interaction you will ever analyze, attack, or "
+        "defend involves either TCP or UDP at the transport layer. "
+        "Understanding their mechanics is the foundation everything "
+        "else is built on."
+    )
+
+    pace()
+
+    lesson_block(
+        "TCP (Transmission Control Protocol) is connection-oriented. "
+        "Before any data flows, TCP establishes a connection using a "
+        "three-way handshake."
     )
 
     lesson_block(
-        "TCP (Transmission Control Protocol) is a connection-oriented protocol. "
-        "Before any data flows, TCP establishes a connection using a three-way "
-        "handshake. The client sends a SYN (synchronize) packet to the server. "
-        "The server responds with a SYN-ACK (synchronize-acknowledge). The client "
-        "completes the handshake with an ACK (acknowledge). Only then can data "
-        "flow. This handshake ensures both sides are ready and agree on initial "
-        "sequence numbers used to track data ordering."
+        "The client sends a SYN packet. The server responds with a "
+        "SYN-ACK. The client completes with an ACK. Only then can "
+        "data flow. This ensures both sides are ready."
     )
+
+    pace()
 
     sub_header("The TCP Three-Way Handshake")
     code_block("""\
@@ -67,22 +80,29 @@ sock.connect(("example.com", 80))   # SYN -> SYN-ACK -> ACK happens here
 sock.sendall(b"Hello")               # Data flows on the established connection
 sock.close()                          # FIN -> ACK -> FIN -> ACK tears it down""", language="text")
 
-    lesson_block(
-        "After the handshake, TCP provides several guarantees: all data arrives "
-        "(it retransmits lost packets), data arrives in order (sequence numbers "
-        "track position), data is not corrupted (checksums verify integrity), and "
-        "flow control prevents the sender from overwhelming the receiver (the "
-        "receive window). TCP also provides congestion control to avoid overwhelming "
-        "the network itself."
-    )
+    tip("Every time you call sock.connect(), the three-way handshake happens automatically. Python hides this complexity for you.")
+
+    pace()
 
     lesson_block(
-        "TCP connections are terminated with a four-way process. Either side can "
-        "initiate by sending a FIN (finish) packet. The other side acknowledges "
-        "with an ACK, then sends its own FIN, which gets acknowledged. This "
-        "ensures both sides have finished transmitting. If something goes wrong, "
-        "a RST (reset) packet abruptly terminates the connection."
+        "After the handshake, TCP guarantees: all data arrives (lost "
+        "packets are retransmitted), data arrives in order (sequence "
+        "numbers track position), and data is not corrupted (checksums "
+        "verify integrity)."
     )
+
+    pace()
+
+    lesson_block(
+        "TCP connections end with a four-way process. Either side "
+        "sends a FIN packet, the other ACKs it, then sends its own "
+        "FIN, which gets ACKed. A RST packet can abruptly terminate "
+        "a connection if something goes wrong."
+    )
+
+    pace()
+
+    nice_work("You now understand the TCP lifecycle from start to finish. This knowledge is essential for understanding port scanning.")
 
     sub_header("TCP Connection States")
     code_block("""\
@@ -103,14 +123,21 @@ sock.close()                          # FIN -> ACK -> FIN -> ACK tears it down""
 # macOS:   netstat -an -p tcp
 # Windows: netstat -an -p tcp""", language="text")
 
+    pace()
+
     lesson_block(
-        "UDP (User Datagram Protocol) is the opposite of TCP in many ways. It is "
-        "connectionless — there is no handshake. Each packet (called a datagram) is "
-        "independent and self-contained. UDP provides no guarantees: packets can "
-        "arrive out of order, be duplicated, or be lost entirely. There is no flow "
-        "control or congestion control. This sounds terrible, but the trade-off is "
-        "speed and simplicity."
+        "UDP (User Datagram Protocol) is the opposite of TCP. It is "
+        "connectionless — no handshake, no guarantees. Each packet "
+        "(datagram) is independent."
     )
+
+    lesson_block(
+        "Packets can arrive out of order, be duplicated, or get lost. "
+        "But the trade-off is speed and simplicity. DNS, DHCP, and "
+        "VoIP all use UDP."
+    )
+
+    pace()
 
     sub_header("TCP vs UDP Comparison")
     code_block("""\
@@ -127,15 +154,19 @@ sock.close()                          # FIN -> ACK -> FIN -> ACK tears it down""
 # │ Flooding attacks    │ SYN flood        │ UDP flood        │
 # └─────────────────────┴──────────────────┴──────────────────┘""", language="text")
 
+    pace()
+
+    nice_work("Great job understanding TCP vs UDP. Keep this comparison in mind as we build scanning tools later.")
+
     sub_header("Port Numbers and Services")
     lesson_block(
-        "Port numbers range from 0 to 65535 and are divided into three ranges. "
-        "Well-known ports (0-1023) are assigned to standard services — HTTP is 80, "
-        "HTTPS is 443, SSH is 22, DNS is 53. These typically require root/admin "
-        "privileges to bind to. Registered ports (1024-49151) are used by "
-        "applications that register with IANA. Dynamic/ephemeral ports (49152-65535) "
-        "are used by client programs for outbound connections."
+        "Port numbers range from 0 to 65535. Well-known ports (0-1023) "
+        "are for standard services like HTTP (80) and SSH (22). "
+        "Registered ports (1024-49151) are for applications. "
+        "Ephemeral ports (49152-65535) are for client connections."
     )
+
+    pace()
 
     code_block("""\
 # Common ports every security professional must know:
@@ -164,7 +195,17 @@ sock.close()                          # FIN -> ACK -> FIN -> ACK tears it down""
 #8080   TCP       HTTP-Alt        Alternative web server port
 #8443   TCP       HTTPS-Alt       Alternative HTTPS port""", language="text")
 
+    tip("You do not need to memorize all of these at once. Focus on ports 22, 80, 443, 445, and 3389 first -- those are the ones you will see most often.")
+
+    pace()
+
     sub_header("What Happens During a Connection — Packet by Packet")
+
+    lesson_block(
+        "Let's trace exactly what happens at the network level when "
+        "Python opens a socket connection."
+    )
+
     code_block("""\
 import socket
 
@@ -179,8 +220,11 @@ sock.connect(("93.184.216.34", 80))
 #    - SYN packet sent to 93.184.216.34:80
 #    - SYN-ACK received from server
 #    - ACK sent to server
-#    - connect() returns — connection is ESTABLISHED
+#    - connect() returns — connection is ESTABLISHED""")
 
+    pace()
+
+    code_block("""\
 sock.sendall(b"GET / HTTP/1.1\\r\\nHost: example.com\\r\\n\\r\\n")
 # 3. sendall() triggers:
 #    - Data packed into TCP segment(s)
@@ -202,6 +246,8 @@ sock.close()
 #    - ACK sent to server
 #    - Socket enters TIME_WAIT state""")
 
+    pace()
+
     why_it_matters(
         "Understanding TCP/UDP at this level is critical for security work. SYN scans "
         "exploit the handshake to detect open ports without completing connections. "
@@ -211,6 +257,8 @@ sock.close()
         "captures and understanding exactly what happened at each step. Without this "
         "knowledge, you are just running tools without understanding their output."
     )
+
+    pace()
 
     scenario_block("SYN Flood Attack Investigation", (
         "Your monitoring system alerts on high CPU usage on the web server. Running "
@@ -222,6 +270,8 @@ sock.close()
         "users cannot connect. Your knowledge of the TCP handshake lets you "
         "immediately identify the attack type and apply SYN cookies as a mitigation."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -312,30 +362,44 @@ if tcp_time and udp_time:
 def lesson_port_scanner(progress):
     section_header("Lesson 2: Building a Port Scanner")
 
+    learning_goal([
+        "Understand TCP connect scanning and what the results mean",
+        "Build a port scanner from scratch, step by step",
+        "Use threading to scan hundreds of ports in seconds",
+        "Add a command-line interface for flexibility",
+    ])
+
     lesson_block(
-        "A port scanner is the most fundamental tool in a security professional's "
-        "toolkit. It discovers which network services are running on a target system "
-        "by probing ports and analyzing the responses. When you understand how to "
-        "build one from scratch, you truly understand what tools like nmap are doing "
-        "under the hood — and you can customize the behavior for your exact needs."
+        "A port scanner is the most fundamental tool in a security "
+        "professional's toolkit. It discovers which services are "
+        "running on a target by probing ports and analyzing responses."
     )
 
     lesson_block(
-        "The simplest scanning technique is the TCP connect scan. For each port, you "
-        "attempt a full TCP connection (the three-way handshake). If the connection "
-        "succeeds (you receive a SYN-ACK and complete with ACK), the port is open. "
-        "If you receive a RST (reset) packet, the port is closed. If there is no "
-        "response at all (timeout), the port is filtered — likely blocked by a "
-        "firewall."
+        "When you understand how to build one from scratch, you truly "
+        "understand what tools like nmap are doing under the hood."
     )
 
+    pace()
+
     lesson_block(
-        "The main downside of TCP connect scanning is speed. Each probe waits for "
-        "either a connection or a timeout. With a 2-second timeout, scanning 65,535 "
-        "ports sequentially would take over 36 hours. This is why threading is "
-        "essential — by scanning many ports in parallel, we can reduce this to "
-        "minutes. Python's concurrent.futures module makes this straightforward."
+        "The simplest technique is the TCP connect scan. For each port, "
+        "you attempt a full TCP connection. If it succeeds, the port "
+        "is open. If you get a RST, it is closed. No response means "
+        "it is filtered (probably by a firewall)."
     )
+
+    pace()
+
+    lesson_block(
+        "The main downside is speed. With a 2-second timeout, scanning "
+        "65,535 ports sequentially would take over 36 hours. Threading "
+        "is essential — we will add it in step 3."
+    )
+
+    tip("Start with a small set of common ports when testing your scanner. Scale up once it works.")
+
+    pace()
 
     why_it_matters(
         "Port scanning is the first phase of almost every security assessment. It "
@@ -345,6 +409,8 @@ def lesson_port_scanner(progress):
         "port is a potential attack surface. Knowing how to scan quickly and interpret "
         "results accurately is a non-negotiable skill."
     )
+
+    pace()
 
     sub_header("Step 1: Basic Single-Port Check")
     code_block("""\
@@ -373,13 +439,20 @@ def check_port(host, port, timeout=1.5):
 status = check_port("127.0.0.1", 80)
 print(f"Port 80: {status}")""")
 
+    pace()
+
     lesson_block(
-        "Notice we use connect_ex() instead of connect(). The key difference is "
-        "that connect_ex() returns an error code instead of raising an exception — "
-        "0 means success (port open), any other value means failure. This is more "
-        "efficient than catching exceptions for every closed port, especially when "
-        "scanning thousands of ports."
+        "We use connect_ex() instead of connect(). The difference: "
+        "connect_ex() returns an error code (0 = success) instead of "
+        "raising an exception. This is more efficient when scanning "
+        "thousands of ports."
     )
+
+    tip("connect_ex() returning 0 means the port is open. Any other value means closed or error.")
+
+    pace()
+
+    nice_work("You have a working single-port checker. Now let's build a full scanner.")
 
     sub_header("Step 2: Sequential Scanner (Slow but Simple)")
     code_block("""\
@@ -415,7 +488,15 @@ common_ports = [21, 22, 23, 25, 53, 80, 110, 135, 139, 143,
                 443, 445, 993, 995, 1433, 3306, 3389, 5432, 8080, 8443]
 sequential_scan("127.0.0.1", common_ports)""")
 
+    pace()
+
     sub_header("Step 3: Threaded Scanner (Fast)")
+
+    lesson_block(
+        "Now let's make it fast with threading. Python's "
+        "concurrent.futures module makes this straightforward."
+    )
+
     code_block("""\
 import socket
 import time
@@ -479,14 +560,23 @@ def threaded_scan(host, ports, timeout=1.0, max_workers=100):
 # Example: scan top 1024 ports quickly
 threaded_scan("127.0.0.1", range(1, 1025), timeout=0.5, max_workers=200)""")
 
+    pace()
+
     lesson_block(
-        "The threaded scanner is dramatically faster. Scanning 1024 ports with a "
-        "0.5-second timeout could take 512 seconds sequentially. With 200 threads, "
-        "the same scan takes about 3 seconds — a 170x speedup. However, be careful "
-        "with thread count. Too many threads can overwhelm the target or your own "
-        "system. Start with 100-200 for local networks, reduce to 20-50 for remote "
-        "targets to avoid detection and rate-limiting."
+        "The threaded scanner is dramatically faster. Scanning 1024 "
+        "ports sequentially could take 512 seconds. With 200 threads, "
+        "the same scan takes about 3 seconds."
     )
+
+    lesson_block(
+        "Be careful with thread count. Start with 100-200 for local "
+        "networks, and reduce to 20-50 for remote targets to avoid "
+        "detection and rate-limiting."
+    )
+
+    pace()
+
+    nice_work("You just built a fast, threaded port scanner. This is a tool you will actually use in real work.")
 
     sub_header("Step 4: Adding a Command-Line Interface")
     code_block("""\
@@ -526,6 +616,8 @@ def main():
 if __name__ == "__main__":
     main()""")
 
+    pace()
+
     sub_header("Interpreting Scan Results")
     code_block("""\
 # What the results mean:
@@ -550,6 +642,8 @@ if __name__ == "__main__":
 # Port 3306 open   — MySQL exposed to network (should be localhost only)
 # Port 3389 open   — RDP exposed (check for BlueKeep, brute force)""", language="text")
 
+    pace()
+
     scenario_block("Discovering Shadow IT", (
         "During a quarterly security assessment, you scan the company's IP range and "
         "discover a machine at 10.0.5.47 with ports 80, 22, and 3306 open. This "
@@ -559,6 +653,8 @@ if __name__ == "__main__":
         "database contained a copy of customer records for 'testing.' Your port "
         "scan caught this shadow IT before an attacker could exploit it."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -613,8 +709,11 @@ class PortScanner:
             print(f"\\r  Progress: {pct:.0f}% ({self.scanned}/{self.total})",
                   end="", flush=True)
 
-        return {"port": port, "status": status}
+        return {"port": port, "status": status}""")
 
+        pace()
+
+        code_block("""\
     def scan(self):
         ip = socket.gethostbyname(self.host)
         start = time.time()
@@ -670,31 +769,40 @@ scanner.save_json("scan_results.json")""")
 def lesson_banner_grabbing(progress):
     section_header("Lesson 3: Banner Grabbing")
 
-    lesson_block(
-        "After discovering open ports, the next step is to identify what software "
-        "is running on them. Many network services announce themselves by sending a "
-        "banner — a text string that often includes the software name, version number, "
-        "and sometimes the operating system. This is called banner grabbing, and it is "
-        "one of the most valuable reconnaissance techniques available."
-    )
+    learning_goal([
+        "Understand passive vs active banner grabbing techniques",
+        "Grab service banners from open ports using Python",
+        "Enumerate HTTP services through header analysis",
+        "Check banners against known vulnerable versions",
+    ])
 
     lesson_block(
-        "Banner grabbing works because many protocols are designed to send an "
-        "identification string when a client connects. SSH servers send their version "
-        "string immediately upon connection (e.g., 'SSH-2.0-OpenSSH_8.9p1'). FTP "
-        "servers send a welcome message with the server software name. SMTP servers "
-        "announce themselves with a 220 greeting line. HTTP servers include a Server "
-        "header in responses. Even when administrators try to hide version info, "
-        "behavioral analysis can often fingerprint the software."
+        "After discovering open ports, the next step is to identify "
+        "what software is running on them. Many services announce "
+        "themselves by sending a banner with the software name and "
+        "version. This is called banner grabbing."
     )
 
+    pace()
+
     lesson_block(
-        "There are two types of banner grabbing. Passive banner grabbing reads "
-        "whatever the server sends upon connection without sending any data. Active "
-        "banner grabbing sends a request (like an HTTP GET) and analyzes the "
-        "response headers and content. Both techniques are valuable and used in "
-        "combination for thorough enumeration."
+        "Banner grabbing works because many protocols send an ID "
+        "string when a client connects. SSH servers send their version "
+        "immediately (e.g., 'SSH-2.0-OpenSSH_8.9p1'). FTP servers "
+        "send a welcome message. SMTP servers announce with a 220 line."
     )
+
+    pace()
+
+    lesson_block(
+        "There are two types. Passive banner grabbing reads whatever "
+        "the server sends on its own. Active banner grabbing sends a "
+        "request (like an HTTP GET) to trigger a response."
+    )
+
+    tip("Always try passive grabbing first. Some services will give you their version without you asking.")
+
+    pace()
 
     why_it_matters(
         "Knowing the exact software and version running on a port is critical for "
@@ -705,6 +813,8 @@ def lesson_banner_grabbing(progress):
         "attention and cross-reference against vulnerability databases like CVE and "
         "NVD. It is also a finding in itself — version disclosure helps attackers."
     )
+
+    pace()
 
     sub_header("Passive Banner Grabbing — Just Connect and Listen")
     code_block("""\
@@ -734,6 +844,10 @@ for port in banner_ports:
     else:
         print(f"  {port:>5}/tcp: (no banner)")""")
 
+    pace()
+
+    nice_work("Passive banner grabbing is simple and effective. Many services willingly tell you exactly what they are.")
+
     sub_header("Active Banner Grabbing — Send a Request")
     code_block("""\
 import socket
@@ -762,8 +876,11 @@ def active_grab(host, port, probe=b"\\r\\n", timeout=3):
 
             return (initial + response).decode("utf-8", errors="replace").strip()
     except (ConnectionRefusedError, OSError):
-        return None
+        return None""")
 
+    pace()
+
+    code_block("""\
 # Different probes for different services
 probes = {
     "HTTP":  b"HEAD / HTTP/1.1\\r\\nHost: target\\r\\n\\r\\n",
@@ -777,7 +894,16 @@ banner = active_grab("example.com", 80, probes["HTTP"])
 if banner:
     print(f"HTTP Response:\\n{banner[:300]}")""")
 
+    pace()
+
     sub_header("HTTP Header Enumeration")
+
+    lesson_block(
+        "HTTP services reveal a lot through their headers. The Server "
+        "header, X-Powered-By, and even cookie names can identify the "
+        "technology stack."
+    )
+
     code_block("""\
 import requests
 
@@ -804,8 +930,11 @@ def enumerate_http_service(url, timeout=5):
 
         # PHP version (sometimes in X-Powered-By)
         if "PHP" in powered_by:
-            findings.append(("PHP Detected", powered_by))
+            findings.append(("PHP Detected", powered_by))""")
 
+    pace()
+
+    code_block("""\
         # Framework clues from cookies
         cookies = resp.headers.get("Set-Cookie", "")
         if "JSESSIONID" in cookies:
@@ -838,6 +967,12 @@ print("HTTP Service Enumeration:")
 for label, value in results:
     print(f"  {label:>20}: {value}")""")
 
+    tip("Cookie names are a great fingerprinting technique. JSESSIONID = Java, PHPSESSID = PHP, csrftoken = Django.")
+
+    pace()
+
+    nice_work("HTTP header analysis is a rich source of information. You can often identify the entire tech stack from headers alone.")
+
     sub_header("Building a Multi-Port Banner Grabber")
     code_block("""\
 import socket
@@ -855,8 +990,11 @@ SERVICE_PROBES = {
     3306:(b"\\r\\n", "MySQL"),
     5432:(b"\\r\\n", "PostgreSQL"),
     8080:(b"HEAD / HTTP/1.0\\r\\nHost: target\\r\\n\\r\\n", "HTTP-Alt"),
-}
+}""")
 
+    pace()
+
+    code_block("""\
 def banner_scan(host, port, timeout=3):
     \"\"\"Grab banner from a specific port with an appropriate probe.\"\"\"
     probe, service_name = SERVICE_PROBES.get(port, (b"\\r\\n", "unknown"))
@@ -896,8 +1034,11 @@ def banner_scan(host, port, timeout=3):
 
     except (ConnectionRefusedError, socket.timeout, OSError):
         return {"port": port, "service": service_name,
-                "banner": "", "status": "closed/filtered"}
+                "banner": "", "status": "closed/filtered"}""")
 
+    pace()
+
+    code_block("""\
 def full_banner_scan(host, ports=None, workers=20):
     \"\"\"Scan multiple ports and grab banners.\"\"\"
     if ports is None:
@@ -919,6 +1060,8 @@ def full_banner_scan(host, ports=None, workers=20):
 
 # Run it
 results = full_banner_scan("127.0.0.1")""")
+
+    pace()
 
     sub_header("Analyzing Banners for Vulnerabilities")
     code_block("""\
@@ -966,6 +1109,8 @@ banner = "SSH-2.0-OpenSSH_7.4"
 for finding in analyze_banner(banner, 22):
     print(f"  {finding}")""")
 
+    pace()
+
     scenario_block("Version-Based Exploitation", (
         "Your port scan reveals port 80 open on a target. Banner grabbing shows "
         "'Apache/2.4.49 (Unix)'. You immediately recognize this version as vulnerable "
@@ -975,6 +1120,8 @@ for finding in analyze_banner(banner, 22):
         "banner grabbing is one of the first things you do after port scanning — it "
         "instantly narrows your focus to the most impactful vulnerabilities."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -1013,8 +1160,11 @@ def vuln_check(banner):
     for pattern, cves in KNOWN_VULNS.items():
         if pattern in banner:
             vulns_found.extend(cves)
-    return vulns_found
+    return vulns_found""")
 
+        pace()
+
+        code_block("""\
 def full_enumeration(host, ports):
     results = []
     for port in ports:
@@ -1064,34 +1214,41 @@ full_enumeration("127.0.0.1", [22, 80, 21, 443, 8080])""")
 def lesson_network_mapping(progress):
     section_header("Lesson 4: Network Mapping")
 
+    learning_goal([
+        "Discover live hosts on a network using ping and TCP probes",
+        "Understand how ARP works for local network discovery",
+        "Build a complete network mapper combining multiple techniques",
+        "Read and interpret a network topology map",
+    ])
+
     lesson_block(
-        "Network mapping is the process of discovering all active hosts on a network "
-        "and understanding how they are connected. Before you can assess the security "
-        "of a network, you need to know what is on it. Network mapping answers the "
-        "fundamental questions: How many hosts are alive? What are their IP addresses? "
-        "What operating systems are they running? What services are exposed? How are "
-        "they connected to each other?"
+        "Network mapping is the process of discovering all active "
+        "hosts on a network. Before you can assess security, you "
+        "need to know what is on the network."
     )
 
     lesson_block(
-        "There are several techniques for discovering hosts. ICMP echo (ping) is the "
-        "simplest — send an ICMP echo request and wait for a reply. However, many "
-        "hosts block ICMP. TCP ping is more reliable — try connecting to a common "
-        "port (80 or 443) and see if the host responds. ARP (Address Resolution "
-        "Protocol) scanning works on local networks — it is the most reliable method "
-        "for discovering hosts on your subnet because ARP operates at Layer 2 and "
+        "It answers the key questions: How many hosts are alive? "
+        "What services are exposed? How are they connected?"
+    )
+
+    pace()
+
+    lesson_block(
+        "There are several techniques. ICMP ping is the simplest "
+        "but many hosts block it. TCP ping is more reliable — try "
+        "connecting to a common port like 80 or 443."
+    )
+
+    lesson_block(
+        "ARP scanning works on local networks and is the most "
+        "reliable method because it operates at Layer 2 and "
         "cannot be blocked by IP-level firewalls."
     )
 
-    lesson_block(
-        "ARP is the protocol that maps IP addresses to MAC (hardware) addresses on "
-        "a local network. When your computer wants to communicate with 192.168.1.50, "
-        "it first checks its ARP cache. If the MAC address is not cached, it sends a "
-        "broadcast ARP request asking 'Who has 192.168.1.50?' The host at that IP "
-        "responds with its MAC address. By sending ARP requests for every IP in the "
-        "subnet, we can discover all active hosts — even those that block ping and "
-        "have no open TCP ports."
-    )
+    tip("Always use multiple discovery methods. No single technique finds every host.")
+
+    pace()
 
     why_it_matters(
         "You cannot secure what you do not know exists. Network mapping is the "
@@ -1103,6 +1260,8 @@ def lesson_network_mapping(progress):
         "be affected. Continuous network mapping detects changes that could indicate "
         "unauthorized access."
     )
+
+    pace()
 
     sub_header("Host Discovery with ICMP Ping")
     code_block("""\
@@ -1151,6 +1310,10 @@ def ping_sweep(network_cidr, workers=50):
 # Example: sweep a /24 subnet
 # alive_hosts = ping_sweep("192.168.1.0/24")""")
 
+    pace()
+
+    nice_work("You have a working ping sweep. But remember, many hosts block ICMP. Let's add TCP probing.")
+
     sub_header("TCP-Based Host Discovery")
     code_block("""\
 import socket
@@ -1169,8 +1332,11 @@ def tcp_ping(ip_str, port=80, timeout=1):
         # Only timeout/no-route means the host is probably down
         return result != 110 and result != 113  # Not timeout/no-route
     except (socket.timeout, OSError):
-        return False
+        return False""")
 
+    pace()
+
+    code_block("""\
 def tcp_sweep(network_cidr, ports=[80, 443, 22], workers=100):
     \"\"\"Discover hosts using TCP probes on common ports.\"\"\"
     network = ipaddress.ip_network(network_cidr, strict=False)
@@ -1199,7 +1365,18 @@ def tcp_sweep(network_cidr, ports=[80, 443, 22], workers=100):
 # Example usage:
 # hosts = tcp_sweep("192.168.1.0/24", ports=[80, 443, 22, 3389])""")
 
+    pace()
+
     sub_header("Understanding ARP for Local Network Discovery")
+
+    lesson_block(
+        "ARP maps IP addresses to MAC (hardware) addresses on a "
+        "local network. It is the most reliable way to find hosts "
+        "on your subnet because every device must respond to ARP."
+    )
+
+    pace()
+
     code_block("""\
 # ARP (Address Resolution Protocol) — How Local Networks Work
 #
@@ -1229,6 +1406,10 @@ def tcp_sweep(network_cidr, ports=[80, 443, 22], workers=100):
 # View your ARP cache:
 #   Linux/macOS: arp -a
 #   Windows:     arp -a""", language="text")
+
+    pace()
+
+    nice_work("ARP is a powerful discovery tool on local networks. It cannot be blocked by regular firewalls.")
 
     sub_header("Reading the System ARP Cache")
     code_block("""\
@@ -1271,7 +1452,15 @@ print("Hosts in ARP cache:")
 for host in read_arp_cache():
     print(f"  {host['ip']:>15}  {host['mac']}")""")
 
+    pace()
+
     sub_header("Building a Complete Network Mapper")
+
+    lesson_block(
+        "Now let's combine everything into a proper network mapper "
+        "that uses TCP probing, ICMP, and DNS resolution."
+    )
+
     code_block("""\
 import socket
 import subprocess
@@ -1302,8 +1491,11 @@ class NetworkMapper:
             self._ping_discovery(all_ips)
 
         print(f"[+] Total hosts discovered: {len(self.hosts)}")
-        return self.hosts
+        return self.hosts""")
 
+    pace()
+
+    code_block("""\
     def _tcp_discovery(self, ips):
         \"\"\"Discover hosts via TCP probes.\"\"\"
         probe_ports = [80, 443, 22, 445, 3389]
@@ -1344,8 +1536,11 @@ class NetworkMapper:
         except socket.timeout:
             return False, False
         except OSError:
-            return False, False
+            return False, False""")
 
+    pace()
+
+    code_block("""\
     def _ping_discovery(self, ips):
         \"\"\"Discover hosts via ICMP ping.\"\"\"
         import platform
@@ -1376,8 +1571,11 @@ class NetworkMapper:
             )
             return r.returncode == 0
         except (subprocess.TimeoutExpired, FileNotFoundError):
-            return False
+            return False""")
 
+    pace()
+
+    code_block("""\
     def resolve_hostnames(self):
         \"\"\"Reverse-DNS lookup for discovered hosts.\"\"\"
         print("[*] Resolving hostnames...")
@@ -1428,6 +1626,10 @@ class NetworkMapper:
 # mapper.generate_report()
 # mapper.save_json("network_map.json")""")
 
+    pace()
+
+    nice_work("You have built a complete network mapper. This is a genuinely useful tool for real security work.")
+
     sub_header("Understanding Network Topology")
     code_block("""\
 # After discovering hosts, map the network topology:
@@ -1436,19 +1638,21 @@ class NetworkMapper:
 #    |
 # [Firewall / Router]  (192.168.1.1)
 #    |
-#    ├── [Web Server]   (192.168.1.10)  ports: 80, 443
-#    ├── [Mail Server]  (192.168.1.11)  ports: 25, 143, 993
-#    ├── [DB Server]    (192.168.1.20)  ports: 3306
-#    ├── [Dev Server]   (192.168.1.30)  ports: 22, 80, 3000, 8080
-#    ├── [Workstation]  (192.168.1.100) ports: (none)
-#    ├── [Workstation]  (192.168.1.101) ports: 3389
-#    └── [???Unknown]   (192.168.1.200) ports: 22, 4444  <-- suspicious!
+#    +-- [Web Server]   (192.168.1.10)  ports: 80, 443
+#    +-- [Mail Server]  (192.168.1.11)  ports: 25, 143, 993
+#    +-- [DB Server]    (192.168.1.20)  ports: 3306
+#    +-- [Dev Server]   (192.168.1.30)  ports: 22, 80, 3000, 8080
+#    +-- [Workstation]  (192.168.1.100) ports: (none)
+#    +-- [Workstation]  (192.168.1.101) ports: 3389
+#    +-- [???Unknown]   (192.168.1.200) ports: 22, 4444  <-- suspicious!
 #
 # Key observations from this map:
 # 1. DB server (3306) should only be accessible from the web server
 # 2. Dev server has multiple web services — potential attack surface
 # 3. Unknown host at .200 with port 4444 (Metasploit?) — investigate!
 # 4. Workstation at .101 has RDP exposed — should it be?""", language="text")
+
+    pace()
 
     scenario_block("Finding the Attacker's Foothold", (
         "During an incident response, you need to quickly map the compromised "
@@ -1460,6 +1664,8 @@ class NetworkMapper:
         "Raspberry Pi plugged into a network jack in a conference room. Your network "
         "mapping skills led directly to discovering the physical implant."
     ))
+
+    pace()
 
     # ── Practice Challenge ──
     sub_header("Practice Challenge")
@@ -1511,8 +1717,11 @@ def combined_discovery(network_cidr):
                     }
     except Exception:
         pass
-    print(f"  Found {len(discovered)} hosts in ARP cache")
+    print(f"  Found {len(discovered)} hosts in ARP cache")""")
 
+        pace()
+
+        code_block("""\
     # Phase 2: TCP probe remaining hosts
     print("[Phase 2] TCP probing...")
     remaining = all_ips - set(discovered.keys())
@@ -1547,8 +1756,11 @@ def combined_discovery(network_cidr):
                 if port not in discovered[ip]["ports"]:
                     discovered[ip]["ports"].append(port)
 
-    print(f"  Total hosts: {len(discovered)}")
+    print(f"  Total hosts: {len(discovered)}")""")
 
+        pace()
+
+        code_block("""\
     # Phase 3: Reverse DNS
     print("[Phase 3] Resolving hostnames...")
     for ip in discovered:
