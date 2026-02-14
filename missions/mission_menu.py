@@ -27,6 +27,14 @@ MISSION_TOPICS = {
     "mission5": "Incident Response",
 }
 
+MISSION_DIFFICULTY = {
+    "mission1": ("Beginner", G),
+    "mission2": ("Intermediate", Y),
+    "mission3": ("Beginner", G),
+    "mission4": ("Intermediate", Y),
+    "mission5": ("Advanced", R),
+}
+
 
 def missions_menu(progress: dict):
     """Display the Story Mode menu and launch selected missions."""
@@ -42,7 +50,9 @@ def missions_menu(progress: dict):
             else:
                 status = f"{DIM}[--]{RESET}"
             num = mk.replace("mission", "")
-            options.append((mk, f"{status} Mission {num}: {name}  ({topic})"))
+            diff_label, diff_color = MISSION_DIFFICULTY.get(mk, ("", ""))
+            diff_tag = f"  {diff_color}[{diff_label}]{RESET}" if diff_label else ""
+            options.append((mk, f"{status} Mission {num}: {name}  ({diff_color}{topic}{RESET}){diff_tag}"))
 
         choice = show_menu("Story Mode Missions", options)
         if choice == "back":

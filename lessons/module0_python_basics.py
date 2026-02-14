@@ -13,6 +13,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.guided_practice import guided_practice
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -393,25 +394,91 @@ print(f"Scanning port {port}...")""")
 
     press_enter()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge: Simple Calculator")
-    info("Build a calculator that asks the user for two numbers and an")
-    info("operator (+, -, *, /), then prints the result.\n")
-    info("Example:")
-    info("  Enter first number: 15")
-    info("  Enter second number: 4")
-    info("  Enter operator (+, -, *, /): *")
-    info("  Result: 15 * 4 = 60\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Use input() to get the numbers and operator.")
-        hint_text("Convert the numbers with float() so decimals work too.")
-        hint_text("Use if/elif to check which operator was entered.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
+    # ── Guided Practice ──
+    guided_practice(
+        title="Simple Calculator",
+        intro="Let's build a calculator step by step. Each step builds on the last.",
+        steps=[
+            {
+                "instruction": (
+                    "Get the user's input. Use input() to ask for two numbers "
+                    "and convert them to floats. Store them in num1 and num2."
+                ),
+                "required_keywords": ["input", "float"],
+                "hints": [
+                    "Use float(input('Enter first number: ')) to get a number.",
+                    "You need two separate input() calls — one for each number.",
+                    "Pattern: num1 = float(input('...'))",
+                ],
+                "solution": (
+                    'num1 = float(input("Enter first number: "))\n'
+                    'num2 = float(input("Enter second number: "))'
+                ),
+            },
+            {
+                "instruction": (
+                    "Ask the user for an operator (+, -, *, /). "
+                    "Store it in a variable called operator."
+                ),
+                "context_code": (
+                    'num1 = float(input("Enter first number: "))\n'
+                    'num2 = float(input("Enter second number: "))'
+                ),
+                "required_keywords": ["input", "operator"],
+                "hints": [
+                    "Use input() again — no need to convert to float this time.",
+                    'operator = input("Enter operator (+, -, *, /): ").strip()',
+                ],
+                "solution": 'operator = input("Enter operator (+, -, *, /): ").strip()',
+            },
+            {
+                "instruction": (
+                    "Use if/elif to check the operator and calculate the result. "
+                    "Handle +, -, *, and /. Store the answer in a variable called result."
+                ),
+                "context_code": (
+                    'num1 = float(input("Enter first number: "))\n'
+                    'num2 = float(input("Enter second number: "))\n'
+                    'operator = input("Enter operator (+, -, *, /): ").strip()'
+                ),
+                "required_keywords": ["if", "elif", "result"],
+                "hints": [
+                    'Start with: if operator == "+": result = num1 + num2',
+                    "Add elif branches for -, *, and /.",
+                    "For division, check if num2 == 0 before dividing.",
+                ],
+                "solution": (
+                    'if operator == "+":\n'
+                    '    result = num1 + num2\n'
+                    'elif operator == "-":\n'
+                    '    result = num1 - num2\n'
+                    'elif operator == "*":\n'
+                    '    result = num1 * num2\n'
+                    'elif operator == "/":\n'
+                    '    if num2 == 0:\n'
+                    '        print("Error: Cannot divide by zero!")\n'
+                    '        result = None\n'
+                    '    else:\n'
+                    '        result = num1 / num2'
+                ),
+            },
+            {
+                "instruction": (
+                    "Print the result using an f-string that shows the full "
+                    "equation, like: 15.0 * 4.0 = 60.0"
+                ),
+                "required_keywords": ["print", "result"],
+                "hints": [
+                    'Use an f-string: print(f"{num1} {operator} {num2} = {result}")',
+                    "Check if result is not None before printing.",
+                ],
+                "solution": (
+                    'if result is not None:\n'
+                    '    print(f"Result: {num1} {operator} {num2} = {result}")'
+                ),
+            },
+        ],
+        complete_solution="""\
 # Simple Calculator
 num1 = float(input("Enter first number: "))
 num2 = float(input("Enter second number: "))
@@ -434,8 +501,8 @@ else:
     result = None
 
 if result is not None:
-    print(f"Result: {num1} {operator} {num2} = {result}")""")
-    press_enter()
+    print(f"Result: {num1} {operator} {num2} = {result}")""",
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson1")
     success("Lesson 1 complete: Variables & Data Types")
@@ -754,81 +821,127 @@ match command:
 
     press_enter()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge: Password Validator")
-    info("Build a password validator that checks if a password meets these rules:")
-    info("  1. At least 8 characters long")
-    info("  2. Contains at least one uppercase letter")
-    info("  3. Contains at least one lowercase letter")
-    info("  4. Contains at least one digit")
-    info("  5. Does not contain the word 'password'\n")
-    info("Print a message for each rule that passes or fails.\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Use len(password) to check length.")
-        hint_text("Loop through each character and check with .isupper(), .isdigit(), etc.")
-        hint_text("Use 'password' in pw.lower() to check for the forbidden word.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
+    # ── Guided Practice ──
+    guided_practice(
+        title="Password Validator",
+        intro="Let's build a password strength checker, one rule at a time.",
+        steps=[
+            {
+                "instruction": (
+                    "Define a function called validate_password that takes a "
+                    "password parameter. Inside it, create an empty list called "
+                    "issues, then check if the password is shorter than 8 characters "
+                    "using len(). If it is, append a message to the issues list."
+                ),
+                "required_keywords": ["def", "len", "issues"],
+                "hints": [
+                    "Start with: def validate_password(password):",
+                    "Create the list: issues = []",
+                    'Check: if len(password) < 8: issues.append("Too short")',
+                ],
+                "solution": (
+                    'def validate_password(password):\n'
+                    '    issues = []\n'
+                    '    if len(password) < 8:\n'
+                    '        issues.append("Must be at least 8 characters long")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Add checks for uppercase, lowercase, and digit characters. "
+                    "Loop through each character using a for loop and check with "
+                    ".isupper(), .islower(), and .isdigit()."
+                ),
+                "required_keywords": ["for", "isupper", "isdigit"],
+                "hints": [
+                    "Use a boolean flag: has_upper = False, then set True when found.",
+                    "for char in password: if char.isupper(): has_upper = True; break",
+                    "After the loop, if not has_upper: issues.append('...')",
+                ],
+                "solution": (
+                    '    has_upper = has_lower = has_digit = False\n'
+                    '    for char in password:\n'
+                    '        if char.isupper(): has_upper = True\n'
+                    '        if char.islower(): has_lower = True\n'
+                    '        if char.isdigit(): has_digit = True\n'
+                    '    if not has_upper:\n'
+                    '        issues.append("Must contain an uppercase letter")\n'
+                    '    if not has_lower:\n'
+                    '        issues.append("Must contain a lowercase letter")\n'
+                    '    if not has_digit:\n'
+                    '        issues.append("Must contain a digit")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Check if the password contains the forbidden word 'password' "
+                    "(case-insensitive). Use .lower() to make the comparison work "
+                    "regardless of capitalization."
+                ),
+                "required_keywords": ["password", "lower"],
+                "hints": [
+                    'Use: if "password" in password.lower()',
+                    "This catches Password, PASSWORD, pAsSwOrD, etc.",
+                ],
+                "solution": (
+                    '    if "password" in password.lower():\n'
+                    '        issues.append("Must not contain the word \'password\'")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Print the results: if there are issues, print each one. "
+                    "Otherwise print that the password is accepted."
+                ),
+                "required_keywords": ["print", "issues"],
+                "hints": [
+                    "Check: if issues: ... else: ...",
+                    "Loop through issues with: for issue in issues: print(f'  - {issue}')",
+                ],
+                "solution": (
+                    '    if issues:\n'
+                    '        print("Password REJECTED:")\n'
+                    '        for issue in issues:\n'
+                    '            print(f"  - {issue}")\n'
+                    '    else:\n'
+                    '        print("Password ACCEPTED!")'
+                ),
+            },
+        ],
+        complete_solution="""\
 def validate_password(password):
-    \"\"\"Check a password against security rules.\"\"\"
     issues = []
 
-    # Rule 1: Length
     if len(password) < 8:
         issues.append("Must be at least 8 characters long")
 
-    # Rule 2: Uppercase
-    has_upper = False
+    has_upper = has_lower = has_digit = False
     for char in password:
-        if char.isupper():
-            has_upper = True
-            break
+        if char.isupper(): has_upper = True
+        if char.islower(): has_lower = True
+        if char.isdigit(): has_digit = True
     if not has_upper:
-        issues.append("Must contain at least one uppercase letter")
-
-    # Rule 3: Lowercase
-    has_lower = False
-    for char in password:
-        if char.islower():
-            has_lower = True
-            break
+        issues.append("Must contain an uppercase letter")
     if not has_lower:
-        issues.append("Must contain at least one lowercase letter")
-
-    # Rule 4: Digit
-    has_digit = False
-    for char in password:
-        if char.isdigit():
-            has_digit = True
-            break
+        issues.append("Must contain a lowercase letter")
     if not has_digit:
-        issues.append("Must contain at least one digit")
+        issues.append("Must contain a digit")
 
-    # Rule 5: No 'password'
     if "password" in password.lower():
         issues.append("Must not contain the word 'password'")
 
-    # Results
     if issues:
-        print("Password REJECTED. Issues found:")
+        print("Password REJECTED:")
         for issue in issues:
             print(f"  - {issue}")
     else:
-        print("Password ACCEPTED! Meets all requirements.")
-
-    return len(issues) == 0
+        print("Password ACCEPTED!")
 
 # Test it
-test_passwords = ["short", "alllowercase1", "ALLUPPERCASE1",
-                  "NoDigitsHere", "MyPassword1", "Str0ngP@ss!"]
-for pw in test_passwords:
+for pw in ["short", "alllowercase1", "NoDigitsHere", "Str0ngP@ss!"]:
     print(f"\\nTesting: '{pw}'")
-    validate_password(pw)""")
-    press_enter()
+    validate_password(pw)""",
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson2")
     success("Lesson 2 complete: Control Flow")
@@ -1164,41 +1277,102 @@ print(lower_words)  # ['hello', 'world', 'python']""")
 
     press_enter()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge: Number Guessing Game")
-    info("Build a number guessing game:")
-    info("  1. The program picks a random number between 1 and 100")
-    info("  2. The user guesses, and the program says 'too high' or 'too low'")
-    info("  3. The game continues until the user guesses correctly")
-    info("  4. Count and display the number of attempts")
-    info("  5. BONUS: Limit to 7 guesses and tell them if they lose\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Use 'import random' and 'random.randint(1, 100)' to pick a number.")
-        hint_text("Use a while loop that runs until the guess matches the secret.")
-        hint_text("Use int(input(...)) to get the user's guess as a number.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
+    # ── Guided Practice ──
+    guided_practice(
+        title="Number Guessing Game",
+        intro="Let's build a guessing game piece by piece.",
+        steps=[
+            {
+                "instruction": (
+                    "Import the random module and use random.randint(1, 100) to "
+                    "pick a secret number. Store it in a variable called secret. "
+                    "Also set up an attempts counter starting at 0."
+                ),
+                "required_keywords": ["import", "random", "randint"],
+                "hints": [
+                    "Start with: import random",
+                    "Then: secret = random.randint(1, 100)",
+                    "And: attempts = 0",
+                ],
+                "solution": (
+                    'import random\n'
+                    '\n'
+                    'secret = random.randint(1, 100)\n'
+                    'attempts = 0'
+                ),
+            },
+            {
+                "instruction": (
+                    "Write a while loop that keeps running. Inside it, use "
+                    "input() to get the user's guess and convert it to an int."
+                ),
+                "context_code": (
+                    'import random\n'
+                    'secret = random.randint(1, 100)\n'
+                    'attempts = 0'
+                ),
+                "required_keywords": ["while", "input", "int"],
+                "hints": [
+                    "Use: while True: (or while attempts < 7:)",
+                    "Get input: guess = int(input('Your guess: '))",
+                    "Increment attempts: attempts += 1",
+                ],
+                "solution": (
+                    'while attempts < 7:\n'
+                    '    guess = int(input("Your guess: "))\n'
+                    '    attempts += 1'
+                ),
+            },
+            {
+                "instruction": (
+                    "Inside the loop, compare the guess to the secret. "
+                    "If equal, print a success message and break. "
+                    "If too low or too high, print a hint."
+                ),
+                "required_keywords": ["if", "elif", "break"],
+                "hints": [
+                    "if guess == secret: print('You got it!'); break",
+                    "elif guess < secret: print('Too low!')",
+                    "else: print('Too high!')",
+                ],
+                "solution": (
+                    '    if guess == secret:\n'
+                    '        print(f"You got it in {attempts} attempts!")\n'
+                    '        break\n'
+                    '    elif guess < secret:\n'
+                    '        print("Too low!")\n'
+                    '    else:\n'
+                    '        print("Too high!")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Add a game-over message if the player runs out of guesses. "
+                    "Use an else clause on the while loop (it runs if the loop "
+                    "ends without a break) to reveal the secret number."
+                ),
+                "required_keywords": ["else", "secret"],
+                "hints": [
+                    "Add else: at the same indent level as while:",
+                    "Inside: print(f'Game over! The number was {secret}.')",
+                ],
+                "solution": (
+                    'else:\n'
+                    '    print(f"Game over! The number was {secret}.")'
+                ),
+            },
+        ],
+        complete_solution="""\
 import random
 
 secret = random.randint(1, 100)
-max_guesses = 7
 attempts = 0
 
 print("I'm thinking of a number between 1 and 100.")
-print(f"You have {max_guesses} guesses. Good luck!")
+print("You have 7 guesses. Good luck!")
 
-while attempts < max_guesses:
-    guess_text = input(f"\\nGuess #{attempts + 1}: ")
-
-    if not guess_text.isdigit():
-        print("Please enter a valid number.")
-        continue
-
-    guess = int(guess_text)
+while attempts < 7:
+    guess = int(input(f"\\nGuess #{attempts + 1}: "))
     attempts += 1
 
     if guess == secret:
@@ -1208,13 +1382,9 @@ while attempts < max_guesses:
         print("Too low!")
     else:
         print("Too high!")
-
-    remaining = max_guesses - attempts
-    if remaining > 0:
-        print(f"({remaining} guesses remaining)")
 else:
-    print(f"\\nGame over! The number was {secret}.")""")
-    press_enter()
+    print(f"\\nGame over! The number was {secret}.")""",
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson3")
     success("Lesson 3 complete: Loops & Iteration")
@@ -1526,78 +1696,131 @@ address = ("192.168.1.1", 443)""", language="text")
 
     press_enter()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge: Contact Book")
-    info("Build a contact book program using a dictionary:")
-    info("  1. Store contacts as {name: {phone, email, role}}")
-    info("  2. Allow adding new contacts")
-    info("  3. Allow looking up contacts by name")
-    info("  4. Allow listing all contacts")
-    info("  5. Allow deleting contacts\n")
+    # ── Guided Practice ──
+    guided_practice(
+        title="Contact Book",
+        intro="Let's build a contact book using dictionaries, step by step.",
+        steps=[
+            {
+                "instruction": (
+                    "Create an empty dictionary called contacts. Then write a "
+                    "while True loop that prints a menu with numbered options "
+                    "(Add, Look up, List, Delete, Quit) and gets the user's choice "
+                    "with input()."
+                ),
+                "required_keywords": ["contacts", "while", "input"],
+                "hints": [
+                    "Start with: contacts = {}",
+                    "Use while True: to keep the menu running.",
+                    "Print options with print(), get choice with input().",
+                ],
+                "solution": (
+                    'contacts = {}\n'
+                    '\n'
+                    'while True:\n'
+                    '    print("\\n--- Contact Book ---")\n'
+                    '    print("1. Add  2. Look up  3. List  4. Delete  5. Quit")\n'
+                    '    choice = input("Choice: ").strip()'
+                ),
+            },
+            {
+                "instruction": (
+                    "Handle the 'Add contact' option. Use input() to get the name, "
+                    "phone, and email. Store them as a nested dictionary inside contacts."
+                ),
+                "required_keywords": ["name", "phone", "email"],
+                "hints": [
+                    "Get each field: name = input('Name: ').strip()",
+                    "Store as nested dict: contacts[name] = {'phone': phone, 'email': email}",
+                    "Print confirmation: print(f'Added {name}!')",
+                ],
+                "solution": (
+                    '    if choice == "1":\n'
+                    '        name = input("Name: ").strip()\n'
+                    '        phone = input("Phone: ").strip()\n'
+                    '        email = input("Email: ").strip()\n'
+                    '        contacts[name] = {"phone": phone, "email": email}\n'
+                    '        print(f"Added {name}!")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Handle 'Look up'. Ask for a name, use .get() to safely look "
+                    "it up (returns None if not found), and print the contact details."
+                ),
+                "required_keywords": ["get", "print"],
+                "hints": [
+                    "Use contacts.get(name) — returns None if the key doesn't exist.",
+                    "if contact: print details, else: print 'not found'.",
+                ],
+                "solution": (
+                    '    elif choice == "2":\n'
+                    '        name = input("Name: ").strip()\n'
+                    '        contact = contacts.get(name)\n'
+                    '        if contact:\n'
+                    '            print(f"  {name}: {contact}")\n'
+                    '        else:\n'
+                    '            print("Not found.")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Handle 'List all' and 'Delete'. For listing, loop through "
+                    "contacts.items(). For deleting, use del contacts[name]. "
+                    "Also handle the Quit option with break."
+                ),
+                "required_keywords": ["for", "items", "del"],
+                "hints": [
+                    "for name, info in contacts.items(): print(...)",
+                    "del contacts[name] removes a key from the dictionary.",
+                    "if choice == '5': break",
+                ],
+                "solution": (
+                    '    elif choice == "3":\n'
+                    '        for name, info in contacts.items():\n'
+                    '            print(f"  {name}: {info}")\n'
+                    '    elif choice == "4":\n'
+                    '        name = input("Name: ").strip()\n'
+                    '        if name in contacts:\n'
+                    '            del contacts[name]\n'
+                    '            print(f"Deleted {name}.")\n'
+                    '    elif choice == "5":\n'
+                    '        break'
+                ),
+            },
+        ],
+        complete_solution="""\
+contacts = {}
 
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Use a while loop for the main menu with options for each action.")
-        hint_text("Use a dict of dicts: contacts = {'Alice': {'phone': '555-0100', ...}}")
-        hint_text("Use .get() to safely look up contacts that might not exist.")
+while True:
+    print("\\n--- Contact Book ---")
+    print("1. Add  2. Look up  3. List  4. Delete  5. Quit")
+    choice = input("Choice: ").strip()
 
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
-def contact_book():
-    \"\"\"A simple contact book using dictionaries.\"\"\"
-    contacts = {}
-
-    while True:
-        print("\\n--- Contact Book ---")
-        print("1. Add contact")
-        print("2. Look up contact")
-        print("3. List all contacts")
-        print("4. Delete contact")
-        print("5. Quit")
-
-        choice = input("\\nChoice: ").strip()
-
-        if choice == "1":
-            name = input("Name: ").strip()
-            phone = input("Phone: ").strip()
-            email = input("Email: ").strip()
-            role = input("Role: ").strip()
-            contacts[name] = {"phone": phone, "email": email, "role": role}
-            print(f"Added {name}!")
-
-        elif choice == "2":
-            name = input("Name to look up: ").strip()
-            contact = contacts.get(name)
-            if contact:
-                print(f"  Name:  {name}")
-                print(f"  Phone: {contact['phone']}")
-                print(f"  Email: {contact['email']}")
-                print(f"  Role:  {contact['role']}")
-            else:
-                print(f"  '{name}' not found.")
-
-        elif choice == "3":
-            if not contacts:
-                print("  No contacts yet.")
-            else:
-                for name, info in contacts.items():
-                    print(f"  {name}: {info['email']} ({info['role']})")
-
-        elif choice == "4":
-            name = input("Name to delete: ").strip()
-            if name in contacts:
-                del contacts[name]
-                print(f"Deleted {name}.")
-            else:
-                print(f"'{name}' not found.")
-
-        elif choice == "5":
-            print("Goodbye!")
-            break
-
-contact_book()""")
-    press_enter()
+    if choice == "1":
+        name = input("Name: ").strip()
+        phone = input("Phone: ").strip()
+        email = input("Email: ").strip()
+        contacts[name] = {"phone": phone, "email": email}
+        print(f"Added {name}!")
+    elif choice == "2":
+        name = input("Name: ").strip()
+        contact = contacts.get(name)
+        if contact:
+            print(f"  {name}: {contact}")
+        else:
+            print("Not found.")
+    elif choice == "3":
+        for name, info in contacts.items():
+            print(f"  {name}: {info}")
+    elif choice == "4":
+        name = input("Name: ").strip()
+        if name in contacts:
+            del contacts[name]
+            print(f"Deleted {name}.")
+    elif choice == "5":
+        break""",
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson4")
     success("Lesson 4 complete: Data Structures")
@@ -1950,42 +2173,106 @@ print(f"Yesterday: {yesterday.strftime('%Y-%m-%d')}")""")
 
     press_enter()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge: Utility Function Library")
-    info("Create a collection of useful functions:")
-    info("  1. is_valid_ip(ip) -- checks if a string is a valid IPv4 address")
-    info("  2. generate_password(length) -- generates a random password")
-    info("  3. caesar_cipher(text, shift) -- encrypts text with a Caesar cipher")
-    info("  4. count_words(text) -- returns a dict of word frequencies")
-    info("  5. format_bytes(num_bytes) -- converts bytes to KB/MB/GB\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("For is_valid_ip: split by '.', check 4 parts, each 0-255.")
-        hint_text("For generate_password: use random.choice() in a loop with a charset string.")
-        hint_text("For caesar_cipher: use ord() and chr() to shift characters.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
+    # ── Guided Practice ──
+    guided_practice(
+        title="Utility Function Library",
+        intro="Let's write three useful functions, one at a time.",
+        steps=[
+            {
+                "instruction": (
+                    "Write a function called is_valid_ip(ip) that checks if a "
+                    "string is a valid IPv4 address. Split the string by '.', "
+                    "check there are 4 parts, and each part is a number between "
+                    "0 and 255. Return True or False."
+                ),
+                "required_keywords": ["def", "split", "255"],
+                "hints": [
+                    "Start: def is_valid_ip(ip): parts = ip.split('.')",
+                    "Check: if len(parts) != 4: return False",
+                    "Loop: for part in parts — check isdigit() and 0 <= int(part) <= 255",
+                ],
+                "solution": (
+                    'def is_valid_ip(ip):\n'
+                    '    parts = ip.split(".")\n'
+                    '    if len(parts) != 4:\n'
+                    '        return False\n'
+                    '    for part in parts:\n'
+                    '        if not part.isdigit():\n'
+                    '            return False\n'
+                    '        if int(part) < 0 or int(part) > 255:\n'
+                    '            return False\n'
+                    '    return True'
+                ),
+            },
+            {
+                "instruction": (
+                    "Write a function called generate_password(length) that "
+                    "creates a random password. Import random, define a charset "
+                    "string of letters and digits, then use random.choice() in "
+                    "a loop to pick random characters."
+                ),
+                "required_keywords": ["def", "random", "choice"],
+                "hints": [
+                    "import random",
+                    "charset = 'abcdefghijklmnopqrstuvwxyzABCDEF...0123456789!@#'",
+                    "Loop: for _ in range(length): password += random.choice(charset)",
+                ],
+                "solution": (
+                    'import random\n'
+                    'import string\n'
+                    '\n'
+                    'def generate_password(length=16):\n'
+                    '    charset = string.ascii_letters + string.digits + "!@#$%^&*"\n'
+                    '    password = ""\n'
+                    '    for _ in range(length):\n'
+                    '        password += random.choice(charset)\n'
+                    '    return password'
+                ),
+            },
+            {
+                "instruction": (
+                    "Write a function called caesar_cipher(text, shift) that "
+                    "shifts each letter by the shift amount. Use ord() to get "
+                    "the character code and chr() to convert back. Non-letter "
+                    "characters should stay unchanged."
+                ),
+                "required_keywords": ["def", "ord", "chr"],
+                "hints": [
+                    "Loop through each char in text.",
+                    "Check char.isalpha() — only shift letters.",
+                    "base = ord('A') if char.isupper() else ord('a'); "
+                    "shifted = (ord(char) - base + shift) % 26 + base; chr(shifted)",
+                ],
+                "solution": (
+                    'def caesar_cipher(text, shift):\n'
+                    '    result = ""\n'
+                    '    for char in text:\n'
+                    '        if char.isalpha():\n'
+                    '            base = ord("A") if char.isupper() else ord("a")\n'
+                    '            shifted = (ord(char) - base + shift) % 26 + base\n'
+                    '            result += chr(shifted)\n'
+                    '        else:\n'
+                    '            result += char\n'
+                    '    return result'
+                ),
+            },
+        ],
+        complete_solution="""\
 import random
 import string
 
 def is_valid_ip(ip):
-    \"\"\"Check if a string is a valid IPv4 address.\"\"\"
     parts = ip.split(".")
     if len(parts) != 4:
         return False
     for part in parts:
         if not part.isdigit():
             return False
-        num = int(part)
-        if num < 0 or num > 255:
+        if int(part) < 0 or int(part) > 255:
             return False
     return True
 
 def generate_password(length=16):
-    \"\"\"Generate a random password of the given length.\"\"\"
     charset = string.ascii_letters + string.digits + "!@#$%^&*"
     password = ""
     for _ in range(length):
@@ -1993,7 +2280,6 @@ def generate_password(length=16):
     return password
 
 def caesar_cipher(text, shift):
-    \"\"\"Encrypt text using a Caesar cipher.\"\"\"
     result = ""
     for char in text:
         if char.isalpha():
@@ -2001,37 +2287,14 @@ def caesar_cipher(text, shift):
             shifted = (ord(char) - base + shift) % 26 + base
             result += chr(shifted)
         else:
-            result += char  # Keep non-letters unchanged
+            result += char
     return result
 
-def count_words(text):
-    \"\"\"Count word frequencies in a text string.\"\"\"
-    words = text.lower().split()
-    counts = {}
-    for word in words:
-        word = word.strip(".,!?;:")  # Remove punctuation
-        counts[word] = counts.get(word, 0) + 1
-    return counts
-
-def format_bytes(num_bytes):
-    \"\"\"Convert bytes to a human-readable string.\"\"\"
-    for unit in ["B", "KB", "MB", "GB", "TB"]:
-        if num_bytes < 1024:
-            return f"{num_bytes:.1f} {unit}"
-        num_bytes /= 1024
-    return f"{num_bytes:.1f} PB"
-
-# Test all functions
-print(is_valid_ip("192.168.1.1"))    # True
-print(is_valid_ip("999.0.0.1"))      # False
-print(generate_password(20))          # Random 20-char password
-print(caesar_cipher("Hello", 3))      # "Khoor"
-print(caesar_cipher("Khoor", -3))     # "Hello" (decrypt)
-print(count_words("the cat sat on the mat the cat"))
-# {'the': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}
-print(format_bytes(1536))             # "1.5 KB"
-print(format_bytes(2_500_000_000))    # "2.3 GB" """)
-    press_enter()
+# Test
+print(is_valid_ip("192.168.1.1"))   # True
+print(generate_password(20))         # Random password
+print(caesar_cipher("Hello", 3))     # Khoor""",
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson5")
     success("Lesson 5 complete: Functions & Modules")
@@ -2443,109 +2706,144 @@ for item in os.listdir("/tmp"):
 
     press_enter()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge: Note-Taking App")
-    info("Build a simple note-taking app that saves notes to a file:")
-    info("  1. Add a new note (with a timestamp)")
-    info("  2. View all notes")
-    info("  3. Search notes by keyword")
-    info("  4. Delete all notes")
-    info("  5. Handle all possible file errors gracefully\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Use 'a' mode to append new notes and 'r' mode to read them.")
-        hint_text("Add timestamps with datetime.now().strftime('%Y-%m-%d %H:%M:%S').")
-        hint_text("For search, read all lines and filter with 'keyword in line'.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
-import os
-from datetime import datetime
-
-NOTES_FILE = "my_notes.txt"
-
+    # ── Guided Practice ──
+    guided_practice(
+        title="Note-Taking App",
+        intro="Let's build an app that saves notes to a file, with error handling.",
+        steps=[
+            {
+                "instruction": (
+                    "Write a function called add_note() that gets a note from "
+                    "the user with input(), then opens a file in append mode ('a') "
+                    "and writes the note. Wrap the file operation in try/except "
+                    "to catch errors."
+                ),
+                "required_keywords": ["open", "write", "try", "except"],
+                "hints": [
+                    "def add_note(): note = input('Enter your note: ')",
+                    "Use: with open('notes.txt', 'a') as f: f.write(note + '\\n')",
+                    "Wrap in try/except to catch PermissionError or OSError.",
+                ],
+                "solution": (
+                    'def add_note():\n'
+                    '    note = input("Enter your note: ").strip()\n'
+                    '    try:\n'
+                    '        with open("notes.txt", "a") as f:\n'
+                    '            f.write(note + "\\n")\n'
+                    '        print("Note saved!")\n'
+                    '    except OSError as e:\n'
+                    '        print(f"Error: {e}")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Write a function called view_notes() that opens the file "
+                    "in read mode, reads all lines, and prints each one. "
+                    "Handle FileNotFoundError for when the file doesn't exist yet."
+                ),
+                "required_keywords": ["open", "read", "FileNotFoundError"],
+                "hints": [
+                    "Use: with open('notes.txt', 'r') as f: notes = f.readlines()",
+                    "except FileNotFoundError: print('No notes yet!')",
+                    "Loop and print: for i, note in enumerate(notes, 1): print(...)",
+                ],
+                "solution": (
+                    'def view_notes():\n'
+                    '    try:\n'
+                    '        with open("notes.txt", "r") as f:\n'
+                    '            notes = f.readlines()\n'
+                    '        for i, note in enumerate(notes, 1):\n'
+                    '            print(f"  {i}. {note.strip()}")\n'
+                    '    except FileNotFoundError:\n'
+                    '        print("No notes yet! Add one first.")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Write a function called search_notes(keyword) that reads "
+                    "the file and prints only lines that contain the keyword. "
+                    "Use .lower() on both to make it case-insensitive."
+                ),
+                "required_keywords": ["for", "if", "lower"],
+                "hints": [
+                    "Read the file, then loop through lines.",
+                    "if keyword.lower() in line.lower(): print the match.",
+                    "Don't forget to handle FileNotFoundError.",
+                ],
+                "solution": (
+                    'def search_notes(keyword):\n'
+                    '    try:\n'
+                    '        with open("notes.txt", "r") as f:\n'
+                    '            for line in f:\n'
+                    '                if keyword.lower() in line.lower():\n'
+                    '                    print(f"  - {line.strip()}")\n'
+                    '    except FileNotFoundError:\n'
+                    '        print("No notes file found.")'
+                ),
+            },
+            {
+                "instruction": (
+                    "Write the main menu loop: a while True loop that shows "
+                    "options (Add, View, Search, Quit), gets the user's choice "
+                    "with input(), and calls the right function."
+                ),
+                "required_keywords": ["while", "input", "choice"],
+                "hints": [
+                    "while True: print the menu, choice = input('Choice: ')",
+                    "if choice == '1': add_note() elif choice == '2': view_notes()",
+                    "Break out of the loop for the quit option.",
+                ],
+                "solution": (
+                    'while True:\n'
+                    '    print("\\n1. Add  2. View  3. Search  4. Quit")\n'
+                    '    choice = input("Choice: ").strip()\n'
+                    '    if choice == "1": add_note()\n'
+                    '    elif choice == "2": view_notes()\n'
+                    '    elif choice == "3":\n'
+                    '        kw = input("Search for: ")\n'
+                    '        search_notes(kw)\n'
+                    '    elif choice == "4": break'
+                ),
+            },
+        ],
+        complete_solution="""\
 def add_note():
-    \"\"\"Add a new note with a timestamp.\"\"\"
     note = input("Enter your note: ").strip()
-    if not note:
-        print("Empty note -- not saved.")
-        return
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
-        with open(NOTES_FILE, "a") as f:
-            f.write(f"[{timestamp}] {note}\\n")
+        with open("notes.txt", "a") as f:
+            f.write(note + "\\n")
         print("Note saved!")
-    except PermissionError:
-        print("Error: No permission to write to file.")
     except OSError as e:
-        print(f"Error saving note: {e}")
+        print(f"Error: {e}")
 
 def view_notes():
-    \"\"\"Display all saved notes.\"\"\"
     try:
-        with open(NOTES_FILE, "r") as f:
+        with open("notes.txt", "r") as f:
             notes = f.readlines()
-        if not notes:
-            print("No notes yet.")
-        else:
-            print(f"\\n--- Your Notes ({len(notes)} total) ---")
-            for i, note in enumerate(notes, 1):
-                print(f"  {i}. {note.strip()}")
+        for i, note in enumerate(notes, 1):
+            print(f"  {i}. {note.strip()}")
     except FileNotFoundError:
-        print("No notes file found. Add a note first!")
+        print("No notes yet! Add one first.")
 
 def search_notes(keyword):
-    \"\"\"Search notes for a keyword.\"\"\"
     try:
-        with open(NOTES_FILE, "r") as f:
-            matches = [line.strip() for line in f
-                       if keyword.lower() in line.lower()]
-        if matches:
-            print(f"\\nFound {len(matches)} matching notes:")
-            for note in matches:
-                print(f"  - {note}")
-        else:
-            print(f"No notes containing '{keyword}'.")
+        with open("notes.txt", "r") as f:
+            for line in f:
+                if keyword.lower() in line.lower():
+                    print(f"  - {line.strip()}")
     except FileNotFoundError:
         print("No notes file found.")
 
-def delete_all():
-    \"\"\"Delete all notes after confirmation.\"\"\"
-    confirm = input("Delete ALL notes? Type 'yes' to confirm: ")
-    if confirm.lower() == "yes":
-        try:
-            os.remove(NOTES_FILE)
-            print("All notes deleted.")
-        except FileNotFoundError:
-            print("No notes file to delete.")
-    else:
-        print("Cancelled.")
-
-# Main loop
 while True:
-    print("\\n--- Note Taker ---")
-    print("1. Add note")
-    print("2. View notes")
-    print("3. Search notes")
-    print("4. Delete all")
-    print("5. Quit")
-
+    print("\\n1. Add  2. View  3. Search  4. Quit")
     choice = input("Choice: ").strip()
-    if choice == "1":
-        add_note()
-    elif choice == "2":
-        view_notes()
+    if choice == "1": add_note()
+    elif choice == "2": view_notes()
     elif choice == "3":
-        keyword = input("Search for: ").strip()
-        search_notes(keyword)
-    elif choice == "4":
-        delete_all()
-    elif choice == "5":
-        print("Goodbye!")
-        break""")
-    press_enter()
+        kw = input("Search for: ")
+        search_notes(kw)
+    elif choice == "4": break""",
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson6")
     success("Lesson 6 complete: Error Handling & File Basics")

@@ -17,18 +17,22 @@ Stages:
   5. Recovery & Lessons Learned   (post-incident review, disclosure)
 """
 
+import re
+
 from utils.display import (
     clear_screen, narrator, terminal_prompt, mission_briefing,
-    mission_complete, code_block, info, sub_header, press_enter,
-    C, G, Y, R, DIM, BRIGHT, RESET,
+    mission_complete, code_block, info, success, sub_header, press_enter,
+    C, G, Y, R, M, DIM, BRIGHT, RESET,
 )
 from utils.progress import mark_mission_complete
 from missions.story_engine import (
     command_task, code_task, puzzle_task, choice_task, quiz_task, stage_intro,
+    timed_task, maybe_random_event, generate_dossier,
 )
+from missions.epilogues import show_epilogue
 
 MISSION_KEY = "mission5"
-MAX_SCORE = 100
+MAX_SCORE = 115  # 100 base + up to 15 from timed bonuses
 
 
 def run(progress: dict):
@@ -40,19 +44,22 @@ def run(progress: dict):
         objective="Respond to an active breach: analyze, contain, and recover",
     )
 
+    dossier_path = generate_dossier(5)
+
     score = 0
     score += stage_1_the_alert()
+    score += maybe_random_event(5)
     score += stage_2_log_analysis()
+    score += _easter_egg_attack_rate(progress)
+    score += maybe_random_event(5)
     score += stage_3_containment()
+    score += maybe_random_event(5)
     score += stage_4_forensics()
+    score += maybe_random_event(5)
     score += stage_5_recovery()
 
-    # Cap at max
-    score = min(score, MAX_SCORE)
-
     mission_complete(5, "Code Red", score, MAX_SCORE)
-
-    # Save progress
+    show_epilogue(5, score, MAX_SCORE)
     mark_mission_complete(progress, MISSION_KEY, score, MAX_SCORE)
 
 
@@ -89,7 +96,8 @@ def stage_1_the_alert() -> int:
         "stays inside, more customer data may be exfiltrated."
     )
 
-    score += choice_task(
+    score += timed_task(
+        choice_task,
         prompt_text=(
             "You've just connected to the CloudStream network. The attacker "
             "is still active. What is your FIRST action?"
@@ -115,6 +123,8 @@ def stage_1_the_alert() -> int:
                 5,
             ),
         ],
+        time_limit=45,
+        bonus=5,
     )
 
     narrator(
@@ -295,7 +305,8 @@ def stage_3_containment() -> int:
         "address (203.0.113.42) on the INPUT chain."
     )
 
-    score += command_task(
+    score += timed_task(
+        command_task,
         prompt_text=(
             "Write the iptables command to block ALL incoming traffic from "
             "the attacker's IP address 203.0.113.42 on the INPUT chain."
@@ -311,6 +322,8 @@ def stage_3_containment() -> int:
             "Use iptables -A INPUT to append a rule to the INPUT chain",
             "The -s flag specifies source IP, -j DROP drops the packets",
         ],
+        time_limit=30,
+        bonus=5,
     )
 
     narrator(
@@ -405,7 +418,8 @@ def stage_4_forensics() -> int:
         "cdn_server.img. The standard tool for forensic disk imaging is dd."
     )
 
-    score += command_task(
+    score += timed_task(
+        command_task,
         prompt_text=(
             "Write the dd command to create a forensic image of /dev/sda "
             "and save it to cdn_server.img. Use a block size of 4K for "
@@ -422,6 +436,8 @@ def stage_4_forensics() -> int:
             "dd uses if= for input file and of= for output file",
             "dd if=/dev/sda of=cdn_server.img bs=4K",
         ],
+        time_limit=40,
+        bonus=5,
     )
 
     narrator(
@@ -639,3 +655,38 @@ def stage_5_recovery() -> int:
     press_enter()
 
     return score
+
+
+# ---------------------------------------------------------------------------
+# Easter Egg — Calculate the attack rate
+# ---------------------------------------------------------------------------
+
+def _easter_egg_attack_rate(progress: dict) -> int:
+    """Hidden bonus: calculate the brute-force attack rate from the logs."""
+    narrator(
+        "You stare at the log summary one more time. 847 failed login "
+        "attempts... and the timeline shows the brute-force started at "
+        "01:58 and succeeded at 02:11 — that's 13 minutes. There's "
+        "something buried in those numbers..."
+    )
+    print()
+    bonus_input = input(f"  {M}{BRIGHT}Notice anything about the timing? (Enter to skip):{RESET} ").strip()
+    if bonus_input and re.search(
+        r"847|65(/|\s*per\s*|\s*/\s*)min|65\s*attempts|attempts\s*per\s*min|brute.*rate|rate.*65|~?\s*65",
+        bonus_input,
+        re.IGNORECASE,
+    ):
+        print()
+        success("HIDDEN BONUS: You calculated the attack rate! +10 pts")
+        narrator(
+            "847 attempts in 13 minutes works out to approximately 65 "
+            "attempts per minute — far too fast for a human. This confirms "
+            "the attacker used an automated brute-force tool like Hydra or "
+            "Burp Intruder. That detail strengthens the forensic report and "
+            "helps identify the specific tooling used in the attack."
+        )
+        eggs = progress.setdefault("easter_eggs_found", [])
+        if "mission5" not in eggs:
+            eggs.append("mission5")
+        return 10
+    return 0

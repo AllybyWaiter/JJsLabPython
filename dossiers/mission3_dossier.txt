@@ -1,0 +1,36 @@
+╔══════════════════════════════════════════════════════════╗
+║         DATAVAULT INC. — RECOVERED HASH DUMP            ║
+╚══════════════════════════════════════════════════════════╝
+
+  FILE: shadow_dump.txt
+  RECOVERED: 2025-02-13 23:14:07 UTC
+  SOURCE: Encrypted file server (imaged drive)
+
+  HASH ENTRIES:
+  ─────────────────────────────────────────────────────────
+  server1_admin:5d41402abc4b2a76b9719d911017c592
+  server2_admin:2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+  server3_admin:$2b$12$WApznUPhDubN0oeveSXHp.Rk0rMoTBMRsGJkN4Y7rx6gSecWGnDO6
+  legacy_db:5f4dcc3b5aa765d61d8327deb882cf99
+
+═══════════════════════════════════════════════════════════
+
+  DATAVAULT PASSWORD POLICY DOCUMENT (Current):
+  ─────────────────────────────────────────────────────────
+  Policy ID:     POL-SEC-004 (Rev 2)
+  Last Updated:  2024-06-15
+  Status:        ** OUTDATED — NEEDS REVISION **
+
+  • Minimum length:          8 characters
+  • Complexity:              1 uppercase, 1 number
+  • Rotation:                Every 90 days
+  • Hash algorithm:          MD5 (!! CRITICAL WEAKNESS !!)
+  • Salt:                    None (!! CRITICAL WEAKNESS !!)
+  • Account lockout:         Disabled
+  • MFA:                     Not implemented
+
+  AUDITOR NOTES:
+  This policy fails to meet NIST SP 800-63B guidelines.
+  MD5 without salt is trivially crackable. Recommend
+  immediate migration to bcrypt or Argon2 with per-user
+  salt and cost factor >= 12.

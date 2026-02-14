@@ -12,15 +12,19 @@ Stages:
   4. Debrief                 — password storage best practices
 """
 
+import re
+
 from utils.display import (
     clear_screen, narrator, terminal_prompt, mission_briefing,
-    mission_complete, code_block, info, sub_header, press_enter,
-    C, G, Y, R, DIM, BRIGHT, RESET,
+    mission_complete, code_block, info, success, sub_header, press_enter,
+    C, G, Y, R, M, DIM, BRIGHT, RESET,
 )
 from utils.progress import mark_mission_complete
 from missions.story_engine import (
     command_task, code_task, puzzle_task, choice_task, quiz_task, stage_intro,
+    maybe_random_event, generate_dossier,
 )
+from missions.epilogues import show_epilogue
 
 MISSION_KEY = "mission3"
 MAX_SCORE = 100
@@ -35,18 +39,20 @@ def run(progress: dict):
         objective="Crack recovered password hashes before the data is lost",
     )
 
+    dossier_path = generate_dossier(3)
+
     score = 0
     score += stage_1_hash_identification()
+    score += _easter_egg_legacy_hash(progress)
+    score += maybe_random_event(3)
     score += stage_2_dictionary_attack()
+    score += maybe_random_event(3)
     score += stage_3_advanced_cracking()
+    score += maybe_random_event(3)
     score += stage_4_debrief()
 
-    # Cap at max
-    score = min(score, MAX_SCORE)
-
     mission_complete(3, "The Vault", score, MAX_SCORE)
-
-    # Save progress
+    show_epilogue(3, score, MAX_SCORE)
     mark_mission_complete(progress, MISSION_KEY, score, MAX_SCORE)
 
 
@@ -486,3 +492,33 @@ def stage_4_debrief() -> int:
     press_enter()
 
     return score
+
+
+# ---------------------------------------------------------------------------
+# Easter Egg — Recognize the legacy hash
+# ---------------------------------------------------------------------------
+
+def _easter_egg_legacy_hash(progress: dict) -> int:
+    """Hidden bonus: recognize the 'password' hash from the dossier."""
+    narrator(
+        "You glance at the dossier one more time. There's a fourth hash "
+        "Rachel didn't mention — the legacy_db entry: "
+        "5f4dcc3b5aa765d61d8327deb882cf99. It's not part of the vault "
+        "servers, but something about it looks familiar..."
+    )
+    print()
+    bonus_input = input(f"  {M}{BRIGHT}Recognize it? (Enter to skip):{RESET} ").strip()
+    if bonus_input and re.search(r"^password$", bonus_input, re.IGNORECASE):
+        print()
+        success("HIDDEN BONUS: You recognized the world's worst password! +10 pts")
+        narrator(
+            "5f4dcc3b5aa765d61d8327deb882cf99 is the MD5 hash of 'password' "
+            "— the single most commonly cracked hash in every leaked database. "
+            "If you can spot it on sight, you've seen enough breaches to know "
+            "what you're doing."
+        )
+        eggs = progress.setdefault("easter_eggs_found", [])
+        if "mission3" not in eggs:
+            eggs.append("mission3")
+        return 10
+    return 0

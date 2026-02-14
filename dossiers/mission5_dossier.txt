@@ -1,0 +1,45 @@
+╔══════════════════════════════════════════════════════════╗
+║       CLOUDSTREAM MEDIA — INCIDENT RESPONSE BRIEF       ║
+╚══════════════════════════════════════════════════════════╝
+
+  INCIDENT TIMELINE (Preliminary):
+  ─────────────────────────────────────────────────────────
+  01:58 UTC  Brute-force attack begins on /admin/login
+             Source: 203.0.113.42 (VPS, Eastern Europe)
+             847 attempts in 13 minutes
+  02:11 UTC  Successful admin login (credentials cracked)
+  02:13 UTC  First file upload: cdn_payload.js (trojanized)
+  02:14 UTC  CDN config modified — serving malware to users
+  02:19 UTC  Payment DB queries: /api/payments/export
+  02:47 UTC  SOC Alert #IR-2024-0047 triggered
+  02:48 UTC  On-call responder notified
+
+  SOC ALERT DETAILS:
+  ─────────────────────────────────────────────────────────
+  Alert ID:      SOC-2024-0047
+  Severity:      CRITICAL
+  Triggered by:  CDN integrity check failure
+  Description:   Hash mismatch on 3 CDN JavaScript bundles
+                 cdn_payload.js does not match known-good hash
+  Affected:      cdn-mgmt.cloudstream.io (10.0.2.15)
+                 cdn-edge-01.cloudstream.io (10.0.2.21)
+                 payment-db.cloudstream.io (10.0.3.8)
+
+  INITIAL LOG EXCERPT (access.log):
+  ─────────────────────────────────────────────────────────
+  203.0.113.42 - - [13/Feb:01:58:01] "POST /admin/login" 401
+  203.0.113.42 - - [13/Feb:01:58:02] "POST /admin/login" 401
+  203.0.113.42 - - [13/Feb:01:58:02] "POST /admin/login" 401
+  ... (844 more 401 responses) ...
+  203.0.113.42 - - [13/Feb:02:11:14] "POST /admin/login" 200
+  203.0.113.42 - - [13/Feb:02:13:01] "POST /admin/upload" 200
+  203.0.113.42 - - [13/Feb:02:14:33] "POST /admin/config" 200
+  203.0.113.42 - - [13/Feb:02:19:07] "GET /api/payments/export" 200
+  203.0.113.42 - - [13/Feb:02:19:44] "GET /api/payments/export" 200
+
+  RESPONSE TEAM:
+  ─────────────────────────────────────────────────────────
+  IR Lead:       [YOU]
+  SOC Analyst:   Priya Mehta (night shift)
+  CTO:           David Park
+  Legal:         Pending notification

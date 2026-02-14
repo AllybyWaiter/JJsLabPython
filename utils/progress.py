@@ -27,6 +27,7 @@ MISSION_NAMES = {
 
 DEFAULT_PROGRESS = {
     "user": "",
+    "alias": "",
     "started": "",
     "last_active": "",
     "modules": {
@@ -44,6 +45,8 @@ DEFAULT_PROGRESS = {
     "difficulty": "beginner",
     "audit_checklists_generated": 0,
     "site_tests_run": 0,
+    "cheat_sheets_unlocked": [],
+    "easter_eggs_found": [],
 }
 
 MODULE_NAMES = {
@@ -86,6 +89,9 @@ def load_progress() -> dict:
                 progress.setdefault("modules", {})[mod_key] = {
                     "completed_lessons": [], "quiz_scores": {}, "challenges_done": []
                 }
+        # Backfill alias for existing users
+        if "alias" not in progress:
+            progress["alias"] = ""
         # Backfill missions for existing users
         if "missions" not in progress:
             progress["missions"] = {
@@ -96,6 +102,11 @@ def load_progress() -> dict:
             for mk in MISSION_NAMES:
                 if mk not in progress["missions"]:
                     progress["missions"][mk] = {"completed": False, "score": 0, "max_score": 100}
+        # Backfill cheat sheets and easter eggs for existing users
+        if "cheat_sheets_unlocked" not in progress:
+            progress["cheat_sheets_unlocked"] = []
+        if "easter_eggs_found" not in progress:
+            progress["easter_eggs_found"] = []
         return progress
     return DEFAULT_PROGRESS.copy()
 
@@ -107,10 +118,11 @@ def save_progress(progress: dict):
         json.dump(progress, f, indent=2)
 
 
-def init_progress(username: str) -> dict:
+def init_progress(username: str, alias: str = "") -> dict:
     """Create a new progress record."""
     progress = DEFAULT_PROGRESS.copy()
     progress["user"] = username
+    progress["alias"] = alias
     progress["started"] = datetime.now().isoformat()
     progress["modules"] = {
         k: {"completed_lessons": [], "quiz_scores": {}, "challenges_done": []}
@@ -153,6 +165,10 @@ def mark_mission_complete(progress: dict, mission_key: str, score: int, max_scor
         "max_score": max_score,
         "date": datetime.now().isoformat(),
     }
+    # Auto-unlock cheat sheet for this mission
+    unlocked = progress.setdefault("cheat_sheets_unlocked", [])
+    if mission_key not in unlocked:
+        unlocked.append(mission_key)
     save_progress(progress)
 
 

@@ -1,0 +1,42 @@
+╔══════════════════════════════════════════════════════════╗
+║          PENETRATION TEST AUTHORIZATION LETTER          ║
+╚══════════════════════════════════════════════════════════╝
+
+TO:     [Authorized Penetration Tester]
+FROM:   Sarah Chen, CISO — NovaTech Industries
+DATE:   2025-02-10
+RE:     Authorization for Penetration Testing — ProjectHub
+
+This letter authorizes the bearer to conduct penetration
+testing against the following systems:
+
+  TARGET SCOPE:
+  ─────────────────────────────────────────────────────────
+  • Application:  ProjectHub (Internal Project Management)
+  • URL:          http://projecthub.novatech.local
+  • IP Address:   10.0.1.50
+  • Ports:        22, 80, 443, 3306
+  • Environment:  Production (after-hours testing window)
+
+  AUTHORIZED ACTIVITIES:
+  ─────────────────────────────────────────────────────────
+  • Web application vulnerability scanning
+  • SQL injection testing on all input fields
+  • Cross-site scripting (XSS) testing
+  • Authentication and session management testing
+  • Authorization bypass testing
+  • API endpoint enumeration
+
+  OUT OF SCOPE:
+  ─────────────────────────────────────────────────────────
+  • Denial of service attacks
+  • Social engineering of NovaTech employees
+  • Physical security testing
+  • Testing of systems outside 10.0.1.50
+
+  EMERGENCY CONTACT:
+  ─────────────────────────────────────────────────────────
+  Sarah Chen (CISO):  +1-555-0142
+  NOC On-Call:        +1-555-0199
+
+Signed: Sarah Chen, CISO — NovaTech Industries

@@ -4,6 +4,8 @@ Provides colored output, banners, formatted text blocks, and UI helpers.
 """
 
 import os
+import sys
+import time
 import textwrap
 from colorama import Fore, Back, Style, init
 
@@ -25,6 +27,62 @@ try:
     TERM_WIDTH = min(os.get_terminal_size().columns, 90)
 except OSError:
     TERM_WIDTH = 80
+
+# -- Hacker alias (set via set_agent_alias) --
+_current_alias = ""
+
+
+def set_agent_alias(alias: str):
+    """Set the current agent alias for display in mission screens."""
+    global _current_alias
+    _current_alias = alias
+
+
+# -- ASCII art per mission --
+MISSION_ART = {
+    1: [
+        r"   ┌───────┐  ",
+        r"   │ ░░░░░ │  ",
+        r"   │ ░ X ░ │  ",
+        r"   │ ░░░░░ │  ",
+        r"   └──┤├───┘  ",
+        r"     /  \     ",
+        r"    BROKEN    ",
+    ],
+    2: [
+        r"  [PC]──────[SW]──────[PC]",
+        r"    \        |        /   ",
+        r"     \       |       /    ",
+        r"      ──[FIREWALL]──     ",
+        r"             |            ",
+        r"         [SERVER]         ",
+    ],
+    3: [
+        r"   ╔══════════════╗ ",
+        r"   ║  THE  VAULT  ║ ",
+        r"   ║   ┌──(O)──┐  ║ ",
+        r"   ║   │ ░░░░░ │  ║ ",
+        r"   ║   │ ░░░░░ │  ║ ",
+        r"   ║   └───────┘  ║ ",
+        r"   ╚══════════════╝ ",
+    ],
+    4: [
+        r"       .-''--.      ",
+        r"      /  ◉  ◉ \     ",
+        r"     |    __    |    ",
+        r"      \  ‾‾‾  /     ",
+        r"       '-..-'       ",
+        r"     G H O S T      ",
+    ],
+    5: [
+        r"      ╱╲   ╱╲       ",
+        r"     ╱  ╲ ╱  ╲      ",
+        r"    ╱ ╱╲ ╳ ╱╲ ╲     ",
+        r"   ╱ ╱  ╳╳╳  ╲ ╲   ",
+        r"   ‾‾  FIRE!  ‾‾   ",
+        r"   !! CODE RED !!   ",
+    ],
+}
 
 
 def clear_screen():
@@ -216,7 +274,6 @@ def progress_bar(current: int, total: int, label: str = ""):
 
 def mission_briefing(mission_num: int, title: str, client: str, objective: str):
     """Display a dramatic mission briefing screen."""
-    import time
     clear_screen()
     width = TERM_WIDTH
     print(f"\n{R}{BRIGHT}")
@@ -230,19 +287,40 @@ def mission_briefing(mission_num: int, title: str, client: str, objective: str):
     print(f"  █{' ' * (width - 6)}█")
     print(f"  {'▀' * (width - 4)}")
     print(f"{RESET}")
+
+    # ASCII art for this mission
+    art_lines = MISSION_ART.get(mission_num, [])
+    if art_lines:
+        print(f"{C}{DIM}")
+        for art_line in art_lines:
+            print(f"    {art_line}")
+        print(f"{RESET}")
+
     time.sleep(0.5)
     print(f"  {C}{BRIGHT}CLIENT:{RESET}    {client}")
     print(f"  {C}{BRIGHT}OBJECTIVE:{RESET} {objective}")
+    if _current_alias:
+        print(f"  {C}{BRIGHT}AGENT:{RESET}     {_current_alias}")
     print()
     print(f"  {DIM}{'─' * (width - 4)}{RESET}")
     press_enter()
 
 
 def narrator(text: str):
-    """Print green story narration text with wrapping."""
+    """Print green story narration text with typing animation."""
     wrapped = textwrap.fill(text, width=TERM_WIDTH - 6)
     for line in wrapped.split("\n"):
-        print(f"  {G}{line}{RESET}")
+        sys.stdout.write(f"  {G}")
+        for ch in line:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            if ch in ".!?":
+                time.sleep(0.04)
+            elif ch in ",;:":
+                time.sleep(0.02)
+            else:
+                time.sleep(0.012)
+        sys.stdout.write(f"{RESET}\n")
     print()
 
 
@@ -277,11 +355,65 @@ def mission_complete(mission_num: int, title: str, score: int, max_score: int):
     print(f"  {'═' * (width - 4)}")
     print(f"{RESET}")
     print(f"  {C}SCORE:{RESET}  {score} / {max_score}  ({pct:.0f}%)")
-    filled = int(pct / 100 * 30)
+    filled = min(int(pct / 100 * 30), 30)
     bar = f"{'█' * filled}{'░' * (30 - filled)}"
     print(f"  [{G}{bar}{RESET}]")
     print()
     print(f"  {rating_color}{BRIGHT}RATING: {rating}{RESET}")
+    if _current_alias:
+        print(f"\n  {G}Well done, Agent {_current_alias}.{RESET}")
     print()
     print(f"  {DIM}{'─' * (width - 4)}{RESET}")
     press_enter()
+
+
+# ---------------------------------------------------------------------------
+# Timer display helpers (Feature 12)
+# ---------------------------------------------------------------------------
+
+def timer_header(time_limit: int):
+    """Print a timed-task banner before the task starts."""
+    width = TERM_WIDTH
+    print()
+    print(f"  {Y}{BRIGHT}{'━' * (width - 4)}")
+    print(f"   ⏱  TIMED — you have {time_limit} seconds")
+    print(f"  {'━' * (width - 4)}{RESET}")
+    print()
+
+
+def timer_result(elapsed: float, time_limit: int, bonus_earned: bool):
+    """Print the elapsed time vs limit with color coding."""
+    if bonus_earned:
+        print(f"  {G}{BRIGHT}⏱  {elapsed:.1f}s / {time_limit}s — Speed bonus earned!{RESET}")
+    else:
+        print(f"  {Y}⏱  {elapsed:.1f}s / {time_limit}s — Time exceeded{RESET}")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# Dossier display helpers (Feature 14)
+# ---------------------------------------------------------------------------
+
+def show_dossier(filepath: str):
+    """Print file contents in a styled evidence box."""
+    try:
+        with open(filepath, "r") as f:
+            content = f.read()
+    except FileNotFoundError:
+        error(f"Dossier not found: {filepath}")
+        return
+
+    width = TERM_WIDTH
+    print(f"\n{DIM}{C}  ┌─ CLASSIFIED DOSSIER {'─' * max(0, width - 27)}┐{RESET}")
+    for line in content.split("\n"):
+        truncated = line[:width - 8]
+        print(f"  {DIM}{C}│{RESET} {truncated}")
+    print(f"{DIM}{C}  └{'─' * (width - 4)}┘{RESET}\n")
+
+
+def dossier_notification(filepath: str):
+    """Print a dossier availability notification."""
+    import os
+    filename = os.path.basename(filepath)
+    print(f"\n  {C}{BRIGHT}📁 DOSSIER:{RESET} {filename} saved to {filepath}")
+    print()

@@ -16,15 +16,19 @@ Stages:
   5. The Reveal & Debrief   — present findings, OSINT legality review
 """
 
+import re
+
 from utils.display import (
     clear_screen, narrator, terminal_prompt, mission_briefing,
-    mission_complete, code_block, info, sub_header, press_enter,
-    C, G, Y, R, DIM, BRIGHT, RESET,
+    mission_complete, code_block, info, success, sub_header, press_enter,
+    C, G, Y, R, M, DIM, BRIGHT, RESET,
 )
 from utils.progress import mark_mission_complete
 from missions.story_engine import (
     command_task, code_task, puzzle_task, choice_task, quiz_task, stage_intro,
+    maybe_random_event, generate_dossier,
 )
+from missions.epilogues import show_epilogue
 
 MISSION_KEY = "mission4"
 MAX_SCORE = 100
@@ -41,19 +45,22 @@ def run(progress: dict):
         ),
     )
 
+    dossier_path = generate_dossier(4)
+
     score = 0
     score += stage_1_anonymous_tip()
+    score += maybe_random_event(4)
     score += stage_2_digital_footprint()
+    score += _easter_egg_nameserver(progress)
+    score += maybe_random_event(4)
     score += stage_3_domain_recon()
+    score += maybe_random_event(4)
     score += stage_4_metadata_analysis()
+    score += maybe_random_event(4)
     score += stage_5_reveal_and_debrief()
 
-    # Cap at max
-    score = min(score, MAX_SCORE)
-
     mission_complete(4, "Ghost Protocol", score, MAX_SCORE)
-
-    # Save progress
+    show_epilogue(4, score, MAX_SCORE)
     mark_mission_complete(progress, MISSION_KEY, score, MAX_SCORE)
 
 
@@ -656,3 +663,34 @@ def stage_5_reveal_and_debrief() -> int:
     press_enter()
 
     return score
+
+
+# ---------------------------------------------------------------------------
+# Easter Egg — Investigate the nameserver
+# ---------------------------------------------------------------------------
+
+def _easter_egg_nameserver(progress: dict) -> int:
+    """Hidden bonus: investigate the suspicious shadowdns.net nameservers."""
+    narrator(
+        "Something nags at you. The WHOIS results showed the nameservers "
+        "as ns1.shadowdns.net and ns2.shadowdns.net — a privacy-focused "
+        "DNS provider. But who runs shadowdns.net itself? That might be "
+        "worth a quick look..."
+    )
+    print()
+    bonus_input = input(f"  {G}{BRIGHT}root@target:~${RESET} ").strip()
+    if bonus_input and re.search(r"whois\s+shadowdns\.net", bonus_input, re.IGNORECASE):
+        print()
+        success("HIDDEN BONUS: You investigated the nameserver! +10 pts")
+        narrator(
+            "The WHOIS for shadowdns.net reveals it was registered through "
+            "the same Panama registrar — NameSilo — on the same day as the "
+            "VantageCorp domains. The adversary didn't just use a privacy DNS "
+            "service; they CREATED one. This is a significant finding that "
+            "strengthens the infrastructure fingerprint."
+        )
+        eggs = progress.setdefault("easter_eggs_found", [])
+        if "mission4" not in eggs:
+            eggs.append("mission4")
+        return 10
+    return 0

@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from utils.display import (
     clear_screen, banner, section_header, sub_header, show_menu,
     info, success, warning, error, disclaimer, press_enter,
-    progress_bar, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM
+    progress_bar, ask_yes_no, set_agent_alias, C, G, Y, R, RESET, BRIGHT, DIM
 )
 from utils.progress import (
     load_progress, save_progress, init_progress, get_overall_stats,
@@ -31,6 +31,7 @@ from utils.progress import (
 )
 from utils.audit_checklist import checklist_menu
 from utils.site_tester import site_tester_menu
+from utils.cheat_sheets import cheat_sheets_menu
 from exercises.exercise_runner import exercises_menu
 
 
@@ -76,6 +77,8 @@ def show_progress_dashboard(progress: dict):
     info(f"Difficulty level: {stats['difficulty'].title()}")
     info(f"Audit checklists generated: {progress.get('audit_checklists_generated', 0)}")
     info(f"Site tests run: {progress.get('site_tests_run', 0)}")
+    info(f"Tool cheat sheets unlocked: {len(progress.get('cheat_sheets_unlocked', []))}/5")
+    info(f"Easter eggs found: {len(progress.get('easter_eggs_found', []))}/5")
 
     sub_header("Module Breakdown")
     for mod_key, mod_name in MODULE_NAMES.items():
@@ -127,7 +130,8 @@ def settings_menu(progress: dict):
         elif choice == "reset":
             if ask_yes_no("Are you sure you want to reset ALL progress? This cannot be undone"):
                 username = progress.get("user", "Analyst")
-                progress.update(init_progress(username))
+                alias = progress.get("alias", "")
+                progress.update(init_progress(username, alias))
                 success("Progress has been reset.")
                 press_enter()
 
@@ -253,9 +257,14 @@ def main():
         print()
         info("Welcome to JJ's LAB! Let's get you set up.")
         username = input(f"  {C}What's your name? {RESET}").strip() or "Security Analyst"
-        progress = init_progress(username)
+        alias = input(f"  {C}Choose a hacker alias (or press Enter to skip): {RESET}").strip()
+        progress = init_progress(username, alias)
+        set_agent_alias(alias)
         print()
-        success(f"Hey {username}! Great to have you here.")
+        if alias:
+            success(f"Hey {username}! Welcome, Agent {alias}.")
+        else:
+            success(f"Hey {username}! Great to have you here.")
         print()
         info("A few tips before you start:")
         print(f"  {C}-{RESET} Start with Module 0 (Python Fundamentals) if you're new to coding")
@@ -263,6 +272,9 @@ def main():
         print(f"  {C}-{RESET} Take your time -- there's no rush!")
         print(f"  {C}-{RESET} Your progress is saved automatically")
         press_enter()
+
+    # Set alias from loaded progress
+    set_agent_alias(progress.get("alias", ""))
 
     # Main loop
     while True:
@@ -274,7 +286,11 @@ def main():
         print()
 
         user = progress.get("user", "Analyst")
-        info(f"Welcome back, {user}!")
+        alias = progress.get("alias", "")
+        if alias:
+            info(f"Welcome back, Agent {alias}!")
+        else:
+            info(f"Welcome back, {user}!")
         print()
 
         choice = show_menu("Main Menu", [
@@ -285,6 +301,7 @@ def main():
             ("site_test", "Test Your Own Site"),
             ("checklist", "Generate Security Audit Checklist"),
             ("progress", "View Progress Dashboard"),
+            ("cheatsheets", "Tool Cheat Sheets"),
             ("settings", "Settings"),
         ], back=False)
 
@@ -312,6 +329,9 @@ def main():
 
         elif choice == "progress":
             show_progress_dashboard(progress)
+
+        elif choice == "cheatsheets":
+            cheat_sheets_menu(progress)
 
         elif choice == "settings":
             settings_menu(progress)

@@ -1,0 +1,37 @@
+╔══════════════════════════════════════════════════════════╗
+║         APEX DYNAMICS — OSINT INVESTIGATION BRIEF       ║
+╚══════════════════════════════════════════════════════════╝
+
+  TARGET SOCIAL MEDIA SUMMARY:
+  ─────────────────────────────────────────────────────────
+  Entity:        Vantage Corp (also: Vantage Holdings Group)
+  LinkedIn:      23 employees listed (est. founded 2024)
+  Twitter/X:     @VantageCorpIO — 142 followers, low activity
+  GitHub:        github.com/vantagecorp — 2 public repos
+                 (both empty README-only, created Sep 2025)
+
+  NOTABLE EMPLOYEES (LinkedIn):
+  • CEO: "David Kessler" — no prior work history listed
+  • CTO: "Elena Markov" — previously at Apex Dynamics (!)
+         Left Apex: August 2025
+         Joined Vantage: September 2025
+
+  DOMAIN WHOIS RECORD:
+  ─────────────────────────────────────────────────────────
+  Domain:        vantagecorp.io
+  Registrar:     NameSilo, LLC
+  Created:       2025-09-14T08:33:17Z
+  Updated:       2025-11-02T14:21:05Z
+  Registrant:    Vantage Holdings Group
+  Country:       PA (Panama)
+  Name Servers:  ns1.shadowdns.net, ns2.shadowdns.net
+
+  RELATED DOMAINS (same registrant pattern):
+  ─────────────────────────────────────────────────────────
+  vantagecorp.io        2025-09-14  NameSilo  Panama
+  vantageholdings.io    2025-09-14  NameSilo  Panama
+  vantage-data.io       2025-09-15  NameSilo  Panama
+  vntgcorp.net          2025-09-15  NameSilo  Panama
+
+  RISK ASSESSMENT: HIGH — Infrastructure pattern matches
+  known corporate espionage tradecraft.

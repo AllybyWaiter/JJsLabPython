@@ -12,6 +12,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.guided_practice import guided_practice
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -199,38 +200,87 @@ for family, socktype, proto, canonname, sockaddr in results:
 
     pace()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge")
-    info("Write a script that connects to a given host and port, sends a simple")
-    info("message, receives the response, and prints it. Use a timeout and a")
-    info("context manager.\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Use 'with socket.socket(AF_INET, SOCK_STREAM) as s:' and remember settimeout().")
-        hint_text("Use sendall() for reliability, recv(4096) for the response.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
-import socket
-
-def connect_and_send(host, port, message):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.settimeout(5)
-        try:
-            s.connect((host, port))
-            s.sendall(message.encode())
-            response = s.recv(4096)
-            print(f"Response: {response.decode(errors='replace')}")
-        except socket.timeout:
-            print("Connection timed out")
-        except ConnectionRefusedError:
-            print(f"Connection refused on {host}:{port}")
-
-# Example usage:
-connect_and_send("127.0.0.1", 80, "GET / HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n")""")
-    press_enter()
+    # ── Guided Practice ──
+    guided_practice(
+        title="Connect and Send",
+        intro="Build a script that connects to a host, sends a message, and receives the response.",
+        steps=[
+            {
+                "instruction": (
+                    "Create a TCP socket using a context manager and set a 5-second timeout.\n"
+                    "Example: with socket.socket(AF_INET, SOCK_STREAM) as s:"
+                ),
+                "required_keywords": ["socket", "with", "settimeout"],
+                "hints": [
+                    "Start with: with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:",
+                    "After the 'with' line, call s.settimeout(5)",
+                ],
+                "solution": (
+                    "with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:\n"
+                    "    s.settimeout(5)"
+                ),
+            },
+            {
+                "instruction": (
+                    "Connect to a host and port, then send a message using sendall().\n"
+                    "Remember: sendall() guarantees all bytes are sent."
+                ),
+                "required_keywords": ["connect", "sendall"],
+                "hints": [
+                    "Use s.connect((host, port)) to establish the connection.",
+                    "Use s.sendall(message.encode()) to send the data.",
+                ],
+                "solution": (
+                    "    s.connect((host, port))\n"
+                    "    s.sendall(message.encode())"
+                ),
+                "context_code": (
+                    "with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:\n"
+                    "    s.settimeout(5)"
+                ),
+            },
+            {
+                "instruction": (
+                    "Receive the response with recv() and add error handling\n"
+                    "with try/except for timeouts."
+                ),
+                "required_keywords": ["recv", "except"],
+                "hints": [
+                    "Use response = s.recv(4096) to read up to 4096 bytes.",
+                    "Wrap everything in try/except socket.timeout:",
+                ],
+                "solution": (
+                    "    try:\n"
+                    "        s.connect((host, port))\n"
+                    "        s.sendall(message.encode())\n"
+                    "        response = s.recv(4096)\n"
+                    "        print(response.decode(errors='replace'))\n"
+                    "    except socket.timeout:\n"
+                    "        print('Connection timed out')"
+                ),
+                "context_code": (
+                    "with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:\n"
+                    "    s.settimeout(5)"
+                ),
+            },
+        ],
+        complete_solution=(
+            "import socket\n\n"
+            "def connect_and_send(host, port, message):\n"
+            "    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:\n"
+            "        s.settimeout(5)\n"
+            "        try:\n"
+            "            s.connect((host, port))\n"
+            "            s.sendall(message.encode())\n"
+            "            response = s.recv(4096)\n"
+            "            print(f'Response: {response.decode(errors=\"replace\")}')\n"
+            "        except socket.timeout:\n"
+            "            print('Connection timed out')\n"
+            "        except ConnectionRefusedError:\n"
+            "            print(f'Connection refused on {host}:{port}')\n\n"
+            "connect_and_send('127.0.0.1', 80, 'GET / HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n')"
+        ),
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson1")
     success("Lesson 1 complete: Socket Programming Basics")
@@ -433,56 +483,98 @@ print(response.status_code)""")
 
     pace()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge")
-    info("Write a script that takes a URL, makes a GET request, and prints:")
-    info("  - Status code and reason")
-    info("  - All response headers")
-    info("  - The first 500 characters of the body")
-    info("  - Whether the server header reveals software version info\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Use response.headers to iterate all headers.")
-        hint_text("Check if 'Server' in response.headers and look for version numbers.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
-import requests
-import re
-
-def inspect_url(url):
-    try:
-        resp = requests.get(url, timeout=10, allow_redirects=True)
-
-        print(f"Status: {resp.status_code} {resp.reason}")
-        print(f"Final URL: {resp.url}")
-        print()
-
-        print("Response Headers:")
-        for key, value in resp.headers.items():
-            print(f"  {key}: {value}")
-        print()
-
-        print(f"Body (first 500 chars):\\n{resp.text[:500]}")
-        print()
-
-        # Check for server version disclosure
-        server = resp.headers.get("Server", "")
-        if server:
-            if re.search(r"[\\d]+\\.[\\d]+", server):
-                print(f"[!] Server header discloses version: {server}")
-            else:
-                print(f"[i] Server header: {server} (no version found)")
-        else:
-            print("[i] No Server header present")
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
-
-inspect_url("https://example.com")""")
-    press_enter()
+    # ── Guided Practice ──
+    guided_practice(
+        title="URL Inspector",
+        intro="Build a script that inspects a URL's response: status, headers, and version disclosure.",
+        steps=[
+            {
+                "instruction": (
+                    "Make a GET request to a URL and print the status code.\n"
+                    "Use the requests library with a timeout."
+                ),
+                "required_keywords": ["requests", "get", "status_code"],
+                "hints": [
+                    "Use resp = requests.get(url, timeout=10)",
+                    "Print with: print(f'Status: {resp.status_code}')",
+                ],
+                "solution": (
+                    "import requests\n\n"
+                    "resp = requests.get('https://example.com', timeout=10)\n"
+                    "print(f'Status: {resp.status_code} {resp.reason}')"
+                ),
+            },
+            {
+                "instruction": (
+                    "Loop through all response headers and print each key-value pair.\n"
+                    "Use the .items() method on the headers dict."
+                ),
+                "required_keywords": ["headers", "for", "items"],
+                "hints": [
+                    "Response headers are in resp.headers — it works like a dict.",
+                    "Use: for key, value in resp.headers.items():",
+                ],
+                "solution": (
+                    "for key, value in resp.headers.items():\n"
+                    "    print(f'  {key}: {value}')"
+                ),
+                "context_code": (
+                    "resp = requests.get('https://example.com', timeout=10)\n"
+                    "print(f'Status: {resp.status_code} {resp.reason}')"
+                ),
+            },
+            {
+                "instruction": (
+                    "Check the Server header for version disclosure.\n"
+                    "Use the re module to look for version numbers (digits with dots)."
+                ),
+                "required_keywords": ["Server", "re"],
+                "hints": [
+                    "Get the header with: server = resp.headers.get('Server', '')",
+                    "Use re.search(r'\\d+\\.\\d+', server) to find version numbers.",
+                ],
+                "solution": (
+                    "import re\n\n"
+                    "server = resp.headers.get('Server', '')\n"
+                    "if server and re.search(r'\\d+\\.\\d+', server):\n"
+                    "    print(f'[!] Version disclosed: {server}')\n"
+                    "else:\n"
+                    "    print(f'[i] Server: {server or \"not present\"}')"
+                ),
+                "context_code": (
+                    "resp = requests.get('https://example.com', timeout=10)\n"
+                    "print(f'Status: {resp.status_code}')\n"
+                    "for key, value in resp.headers.items():\n"
+                    "    print(f'  {key}: {value}')"
+                ),
+            },
+        ],
+        complete_solution=(
+            "import requests\nimport re\n\n"
+            "def inspect_url(url):\n"
+            "    try:\n"
+            "        resp = requests.get(url, timeout=10, allow_redirects=True)\n"
+            "        print(f'Status: {resp.status_code} {resp.reason}')\n"
+            "        print()\n"
+            "        print('Response Headers:')\n"
+            "        for key, value in resp.headers.items():\n"
+            "            print(f'  {key}: {value}')\n"
+            "        print()\n"
+            "        print(f'Body (first 500 chars):\\n{resp.text[:500]}')\n"
+            "        print()\n"
+            "        server = resp.headers.get('Server', '')\n"
+            "        if server:\n"
+            "            if re.search(r'\\d+\\.\\d+', server):\n"
+            "                print(f'[!] Server header discloses version: {server}')\n"
+            "            else:\n"
+            "                print(f'[i] Server header: {server} (no version found)')\n"
+            "        else:\n"
+            "            print('[i] No Server header present')\n"
+            "    except requests.exceptions.RequestException as e:\n"
+            "        print(f'Error: {e}')\n\n"
+            "inspect_url('https://example.com')"
+        ),
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson2")
     success("Lesson 2 complete: HTTP with Requests")
@@ -706,54 +798,110 @@ if ok:
 
     pace()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge")
-    info("Write a function that safely runs a system command, captures output,")
-    info("handles timeouts, and returns structured results. Then use it to get")
-    info("the system hostname, current user, and Python version.\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Wrap subprocess.run() in a try/except for TimeoutExpired and FileNotFoundError.")
-        hint_text("Return a dict with 'success', 'output', and 'error' keys.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
-import subprocess
-
-def safe_run(cmd_list, timeout=10):
-    \"\"\"Safely execute a command and return structured results.\"\"\"
-    result = {"success": False, "output": "", "error": "", "returncode": -1}
-    try:
-        proc = subprocess.run(
-            cmd_list,
-            capture_output=True,
-            text=True,
-            timeout=timeout
-        )
-        result["returncode"] = proc.returncode
-        result["output"] = proc.stdout.strip()
-        result["error"] = proc.stderr.strip()
-        result["success"] = proc.returncode == 0
-    except subprocess.TimeoutExpired:
-        result["error"] = f"Timed out after {timeout}s"
-    except FileNotFoundError:
-        result["error"] = f"Command not found: {cmd_list[0]}"
-    return result
-
-# Gather system info
-for label, cmd in [
-    ("Hostname", ["hostname"]),
-    ("User", ["whoami"]),
-    ("Python", ["python3", "--version"]),
-]:
-    r = safe_run(cmd)
-    if r["success"]:
-        print(f"  {label}: {r['output']}")
-    else:
-        print(f"  {label}: ERROR - {r['error']}")""")
-    press_enter()
+    # ── Guided Practice ──
+    guided_practice(
+        title="Safe Command Runner",
+        intro="Build a function that safely runs system commands with error handling.",
+        steps=[
+            {
+                "instruction": (
+                    "Define a function called safe_run that takes a command list\n"
+                    "and calls subprocess.run() with capture_output=True and text=True."
+                ),
+                "required_keywords": ["def", "subprocess", "run"],
+                "hints": [
+                    "Start with: def safe_run(cmd_list, timeout=10):",
+                    "Inside, call: proc = subprocess.run(cmd_list, capture_output=True, text=True)",
+                ],
+                "solution": (
+                    "import subprocess\n\n"
+                    "def safe_run(cmd_list, timeout=10):\n"
+                    "    proc = subprocess.run(\n"
+                    "        cmd_list,\n"
+                    "        capture_output=True,\n"
+                    "        text=True,\n"
+                    "        timeout=timeout\n"
+                    "    )\n"
+                    "    return proc"
+                ),
+            },
+            {
+                "instruction": (
+                    "Add error handling for TimeoutExpired and capture_output.\n"
+                    "Wrap the subprocess.run() call in try/except."
+                ),
+                "required_keywords": ["capture_output", "TimeoutExpired"],
+                "hints": [
+                    "Use try/except subprocess.TimeoutExpired to catch slow commands.",
+                    "Don't forget capture_output=True to grab stdout and stderr.",
+                ],
+                "solution": (
+                    "def safe_run(cmd_list, timeout=10):\n"
+                    "    result = {'success': False, 'output': '', 'error': ''}\n"
+                    "    try:\n"
+                    "        proc = subprocess.run(\n"
+                    "            cmd_list, capture_output=True, text=True, timeout=timeout\n"
+                    "        )\n"
+                    "        result['success'] = proc.returncode == 0\n"
+                    "        result['output'] = proc.stdout.strip()\n"
+                    "    except subprocess.TimeoutExpired:\n"
+                    "        result['error'] = 'Command timed out'\n"
+                    "    return result"
+                ),
+                "context_code": (
+                    "import subprocess\n\n"
+                    "def safe_run(cmd_list, timeout=10):"
+                ),
+            },
+            {
+                "instruction": (
+                    "Use your safe_run function to get the system hostname and\n"
+                    "current user (whoami). Print the results."
+                ),
+                "required_keywords": ["hostname", "whoami"],
+                "hints": [
+                    "Call safe_run(['hostname']) and safe_run(['whoami'])",
+                    "Check result['success'] before printing result['output']",
+                ],
+                "solution": (
+                    "for label, cmd in [('Hostname', ['hostname']), ('User', ['whoami'])]:\n"
+                    "    r = safe_run(cmd)\n"
+                    "    if r['success']:\n"
+                    "        print(f'  {label}: {r[\"output\"]}')\n"
+                    "    else:\n"
+                    "        print(f'  {label}: ERROR - {r[\"error\"]}')"
+                ),
+            },
+        ],
+        complete_solution=(
+            "import subprocess\n\n"
+            "def safe_run(cmd_list, timeout=10):\n"
+            "    result = {'success': False, 'output': '', 'error': '', 'returncode': -1}\n"
+            "    try:\n"
+            "        proc = subprocess.run(\n"
+            "            cmd_list, capture_output=True, text=True, timeout=timeout\n"
+            "        )\n"
+            "        result['returncode'] = proc.returncode\n"
+            "        result['output'] = proc.stdout.strip()\n"
+            "        result['error'] = proc.stderr.strip()\n"
+            "        result['success'] = proc.returncode == 0\n"
+            "    except subprocess.TimeoutExpired:\n"
+            "        result['error'] = f'Timed out after {timeout}s'\n"
+            "    except FileNotFoundError:\n"
+            "        result['error'] = f'Command not found: {cmd_list[0]}'\n"
+            "    return result\n\n"
+            "for label, cmd in [\n"
+            "    ('Hostname', ['hostname']),\n"
+            "    ('User', ['whoami']),\n"
+            "    ('Python', ['python3', '--version']),\n"
+            "]:\n"
+            "    r = safe_run(cmd)\n"
+            "    if r['success']:\n"
+            "        print(f'  {label}: {r[\"output\"]}')\n"
+            "    else:\n"
+            "        print(f'  {label}: ERROR - {r[\"error\"]}')"
+        ),
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson3")
     success("Lesson 3 complete: Subprocess & OS Interaction")
@@ -987,53 +1135,107 @@ with tempfile.TemporaryDirectory(prefix='seclab_') as tmp_dir:
 
     pace()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge")
-    info("Write a script that scans a directory tree for files that might contain")
-    info("secrets. Look for files named .env, *password*, *secret*, *credential*,")
-    info("*.key, *.pem. For each file found, print its path and file permissions.\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Use os.walk() to traverse directories, os.stat() for permissions.")
-        hint_text("Use stat.filemode() to convert permission bits to a readable string.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
-import os
-import stat
-
-def scan_for_secrets(start_path):
-    secret_patterns = ['.env', 'password', 'secret', 'credential', 'private']
-    secret_extensions = ['.key', '.pem', '.p12', '.pfx', '.jks']
-    findings = []
-
-    for dirpath, dirnames, filenames in os.walk(start_path):
-        dirnames[:] = [d for d in dirnames if not d.startswith('.')]
-        for fname in filenames:
-            fname_lower = fname.lower()
-            is_suspicious = (
-                any(pat in fname_lower for pat in secret_patterns) or
-                any(fname_lower.endswith(ext) for ext in secret_extensions)
-            )
-            if is_suspicious:
-                full_path = os.path.join(dirpath, fname)
-                try:
-                    st = os.stat(full_path)
-                    mode = stat.filemode(st.st_mode)
-                    size = st.st_size
-                    findings.append((full_path, mode, size))
-                except PermissionError:
-                    findings.append((full_path, "ACCESS DENIED", 0))
-
-    print(f"Scan of {start_path} complete. {len(findings)} suspicious files:")
-    for path, mode, size in findings:
-        print(f"  [{mode}] {size:>8} bytes  {path}")
-    return findings
-
-scan_for_secrets(os.path.expanduser("~"))""")
-    press_enter()
+    # ── Guided Practice ──
+    guided_practice(
+        title="Secret Scanner",
+        intro="Build a script that scans directories for files that might contain secrets.",
+        steps=[
+            {
+                "instruction": (
+                    "Define a function and use os.walk() to loop through all\n"
+                    "files in a directory tree. os.walk() yields (dirpath, dirnames, filenames)."
+                ),
+                "required_keywords": ["def", "os.walk", "for"],
+                "hints": [
+                    "Start with: def scan_for_secrets(start_path):",
+                    "Use: for dirpath, dirnames, filenames in os.walk(start_path):",
+                ],
+                "solution": (
+                    "import os\n\n"
+                    "def scan_for_secrets(start_path):\n"
+                    "    for dirpath, dirnames, filenames in os.walk(start_path):\n"
+                    "        for fname in filenames:\n"
+                    "            print(fname)"
+                ),
+            },
+            {
+                "instruction": (
+                    "Check each filename for suspicious patterns like .env and .key.\n"
+                    "Look for filenames containing 'password', 'secret', or ending in '.key', '.pem'."
+                ),
+                "required_keywords": ["if", ".env", ".key"],
+                "hints": [
+                    "Check with: if '.env' in fname or fname.endswith('.key'):",
+                    "You can also use: any(pat in fname for pat in ['.env', 'secret', 'password'])",
+                ],
+                "solution": (
+                    "    for fname in filenames:\n"
+                    "        fname_lower = fname.lower()\n"
+                    "        if any(p in fname_lower for p in ['.env', 'password', 'secret']):\n"
+                    "            print(f'Suspicious: {fname}')\n"
+                    "        elif fname_lower.endswith(('.key', '.pem')):\n"
+                    "            print(f'Suspicious: {fname}')"
+                ),
+                "context_code": (
+                    "def scan_for_secrets(start_path):\n"
+                    "    for dirpath, dirnames, filenames in os.walk(start_path):"
+                ),
+            },
+            {
+                "instruction": (
+                    "Get file permissions using os.stat() and print results.\n"
+                    "Use stat.filemode() to convert permission bits to a readable string."
+                ),
+                "required_keywords": ["stat", "print"],
+                "hints": [
+                    "Build the full path: full_path = os.path.join(dirpath, fname)",
+                    "Get info: st = os.stat(full_path) then stat.filemode(st.st_mode)",
+                ],
+                "solution": (
+                    "import stat\n\n"
+                    "full_path = os.path.join(dirpath, fname)\n"
+                    "st = os.stat(full_path)\n"
+                    "mode = stat.filemode(st.st_mode)\n"
+                    "print(f'  [{mode}] {st.st_size:>8} bytes  {full_path}')"
+                ),
+                "context_code": (
+                    "def scan_for_secrets(start_path):\n"
+                    "    for dirpath, dirnames, filenames in os.walk(start_path):\n"
+                    "        for fname in filenames:\n"
+                    "            if is_suspicious:  # (pattern matching from step 2)\n"
+                    "                # Get file info here"
+                ),
+            },
+        ],
+        complete_solution=(
+            "import os\nimport stat\n\n"
+            "def scan_for_secrets(start_path):\n"
+            "    secret_patterns = ['.env', 'password', 'secret', 'credential', 'private']\n"
+            "    secret_extensions = ['.key', '.pem', '.p12', '.pfx', '.jks']\n"
+            "    findings = []\n\n"
+            "    for dirpath, dirnames, filenames in os.walk(start_path):\n"
+            "        dirnames[:] = [d for d in dirnames if not d.startswith('.')]\n"
+            "        for fname in filenames:\n"
+            "            fname_lower = fname.lower()\n"
+            "            is_suspicious = (\n"
+            "                any(pat in fname_lower for pat in secret_patterns) or\n"
+            "                any(fname_lower.endswith(ext) for ext in secret_extensions)\n"
+            "            )\n"
+            "            if is_suspicious:\n"
+            "                full_path = os.path.join(dirpath, fname)\n"
+            "                try:\n"
+            "                    st = os.stat(full_path)\n"
+            "                    mode = stat.filemode(st.st_mode)\n"
+            "                    findings.append((full_path, mode, st.st_size))\n"
+            "                except PermissionError:\n"
+            "                    findings.append((full_path, 'ACCESS DENIED', 0))\n\n"
+            "    print(f'Scan complete. {len(findings)} suspicious files:')\n"
+            "    for path, mode, size in findings:\n"
+            "        print(f'  [{mode}] {size:>8} bytes  {path}')\n"
+            "    return findings\n\n"
+            "scan_for_secrets(os.path.expanduser('~'))"
+        ),
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson4")
     success("Lesson 4 complete: File I/O for Security")
@@ -1308,60 +1510,105 @@ analyze_auth_log(sample_auth)""")
 
     pace()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge")
-    info("Write a log analyzer that reads log lines and produces a summary report:")
-    info("  - Total lines processed")
-    info("  - Unique IP addresses with request counts")
-    info("  - Any lines containing error status codes (4xx or 5xx)")
-    info("  - Potential SQL injection attempts\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("Combine re.findall() for IPs, re.search() for status codes.")
-        hint_text("Use Counter for aggregating IP counts.")
-
-    press_enter()
-
-    if ask_yes_no("Show the full solution?"):
-        code_block("""\
-import re
-from collections import Counter
-
-def analyze_logs(log_lines):
-    ip_re = re.compile(r'\\b(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\b')
-    status_re = re.compile(r'\\s([45]\\d{2})\\s')
-    sqli_re = re.compile(
-        r\"(UNION\\s+SELECT|OR\\s+1\\s*=\\s*1|'\\s*OR\\s*'|DROP\\s+TABLE)\",
-        re.IGNORECASE
+    # ── Guided Practice ──
+    guided_practice(
+        title="Log Analyzer",
+        intro="Build a log analyzer that extracts IPs, status codes, and attack patterns.",
+        steps=[
+            {
+                "instruction": (
+                    "Compile regex patterns for extracting IP addresses and\n"
+                    "HTTP status codes. Use re.compile() with \\d for digits."
+                ),
+                "required_keywords": ["re", "compile", "\\d"],
+                "hints": [
+                    "IP pattern: re.compile(r'\\b(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\b')",
+                    "Status pattern: re.compile(r'\\s([45]\\d{2})\\s') matches 4xx and 5xx codes.",
+                ],
+                "solution": (
+                    "import re\n\n"
+                    "ip_re = re.compile(r'\\b(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\b')\n"
+                    "status_re = re.compile(r'\\s([45]\\d{2})\\s')"
+                ),
+            },
+            {
+                "instruction": (
+                    "Loop through log lines and use .search() to find matches.\n"
+                    "Append each found IP to a list for counting later."
+                ),
+                "required_keywords": ["for", "search", "append"],
+                "hints": [
+                    "Loop: for line in log_lines:",
+                    "Search: match = ip_re.search(line) then ips.append(match.group(1))",
+                ],
+                "solution": (
+                    "ips = []\nerrors = []\n\n"
+                    "for line in log_lines:\n"
+                    "    ip_match = ip_re.search(line)\n"
+                    "    if ip_match:\n"
+                    "        ips.append(ip_match.group(1))\n"
+                    "    status_match = status_re.search(line)\n"
+                    "    if status_match:\n"
+                    "        errors.append((status_match.group(1), line.strip()))"
+                ),
+                "context_code": (
+                    "ip_re = re.compile(r'\\b(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\b')\n"
+                    "status_re = re.compile(r'\\s([45]\\d{2})\\s')"
+                ),
+            },
+            {
+                "instruction": (
+                    "Print a summary report showing IP counts using Counter.\n"
+                    "Import Counter from collections and use .most_common()."
+                ),
+                "required_keywords": ["print", "Counter"],
+                "hints": [
+                    "Import: from collections import Counter",
+                    "Use: Counter(ips).most_common(10) to get the top 10 IPs.",
+                ],
+                "solution": (
+                    "from collections import Counter\n\n"
+                    "print(f'Total lines: {len(log_lines)}')\n"
+                    "print('\\nTop IPs:')\n"
+                    "for ip, count in Counter(ips).most_common(10):\n"
+                    "    print(f'  {ip}: {count}')\n"
+                    "print(f'\\nError responses: {len(errors)}')"
+                ),
+            },
+        ],
+        complete_solution=(
+            "import re\nfrom collections import Counter\n\n"
+            "def analyze_logs(log_lines):\n"
+            "    ip_re = re.compile(r'\\b(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\b')\n"
+            "    status_re = re.compile(r'\\s([45]\\d{2})\\s')\n"
+            "    sqli_re = re.compile(\n"
+            "        r'(UNION\\s+SELECT|OR\\s+1\\s*=\\s*1|DROP\\s+TABLE)',\n"
+            "        re.IGNORECASE\n"
+            "    )\n\n"
+            "    ips = []\n"
+            "    errors = []\n"
+            "    sqli_attempts = []\n\n"
+            "    for line in log_lines:\n"
+            "        ip_match = ip_re.search(line)\n"
+            "        if ip_match:\n"
+            "            ips.append(ip_match.group(1))\n"
+            "        status_match = status_re.search(line)\n"
+            "        if status_match:\n"
+            "            errors.append((status_match.group(1), line.strip()))\n"
+            "        if sqli_re.search(line):\n"
+            "            sqli_attempts.append(line.strip())\n\n"
+            "    print(f'Total lines: {len(log_lines)}')\n"
+            "    print('\\nTop IPs:')\n"
+            "    for ip, count in Counter(ips).most_common(10):\n"
+            "        print(f'  {ip}: {count}')\n"
+            "    print(f'\\nError responses: {len(errors)}')\n"
+            "    for code, line in errors[:5]:\n"
+            "        print(f'  [{code}] {line[:80]}')\n"
+            "    print(f'\\nSQLi attempts: {len(sqli_attempts)}')\n"
+            "    for line in sqli_attempts:\n"
+            "        print(f'  [!] {line[:80]}')"
+        ),
     )
-
-    ips = []
-    errors = []
-    sqli_attempts = []
-
-    for line in log_lines:
-        ip_match = ip_re.search(line)
-        if ip_match:
-            ips.append(ip_match.group(1))
-
-        status_match = status_re.search(line)
-        if status_match:
-            errors.append((status_match.group(1), line.strip()))
-
-        if sqli_re.search(line):
-            sqli_attempts.append(line.strip())
-
-    print(f"Total lines: {len(log_lines)}")
-    print(f"\\nTop IPs:")
-    for ip, count in Counter(ips).most_common(10):
-        print(f"  {ip}: {count}")
-    print(f"\\nError responses: {len(errors)}")
-    for code, line in errors[:5]:
-        print(f"  [{code}] {line[:80]}")
-    print(f"\\nSQLi attempts: {len(sqli_attempts)}")
-    for line in sqli_attempts:
-        print(f"  [!] {line[:80]}")""")
-    press_enter()
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson5")
     success("Lesson 5 complete: Regex for Log Parsing")
@@ -1664,53 +1911,101 @@ python3 service_enumerator.py 10.0.0.1 -t 1.0""", language="bash")
 
     pace()
 
-    # ── Practice Challenge ──
-    sub_header("Practice Challenge")
-    info("Extend the service enumerator with one of these features:")
-    info("  1. Add threading to scan ports in parallel (use concurrent.futures)")
-    info("  2. Add a function that checks SSL/TLS certificate details")
-    info("  3. Add output in CSV format in addition to JSON\n")
-
-    if ask_yes_no("Would you like a hint?"):
-        hint_text("For threading: use concurrent.futures.ThreadPoolExecutor with max_workers=20.")
-        hint_text("For SSL: use ssl.create_default_context() and getpeercert().")
-
-    press_enter()
-
-    if ask_yes_no("Show the threaded scanning solution?"):
-        code_block("""\
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
-def scan_ports_threaded(host, ports, timeout=2.0, max_workers=20):
-    \"\"\"Scan multiple ports concurrently using a thread pool.\"\"\"
-    results = []
-
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # Submit all port scans
-        future_to_port = {
-            executor.submit(scan_port, host, port, timeout): port
-            for port in ports
-        }
-
-        # Collect results as they complete
-        for future in as_completed(future_to_port):
-            port = future_to_port[future]
-            try:
-                result = future.result()
-                results.append(result)
-                if result["state"] == "open":
-                    print(f"  [+] Port {port} is open ({result['service']})")
-            except Exception as e:
-                print(f"  [-] Error scanning port {port}: {e}")
-
-    # Sort by port number
-    results.sort(key=lambda r: r["port"])
-    return results
-
-# Usage:
-# results = scan_ports_threaded("192.168.1.1", range(1, 1025), timeout=1.0)
-# Scans 1024 ports in seconds instead of minutes!""")
-    press_enter()
+    # ── Guided Practice ──
+    guided_practice(
+        title="Threaded Port Scanner",
+        intro="Add threading to the service enumerator so it scans ports in parallel.",
+        steps=[
+            {
+                "instruction": (
+                    "Import ThreadPoolExecutor from concurrent.futures.\n"
+                    "This lets you run multiple port scans at the same time."
+                ),
+                "required_keywords": ["concurrent", "ThreadPoolExecutor"],
+                "hints": [
+                    "Use: from concurrent.futures import ThreadPoolExecutor, as_completed",
+                    "ThreadPoolExecutor manages a pool of worker threads for you.",
+                ],
+                "solution": (
+                    "from concurrent.futures import ThreadPoolExecutor, as_completed"
+                ),
+            },
+            {
+                "instruction": (
+                    "Create an executor and submit a scan task for each port.\n"
+                    "Use executor.submit() to queue each port scan."
+                ),
+                "required_keywords": ["submit", "executor"],
+                "hints": [
+                    "Use: with ThreadPoolExecutor(max_workers=20) as executor:",
+                    "Submit tasks: future = executor.submit(scan_port, host, port, timeout)",
+                ],
+                "solution": (
+                    "with ThreadPoolExecutor(max_workers=20) as executor:\n"
+                    "    future_to_port = {\n"
+                    "        executor.submit(scan_port, host, port, timeout): port\n"
+                    "        for port in ports\n"
+                    "    }"
+                ),
+                "context_code": (
+                    "from concurrent.futures import ThreadPoolExecutor, as_completed"
+                ),
+            },
+            {
+                "instruction": (
+                    "Collect results as they complete using as_completed().\n"
+                    "Call future.result() to get each scan's return value."
+                ),
+                "required_keywords": ["as_completed", "result"],
+                "hints": [
+                    "Loop: for future in as_completed(future_to_port):",
+                    "Get the value: result = future.result()",
+                ],
+                "solution": (
+                    "    for future in as_completed(future_to_port):\n"
+                    "        port = future_to_port[future]\n"
+                    "        try:\n"
+                    "            result = future.result()\n"
+                    "            results.append(result)\n"
+                    "            if result['state'] == 'open':\n"
+                    "                print(f'  [+] Port {port} is open')\n"
+                    "        except Exception as e:\n"
+                    "            print(f'  [-] Error scanning port {port}: {e}')"
+                ),
+                "context_code": (
+                    "with ThreadPoolExecutor(max_workers=20) as executor:\n"
+                    "    future_to_port = {\n"
+                    "        executor.submit(scan_port, host, port, timeout): port\n"
+                    "        for port in ports\n"
+                    "    }"
+                ),
+            },
+        ],
+        complete_solution=(
+            "from concurrent.futures import ThreadPoolExecutor, as_completed\n\n"
+            "def scan_ports_threaded(host, ports, timeout=2.0, max_workers=20):\n"
+            "    results = []\n\n"
+            "    with ThreadPoolExecutor(max_workers=max_workers) as executor:\n"
+            "        future_to_port = {\n"
+            "            executor.submit(scan_port, host, port, timeout): port\n"
+            "            for port in ports\n"
+            "        }\n\n"
+            "        for future in as_completed(future_to_port):\n"
+            "            port = future_to_port[future]\n"
+            "            try:\n"
+            "                result = future.result()\n"
+            "                results.append(result)\n"
+            "                if result['state'] == 'open':\n"
+            "                    print(f'  [+] Port {port} is open ({result[\"service\"]})')\n"
+            "            except Exception as e:\n"
+            "                print(f'  [-] Error scanning port {port}: {e}')\n\n"
+            "    results.sort(key=lambda r: r['port'])\n"
+            "    return results\n\n"
+            "# Usage:\n"
+            "# results = scan_ports_threaded('192.168.1.1', range(1, 1025), timeout=1.0)\n"
+            "# Scans 1024 ports in seconds instead of minutes!"
+        ),
+    )
 
     mark_lesson_complete(progress, MODULE_KEY, "lesson6")
     mark_challenge_complete(progress, MODULE_KEY, "security_tool")

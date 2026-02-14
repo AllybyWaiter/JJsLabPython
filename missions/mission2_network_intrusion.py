@@ -12,15 +12,19 @@ Stages:
   4. Containment & Debrief — lock down the network and report findings
 """
 
+import re
+
 from utils.display import (
     clear_screen, narrator, terminal_prompt, mission_briefing,
-    mission_complete, code_block, info, sub_header, press_enter,
-    C, G, Y, R, DIM, BRIGHT, RESET,
+    mission_complete, code_block, info, success, sub_header, press_enter,
+    C, G, Y, R, M, DIM, BRIGHT, RESET,
 )
 from utils.progress import mark_mission_complete
 from missions.story_engine import (
     command_task, code_task, puzzle_task, choice_task, quiz_task, stage_intro,
+    maybe_random_event, generate_dossier,
 )
+from missions.epilogues import show_epilogue
 
 MISSION_KEY = "mission2"
 MAX_SCORE = 100
@@ -35,18 +39,20 @@ def run(progress: dict):
         objective="Investigate anomalous network traffic and neutralize a data exfiltration threat",
     )
 
+    dossier_path = generate_dossier(2)
+
     score = 0
     score += stage_1_network_analysis()
+    score += maybe_random_event(2)
     score += stage_2_packet_investigation()
+    score += maybe_random_event(2)
     score += stage_3_backdoor_discovery()
+    score += _easter_egg_exfil_path(progress)
+    score += maybe_random_event(2)
     score += stage_4_containment()
 
-    # Cap at max
-    score = min(score, MAX_SCORE)
-
     mission_complete(2, "Shadow on the Wire", score, MAX_SCORE)
-
-    # Save progress
+    show_epilogue(2, score, MAX_SCORE)
     mark_mission_complete(progress, MISSION_KEY, score, MAX_SCORE)
 
 
@@ -523,3 +529,37 @@ def stage_4_containment() -> int:
     press_enter()
 
     return score
+
+
+# ---------------------------------------------------------------------------
+# Easter Egg — Decode the exfil path
+# ---------------------------------------------------------------------------
+
+def _easter_egg_exfil_path(progress: dict) -> int:
+    """Hidden bonus: decode the exfil_path field from the malware config."""
+    narrator(
+        "Wait — you glance back at the malware config. The c2_server field "
+        "wasn't the only Base64-encoded value. There's also 'exfil_path': "
+        "L3BhY3MvZGljb20vZXhwb3J0. You already know where the data was "
+        "going, but where was it coming from on the local system?"
+    )
+    print()
+    bonus_input = input(f"  {M}{BRIGHT}Anything else from the config? (Enter to skip):{RESET} ").strip()
+    if bonus_input and re.search(
+        r"/pacs/dicom/export|L3BhY3MvZGljb20vZXhwb3J0",
+        bonus_input,
+        re.IGNORECASE,
+    ):
+        print()
+        success("HIDDEN BONUS: You decoded the exfil path too! +10 pts")
+        narrator(
+            "The exfil path is /pacs/dicom/export — the attacker was pulling "
+            "data directly from the PACS DICOM export directory. This confirms "
+            "exactly which data was targeted: patient imaging files and their "
+            "embedded metadata."
+        )
+        eggs = progress.setdefault("easter_eggs_found", [])
+        if "mission2" not in eggs:
+            eggs.append("mission2")
+        return 10
+    return 0

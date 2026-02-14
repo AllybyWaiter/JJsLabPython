@@ -1,0 +1,35 @@
+╔══════════════════════════════════════════════════════════╗
+║        MERCY GENERAL HOSPITAL — NETWORK TOPOLOGY        ║
+╚══════════════════════════════════════════════════════════╝
+
+  NETWORK DIAGRAM (Simplified):
+  ─────────────────────────────────────────────────────────
+
+       [INTERNET]
+           |
+      [FIREWALL] ── 203.x.x.x (Public)
+           |
+     ┌─────┴──────┐
+     |   CORE SW   |
+     └─────┬──────┘
+      ┌────┼────┬────────┐
+      |    |    |        |
+   [VLAN10] [VLAN20] [VLAN30] [VLAN40]
+   Admin   Medical   PACS    Guest
+   10.10.1.x 10.10.2.x 10.10.4.x 10.10.5.x
+
+  FIREWALL RULE EXCERPT:
+  ─────────────────────────────────────────────────────────
+  RULE 1: ALLOW  TCP  ANY -> 10.10.2.0/24:443  (HTTPS)
+  RULE 2: ALLOW  TCP  10.10.4.0/24 -> ANY:443  (PACS Sync)
+  RULE 3: DENY   TCP  10.10.5.0/24 -> 10.10.2.0/24 (Guest)
+  RULE 4: ALLOW  UDP  ANY -> ANY:53             (DNS)
+  ** NOTE: Rule 2 allows PACS subnet outbound on 443 **
+
+  SUSPICIOUS TRAFFIC LOG (IDS Export):
+  ─────────────────────────────────────────────────────────
+  03:01:22  ALERT  10.10.4.22 -> 185.243.115.42:443
+            Bytes: 214,323,712  |  Duration: 47min
+            Protocol: TLS 1.2 (self-signed cert)
+            Pattern: Fixed 4096-byte bursts every 30s
+            Classification: POSSIBLE DATA EXFILTRATION
