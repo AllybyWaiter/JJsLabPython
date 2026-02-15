@@ -204,6 +204,20 @@ def nice_work(msg: str = "Nice work! You're making great progress."):
     print(f"\n{G}{BRIGHT}  >> {msg}{RESET}\n")
 
 
+def learn_more(resources: list):
+    """Show optional video/article links for deeper learning.
+
+    resources: list of (title, url) tuples.
+    """
+    if not resources:
+        return
+    print(f"\n{C}{BRIGHT}  Want to go deeper? Check these out:{RESET}")
+    for title, url in resources:
+        print(f"  {DIM}-{RESET} {title}")
+        print(f"    {DIM}{url}{RESET}")
+    print()
+
+
 def learning_goal(goals: list[str]):
     """Show what the learner will pick up in this section."""
     print(f"\n{C}{BRIGHT}  In this lesson you will learn:{RESET}")
@@ -417,3 +431,70 @@ def dossier_notification(filepath: str):
     filename = os.path.basename(filepath)
     print(f"\n  {C}{BRIGHT}📁 DOSSIER:{RESET} {filename} saved to {filepath}")
     print()
+
+
+# ---------------------------------------------------------------------------
+# Lesson Checkpoint (Phase 3)
+# ---------------------------------------------------------------------------
+
+class LessonCheckpoint:
+    """Track mid-lesson progress so users can resume where they left off."""
+
+    def __init__(self, progress, module_key, lesson_id, total_steps):
+        from utils.progress import load_checkpoint
+        self.progress = progress
+        self.module_key = module_key
+        self.lesson_id = lesson_id
+        self.total_steps = total_steps
+
+        saved = load_checkpoint(progress, module_key, lesson_id)
+        if saved:
+            self.resume_from = saved.get("step", 1)
+            self.qc_correct = saved.get("qc_correct", 0)
+            self.qc_total = saved.get("qc_total", 0)
+        else:
+            self.resume_from = 1
+            self.qc_correct = 0
+            self.qc_total = 0
+
+        self._current_step = self.resume_from
+
+    def offer_resume(self):
+        """If there's a saved checkpoint, offer to resume or restart."""
+        if self.resume_from > 1:
+            info(f"You stopped at step {self.resume_from}/{self.total_steps} last time.")
+            if ask_yes_no("Resume where you left off?"):
+                success(f"Resuming from step {self.resume_from}...")
+            else:
+                self.resume_from = 1
+                self.qc_correct = 0
+                self.qc_total = 0
+                self._current_step = 1
+
+    def at(self, step_num):
+        """Returns True if this step should execute (not skipped)."""
+        return step_num >= self.resume_from
+
+    def save(self, step_num=None):
+        """Save current progress to disk."""
+        from utils.progress import save_checkpoint
+        if step_num:
+            self._current_step = step_num + 1
+        else:
+            self._current_step += 1
+        save_checkpoint(
+            self.progress, self.module_key, self.lesson_id,
+            self._current_step,
+            {"correct": self.qc_correct, "total": self.qc_total},
+        )
+
+    def record_qc(self, was_correct):
+        """Track a quick check result."""
+        self.qc_total += 1
+        if was_correct:
+            self.qc_correct += 1
+
+    def clear(self):
+        """Remove checkpoint after lesson completion."""
+        from utils.progress import clear_checkpoint
+        clear_checkpoint(self.progress, self.module_key, self.lesson_id)

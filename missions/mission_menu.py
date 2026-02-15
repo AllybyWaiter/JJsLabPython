@@ -5,10 +5,10 @@ Story Mode mission selection menu with completion status.
 import importlib
 
 from utils.display import (
-    show_menu, section_header, info, error, press_enter,
-    G, Y, R, C, DIM, BRIGHT, RESET,
+    show_menu, section_header, info, warning, error, press_enter,
+    ask_yes_no, G, Y, R, C, DIM, BRIGHT, RESET,
 )
-from utils.progress import MISSION_NAMES
+from utils.progress import MISSION_NAMES, MODULE_NAMES, MODULE_LESSON_COUNTS
 
 
 MISSION_MODULES = {
@@ -33,6 +33,15 @@ MISSION_DIFFICULTY = {
     "mission3": ("Beginner", G),
     "mission4": ("Intermediate", Y),
     "mission5": ("Advanced", R),
+}
+
+# Recommended modules to complete before attempting each mission
+MISSION_PREREQUISITES = {
+    "mission1": ["module3"],   # Web Pentest → Web Application Security
+    "mission2": ["module2"],   # Network Intrusion → Network Fundamentals
+    "mission3": ["module4"],   # Password Cracking → Password Security
+    "mission4": ["module5"],   # OSINT → Reconnaissance & OSINT
+    "mission5": ["module7"],   # Incident Response → Log Analysis & IR
 }
 
 
@@ -63,8 +72,31 @@ def missions_menu(progress: dict):
         _launch_mission(choice, progress)
 
 
+def _check_prerequisites(mission_key: str, progress: dict) -> bool:
+    """Check if the learner has completed recommended modules. Returns True to proceed."""
+    prereqs = MISSION_PREREQUISITES.get(mission_key, [])
+    missing = []
+    for mod_key in prereqs:
+        completed = len(progress.get("modules", {}).get(mod_key, {}).get("completed_lessons", []))
+        total = MODULE_LESSON_COUNTS.get(mod_key, 0)
+        if completed < total:
+            missing.append((mod_key, MODULE_NAMES.get(mod_key, mod_key), completed, total))
+
+    if not missing:
+        return True
+
+    warning("This mission builds on knowledge from modules you haven't completed yet:")
+    for mod_key, mod_name, done, total in missing:
+        print(f"  {Y}•{RESET} {mod_name} ({done}/{total} lessons)")
+    print()
+    info("Completing these modules first will help you succeed in this mission.")
+    return ask_yes_no("Continue anyway?")
+
+
 def _launch_mission(mission_key: str, progress: dict):
     """Lazy-load and run a mission."""
+    if not _check_prerequisites(mission_key, progress):
+        return
     try:
         mod = importlib.import_module(MISSION_MODULES[mission_key])
         mod.run(progress)

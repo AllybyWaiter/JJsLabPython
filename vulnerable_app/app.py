@@ -85,11 +85,11 @@ def _init_db(db):
 
         INSERT OR IGNORE INTO users (username, password, email, role, bio)
         VALUES
-            ('admin',    'password123',    'admin@seclab.local',    'admin', 'System administrator'),
+            ('admin',    'password123',    'admin@seclab.local',    'admin', 'FLAG{SQL_INJECTION_BYPASSED}'),
             ('alice',    'alice2024',      'alice@seclab.local',    'user',  'Security researcher'),
             ('bob',      'bob_secure!',    'bob@seclab.local',      'user',  'Pentesting enthusiast'),
             ('charlie',  'charlie789',     'charlie@seclab.local',  'user',  'Bug bounty hunter'),
-            ('diana',    'diana_pass',     'diana@seclab.local',    'user',  'CTF player');
+            ('diana',    'diana_pass',     'diana@seclab.local',    'user',  'FLAG{IDOR_BROKEN_ACCESS}');
 
         INSERT OR IGNORE INTO comments (author, content)
         VALUES
@@ -280,6 +280,10 @@ def upload():
             filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             uploaded.save(filepath)
             message = f"File '{filename}' uploaded successfully to {filepath}"
+            # Flag for CTF: detect dangerous extensions
+            dangerous = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+            if dangerous in ('php', 'jsp', 'asp', 'sh', 'py', 'exe'):
+                message += " | FLAG{FILE_UPLOAD_UNRESTRICTED}"
         else:
             message = "No file selected."
 
@@ -301,6 +305,17 @@ def open_redirect():
     target = request.args.get("url", "/")
 
     # VULN: Redirecting to an unvalidated user-supplied URL
+    # CTF: If target is an external URL, show flag instead of actually redirecting
+    parsed = urlparse(target)
+    if parsed.scheme in ("http", "https") and parsed.netloc not in ("127.0.0.1:5050", "localhost:5050", "127.0.0.1", "localhost"):
+        return render_template_string(
+            "<h1 style='color:#58a6ff;font-family:monospace;text-align:center;margin-top:80px;'>"
+            "Open Redirect Detected!</h1>"
+            "<p style='text-align:center;color:#c9d1d9;'>You would have been redirected to: {{ target }}</p>"
+            "<p style='text-align:center;color:#2ea043;font-size:24px;font-family:monospace;'>FLAG{OPEN_REDIRECT_FOUND}</p>"
+            "<p style='text-align:center;'><a href='/' style='color:#58a6ff;'>Back to Home</a></p>",
+            target=target,
+        )
     return redirect(target)
 
 
@@ -317,7 +332,12 @@ def api_users():
 
     # VULN: No authentication, exposes sensitive fields including passwords
     users = db.execute("SELECT id, username, password, email, role, bio FROM users").fetchall()
-    return jsonify([dict(u) for u in users])
+    user_list = [dict(u) for u in users]
+    # CTF: Add flag to admin user's data
+    for u in user_list:
+        if u.get("role") == "admin":
+            u["flag"] = "FLAG{API_NO_AUTH_REQUIRED}"
+    return jsonify(user_list)
 
 
 # ---------- 8. Hardcoded Credentials (Admin) ----------

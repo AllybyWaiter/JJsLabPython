@@ -16,6 +16,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.case_studies import show_case_study
 
 
 # ---------------------------------------------------------------------------
@@ -1111,6 +1112,16 @@ def check_robots_txt(domain):
         mark_challenge_complete(progress, module_key, "google_dorking_challenge")
         success("Challenge marked complete!")
 
+    scenario_block("Real-World Breach: Equifax (2017)", (
+        "Before exploiting the Apache Struts vulnerability that exposed 147 million "
+        "Americans' data, attackers performed extensive reconnaissance on Equifax's "
+        "infrastructure. They mapped subdomains, identified technologies, and found "
+        "the unpatched server. Public records, WHOIS data, and Shodan results gave "
+        "them a roadmap. The OSINT techniques you learned in this module are the same "
+        "ones attackers use — and the same ones defenders need to audit their own "
+        "exposure before someone else does."
+    ))
+
     press_enter()
     mark_lesson_complete(progress, module_key, lesson_id)
     success("Lesson 4 complete: Google Dorking Theory")
@@ -1247,6 +1258,7 @@ def _run_module_quiz(progress):
 def run(progress):
     """Main entry point called from the menu system."""
     module_key = "module5"
+    show_case_study("module5")
     while True:
         choice = show_menu("Module 5: Reconnaissance & OSINT", [
             ("dns_lookups", "Lesson 1: DNS Lookups"),

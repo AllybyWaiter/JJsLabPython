@@ -23,6 +23,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.case_studies import show_case_study
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ from utils.quiz import run_quiz
 def run(progress):
     """Main entry point called from the menu system."""
     module_key = "module4"
+    show_case_study("module4")
     while True:
         choice = show_menu("Module 4: Password Security", [
             ("hashing",           "Lesson 1: Hashing Algorithms"),
@@ -1351,6 +1353,15 @@ def lesson_policy(progress, module_key):
     print()
     hint_text("Reference NIST SP 800-63B for your requirements.")
     hint_text("Consider different tiers: general users, admins, service accounts.")
+
+    scenario_block("Real-World Breach: LinkedIn (2012)", (
+        "In 2012, attackers stole 6.5 million LinkedIn password hashes — but the real "
+        "disaster was revealed in 2016 when the full dump surfaced: 117 million accounts. "
+        "LinkedIn had used unsalted SHA-1, making most passwords trivially crackable. "
+        "The breach fueled credential-stuffing attacks across the internet for years. "
+        "If LinkedIn had used bcrypt with proper salting — what you learned in this "
+        "module — those hashes would still be uncracked today."
+    ))
 
     if ask_yes_no("Did you draft a password policy document?"):
         success("Well done! Writing policies is a key skill for security professionals.")

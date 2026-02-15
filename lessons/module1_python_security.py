@@ -13,6 +13,7 @@ from utils.display import (
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
 from utils.guided_practice import guided_practice
+from utils.case_studies import show_case_study
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -204,6 +205,7 @@ for family, socktype, proto, canonname, sockaddr in results:
     guided_practice(
         title="Connect and Send",
         intro="Build a script that connects to a host, sends a message, and receives the response.",
+        difficulty=progress.get("difficulty", "beginner"),
         steps=[
             {
                 "instruction": (
@@ -487,6 +489,7 @@ print(response.status_code)""")
     guided_practice(
         title="URL Inspector",
         intro="Build a script that inspects a URL's response: status, headers, and version disclosure.",
+        difficulty=progress.get("difficulty", "beginner"),
         steps=[
             {
                 "instruction": (
@@ -802,6 +805,7 @@ if ok:
     guided_practice(
         title="Safe Command Runner",
         intro="Build a function that safely runs system commands with error handling.",
+        difficulty=progress.get("difficulty", "beginner"),
         steps=[
             {
                 "instruction": (
@@ -1139,6 +1143,7 @@ with tempfile.TemporaryDirectory(prefix='seclab_') as tmp_dir:
     guided_practice(
         title="Secret Scanner",
         intro="Build a script that scans directories for files that might contain secrets.",
+        difficulty=progress.get("difficulty", "beginner"),
         steps=[
             {
                 "instruction": (
@@ -1514,6 +1519,7 @@ analyze_auth_log(sample_auth)""")
     guided_practice(
         title="Log Analyzer",
         intro="Build a log analyzer that extracts IPs, status codes, and attack patterns.",
+        difficulty=progress.get("difficulty", "beginner"),
         steps=[
             {
                 "instruction": (
@@ -1915,6 +1921,7 @@ python3 service_enumerator.py 10.0.0.1 -t 1.0""", language="bash")
     guided_practice(
         title="Threaded Port Scanner",
         intro="Add threading to the service enumerator so it scans ports in parallel.",
+        difficulty=progress.get("difficulty", "beginner"),
         steps=[
             {
                 "instruction": (
@@ -2115,6 +2122,7 @@ QUIZ_QUESTIONS = [
 def run(progress):
     """Main entry point called from the menu system."""
     module_key = MODULE_KEY
+    show_case_study("module1")
     while True:
         choice = show_menu("Module 1: Python for Security", [
             ("lesson1", "Lesson 1: Socket Programming Basics"),

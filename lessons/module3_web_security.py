@@ -14,6 +14,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.case_studies import show_case_study
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -23,6 +24,7 @@ from utils.quiz import run_quiz
 def run(progress):
     """Main entry point called from the menu system."""
     module_key = "module3"
+    show_case_study("module3")
     while True:
         choice = show_menu("Module 3: Web Application Security", [
             ("owasp_top10",         "Lesson 1: OWASP Top 10 Overview"),
@@ -1459,6 +1461,16 @@ def lesson_input_val_headers(progress, module_key):
     print()
     hint_text("Start by adding one header at a time and testing after each addition.")
     hint_text("Online tool: securityheaders.com can also grade public sites.")
+
+    scenario_block("Real-World Breach: TalkTalk (2015)", (
+        "A 17-year-old used SQL injection to breach TalkTalk, a UK telecom company. "
+        "The attack exploited an unpatched vulnerability in their web application, "
+        "exposing personal data of 157,000 customers including bank account numbers. "
+        "TalkTalk was fined \u00a3400,000 by the ICO. The irony: SQL injection has been "
+        "well-understood for over 20 years. The techniques you learned in this module "
+        "— input validation, parameterized queries, and security testing — would have "
+        "prevented this entirely."
+    ))
 
     if ask_yes_no("Did you complete the header audit and add the missing headers?"):
         success("Outstanding! Security headers are a quick win for any web app.")

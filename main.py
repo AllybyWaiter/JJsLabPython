@@ -29,10 +29,15 @@ from utils.progress import (
     load_progress, save_progress, init_progress, get_overall_stats,
     MODULE_NAMES, MODULE_LESSON_COUNTS
 )
+from utils.analytics import start_session_timer, end_session_timer, show_analytics_dashboard
 from utils.audit_checklist import checklist_menu
 from utils.site_tester import site_tester_menu
 from utils.cheat_sheets import cheat_sheets_menu
+from utils.glossary import glossary_menu
+from utils.vuln_app_guide import vuln_app_guide_menu
 from exercises.exercise_runner import exercises_menu
+from utils.sandbox import sandbox_menu
+from utils.pre_assessment import run_pre_assessment
 
 
 # Module imports — lazy-loaded to avoid startup cost
@@ -50,6 +55,9 @@ MODULE_RUNNERS = {
 
 # Track the vulnerable app process
 vuln_app_process = None
+
+# Track the current progress dict for cleanup/analytics
+_current_progress = None
 
 
 def load_module(module_key: str):
@@ -177,11 +185,38 @@ def start_vulnerable_app():
         vuln_app_process = subprocess.Popen(
             [sys.executable, app_path],
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
         )
-        success(f"Vulnerable app started! PID: {vuln_app_process.pid}")
-        info("Access it at: http://127.0.0.1:5050")
-        info("It will run in the background until you stop it or exit JJ's LAB.")
+        info("Starting vulnerable app...")
+        # Health check — poll until the app responds
+        import urllib.request
+        ready = False
+        for attempt in range(8):
+            import time as _time
+            _time.sleep(0.5)
+            if vuln_app_process.poll() is not None:
+                stderr_output = vuln_app_process.stderr.read().decode(errors="replace").strip()
+                error("App process exited unexpectedly.")
+                if stderr_output:
+                    error(f"Reason: {stderr_output[-300:]}")
+                info("Common fixes:")
+                print(f"  {C}1.{RESET} Install Flask: pip install flask")
+                print(f"  {C}2.{RESET} Check if port 5050 is already in use")
+                print(f"  {C}3.{RESET} Run manually to see full error: python vulnerable_app/app.py")
+                vuln_app_process = None
+                break
+            try:
+                urllib.request.urlopen("http://127.0.0.1:5050", timeout=1)
+                ready = True
+                break
+            except Exception:
+                pass
+        if ready:
+            success(f"Vulnerable app is READY on http://127.0.0.1:5050  (PID: {vuln_app_process.pid})")
+            info("It will run in the background until you stop it or exit JJ's LAB.")
+        elif vuln_app_process:
+            warning("App started but not responding yet. It may need a moment.")
+            info(f"Access it at: http://127.0.0.1:5050  (PID: {vuln_app_process.pid})")
     except Exception as e:
         error(f"Failed to start: {e}")
 
@@ -203,6 +238,8 @@ def stop_vulnerable_app():
 def cleanup(signum=None, frame=None):
     """Clean up on exit."""
     stop_vulnerable_app()
+    if _current_progress is not None:
+        end_session_timer(_current_progress)
     print(f"\n{C}Thanks for learning with JJ's LAB. Stay secure!{RESET}\n")
     sys.exit(0)
 
@@ -273,8 +310,16 @@ def main():
         print(f"  {C}-{RESET} Your progress is saved automatically")
         press_enter()
 
+        if ask_yes_no("Take a quick skills assessment to find your starting point?"):
+            run_pre_assessment(progress)
+
     # Set alias from loaded progress
     set_agent_alias(progress.get("alias", ""))
+
+    # Start session timer for analytics tracking
+    global _current_progress
+    _current_progress = progress
+    start_session_timer(progress)
 
     # Main loop
     while True:
@@ -297,11 +342,16 @@ def main():
             ("modules", "Learning Modules  (start here!)"),
             ("missions", "Story Mode Missions"),
             ("exercises", "Practice Challenges"),
+            ("ctf", "CTF Challenges  (capture the flag!)"),
+            ("sandbox", "Code Sandbox"),
             ("vuln_app", "Start Vulnerable Practice App"),
+            ("vuln_guide", "Vulnerable App Practice Guide"),
             ("site_test", "Test Your Own Site"),
             ("checklist", "Generate Security Audit Checklist"),
             ("progress", "View Progress Dashboard"),
+            ("analytics", "Learning Analytics"),
             ("cheatsheets", "Tool Cheat Sheets"),
+            ("glossary", "Security Glossary"),
             ("settings", "Settings"),
         ], back=False)
 
@@ -318,8 +368,18 @@ def main():
         elif choice == "exercises":
             exercises_menu(progress)
 
+        elif choice == "ctf":
+            from ctf.ctf_menu import ctf_menu
+            ctf_menu(progress, session=session)
+
+        elif choice == "sandbox":
+            sandbox_menu(progress)
+
         elif choice == "vuln_app":
             start_vulnerable_app()
+
+        elif choice == "vuln_guide":
+            vuln_app_guide_menu(progress)
 
         elif choice == "site_test":
             site_tester_menu(progress)
@@ -330,8 +390,14 @@ def main():
         elif choice == "progress":
             show_progress_dashboard(progress)
 
+        elif choice == "analytics":
+            show_analytics_dashboard(progress)
+
         elif choice == "cheatsheets":
             cheat_sheets_menu(progress)
+
+        elif choice == "glossary":
+            glossary_menu(progress)
 
         elif choice == "settings":
             settings_menu(progress)

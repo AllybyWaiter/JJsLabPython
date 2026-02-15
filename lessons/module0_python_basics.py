@@ -9,11 +9,12 @@ from utils.display import (
     section_header, sub_header, lesson_block, code_block,
     scenario_block, why_it_matters, info, success, warning, press_enter,
     show_menu, disclaimer, hint_text, ask_yes_no, C, G, Y, R, RESET, BRIGHT, DIM,
-    pace, learning_goal, nice_work, tip
+    pace, learning_goal, nice_work, tip, LessonCheckpoint, learn_more
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
 from utils.guided_practice import guided_practice
+from utils.case_studies import show_case_study
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -27,70 +28,81 @@ MODULE_KEY = "module0"
 # ──────────────────────────────────────────────────────────────────────
 def lesson_variables_and_types(progress):
     section_header("Lesson 1: Getting Started -- Variables & Data Types")
+    cp = LessonCheckpoint(progress, MODULE_KEY, "lesson1", total_steps=5)
+    cp.offer_resume()
 
-    learning_goal([
-        "Understand what variables are and how to create them",
-        "Know the four basic data types: int, float, str, bool",
-        "Convert between data types",
-        "Work with strings and get input from the user",
-    ])
+    if cp.at(1):
+        learning_goal([
+            "Understand what variables are and how to create them",
+            "Know the four basic data types: int, float, str, bool",
+            "Convert between data types",
+            "Work with strings and get input from the user",
+        ])
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Welcome to Python! Python is one of the most popular programming "
-        "languages in the world, and it is the number one language used in "
-        "cybersecurity."
-    )
+        lesson_block(
+            "Welcome to Python! Python is one of the most popular programming "
+            "languages in the world, and it is the number one language used in "
+            "cybersecurity."
+        )
 
-    lesson_block(
-        "Whether you want to automate tasks, analyze log files, "
-        "write security tools, or understand how hackers think, Python is where "
-        "you start. It was designed to be easy to read and write, which makes "
-        "it perfect for beginners."
-    )
+        lesson_block(
+            "Whether you want to automate tasks, analyze log files, "
+            "write security tools, or understand how hackers think, Python is where "
+            "you start. It was designed to be easy to read and write, which makes "
+            "it perfect for beginners."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "A program is simply a set of instructions that tells a computer what "
-        "to do. Think of it like a recipe: you write down the steps, and the "
-        "computer follows them one by one, from top to bottom."
-    )
+        lesson_block(
+            "A program is simply a set of instructions that tells a computer what "
+            "to do. Think of it like a recipe: you write down the steps, and the "
+            "computer follows them one by one, from top to bottom."
+        )
 
-    pace()
+        pace()
 
-    why_it_matters(
-        "Python is the go-to language for security professionals. It is used "
-        "to write penetration testing tools (like parts of Metasploit), analyze "
-        "malware, parse log files during incident response, automate security "
-        "scans, and build custom exploits. Learning Python is not optional in "
-        "cybersecurity -- it is essential."
-    )
+        why_it_matters(
+            "Python is the go-to language for security professionals. It is used "
+            "to write penetration testing tools (like parts of Metasploit), analyze "
+            "malware, parse log files during incident response, automate security "
+            "scans, and build custom exploits. Learning Python is not optional in "
+            "cybersecurity -- it is essential."
+        )
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial for Beginners (Full Course) - Programming with Mosh", "https://www.youtube.com/watch?v=_uQrJ0TkZlc"),
+                ("Python for Beginners - Learn Python in 1 Hour - Programming with Mosh", "https://www.youtube.com/watch?v=kqtD5dpn9C8"),
+            ])
 
-    # ── Comments ──
-    sub_header("Comments -- Notes for Humans")
+        press_enter()
+        cp.save(1)
 
-    lesson_block(
-        "Before we write any real code, let's learn about comments. A comment "
-        "is a note you leave in your code for yourself or other people. The "
-        "computer completely ignores comments. They start with the # symbol."
-    )
+    if cp.at(2):
+        # ── Comments ──
+        sub_header("Comments -- Notes for Humans")
 
-    pace()
+        lesson_block(
+            "Before we write any real code, let's learn about comments. A comment "
+            "is a note you leave in your code for yourself or other people. The "
+            "computer completely ignores comments. They start with the # symbol."
+        )
 
-    code_block("""\
+        pace()
+
+        code_block("""\
 # This is a comment -- Python ignores this line completely
 # Comments help you (and others) understand your code later
 
 # You can also put comments at the end of a line:
 x = 10  # This stores the number 10 in a variable called x""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Multi-line comments use triple quotes (also called docstrings):
 \"\"\"
 This is a multi-line comment.
@@ -98,29 +110,31 @@ It can span as many lines as you need.
 Often used to describe what a function or file does.
 \"\"\"""")
 
-    tip("Good comments explain WHY you did something, not what the code does.")
+        tip("Good comments explain WHY you did something, not what the code does.")
 
-    press_enter()
+        press_enter()
+        cp.save(2)
 
-    # ── Variables ──
-    sub_header("Variables -- Storing Information")
+    if cp.at(3):
+        # ── Variables ──
+        sub_header("Variables -- Storing Information")
 
-    lesson_block(
-        "A variable is like a labeled box where you store information. You give "
-        "the box a name, put something inside it, and later you can look inside "
-        "the box to see what is there."
-    )
+        lesson_block(
+            "A variable is like a labeled box where you store information. You give "
+            "the box a name, put something inside it, and later you can look inside "
+            "the box to see what is there."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "In Python, you create a variable by choosing a name, typing an equals "
-        "sign, and then the value you want to store."
-    )
+        lesson_block(
+            "In Python, you create a variable by choosing a name, typing an equals "
+            "sign, and then the value you want to store."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Creating variables -- think of each as a labeled box
 name = "Alice"          # A box labeled 'name' containing the text "Alice"
 age = 25                # A box labeled 'age' containing the number 25
@@ -133,26 +147,26 @@ print(age)              # Output: 25
 print(temperature)      # Output: 98.6
 print(is_admin)         # Output: True""")
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Variable naming rules: (1) Names can contain letters, numbers, and "
-        "underscores, but must start with a letter or underscore, never a "
-        "number. (2) Names are case-sensitive -- 'Age' and 'age' are different "
-        "variables."
-    )
+        lesson_block(
+            "Variable naming rules: (1) Names can contain letters, numbers, and "
+            "underscores, but must start with a letter or underscore, never a "
+            "number. (2) Names are case-sensitive -- 'Age' and 'age' are different "
+            "variables."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "(3) You cannot use Python keywords like 'if', 'for', "
-        "'while', 'class', etc. as variable names. (4) Use descriptive names: "
-        "'user_age' is better than 'x'."
-    )
+        lesson_block(
+            "(3) You cannot use Python keywords like 'if', 'for', "
+            "'while', 'class', etc. as variable names. (4) Use descriptive names: "
+            "'user_age' is better than 'x'."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Good variable names -- clear and descriptive
 user_name = "bob"
 login_attempts = 3
@@ -165,29 +179,29 @@ n = 3                  # Unclear
 # 3attempts = 5        # ERROR: cannot start with a number
 # my-var = 10          # ERROR: hyphens are not allowed, use underscores""")
 
-    nice_work("You just learned about variables! That is a huge first step.")
+        nice_work("You just learned about variables! That is a huge first step.")
 
-    press_enter()
+        press_enter()
 
-    # ── Data Types ──
-    sub_header("Data Types -- Different Kinds of Information")
+        # ── Data Types ──
+        sub_header("Data Types -- Different Kinds of Information")
 
-    lesson_block(
-        "Not all information is the same. A person's name is text, their age "
-        "is a whole number, their weight might have decimals, and whether they "
-        "are logged in is either yes or no."
-    )
+        lesson_block(
+            "Not all information is the same. A person's name is text, their age "
+            "is a whole number, their weight might have decimals, and whether they "
+            "are logged in is either yes or no."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Python has different data types for each kind of information. "
-        "Let's look at the four basic types."
-    )
+        lesson_block(
+            "Python has different data types for each kind of information. "
+            "Let's look at the four basic types."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # int -- whole numbers (no decimal point)
 port_number = 443
 failed_attempts = 7
@@ -198,9 +212,9 @@ success_rate = 99.7
 pi = 3.14159
 temperature = -40.0""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # str -- strings of text (always in quotes)
 hostname = "server01.company.com"
 greeting = 'Hello, World!'     # Single or double quotes both work
@@ -210,38 +224,46 @@ ip_address = "192.168.1.1"
 is_connected = True
 has_firewall = False""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Check the type of any variable using type()
 print(type(port_number))    # Output: <class 'int'>
 print(type(success_rate))   # Output: <class 'float'>
 print(type(hostname))       # Output: <class 'str'>
 print(type(is_connected))   # Output: <class 'bool'>""")
 
-    tip("You can always check a variable's type with type(). It is great for debugging!")
+        tip("You can always check a variable's type with type(). It is great for debugging!")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Variables and Data Types - Corey Schafer", "https://www.youtube.com/watch?v=k9TUPpGqYTo"),
+                ("Python Tutorial: Strings - Corey Schafer", "https://www.youtube.com/watch?v=k9TUPpGqYTo"),
+            ])
 
-    # ── Type Conversion ──
-    sub_header("Type Conversion -- Changing Between Types")
+        press_enter()
+        cp.save(3)
 
-    lesson_block(
-        "Sometimes you need to convert one type to another. For example, when "
-        "you read input from a user, Python always gives you a string, even if "
-        "the user typed a number."
-    )
+    if cp.at(4):
+        # ── Type Conversion ──
+        sub_header("Type Conversion -- Changing Between Types")
 
-    pace()
+        lesson_block(
+            "Sometimes you need to convert one type to another. For example, when "
+            "you read input from a user, Python always gives you a string, even if "
+            "the user typed a number."
+        )
 
-    lesson_block(
-        "You need to convert it to an integer before "
-        "you can do math with it."
-    )
+        pace()
 
-    pace()
+        lesson_block(
+            "You need to convert it to an integer before "
+            "you can do math with it."
+        )
 
-    code_block("""\
+        pace()
+
+        code_block("""\
 # Converting between types
 age_text = "25"           # This is a string, not a number
 age_number = int("25")    # Now it is an integer: 25
@@ -250,9 +272,9 @@ print(age_number + 5)     # Output: 30
 price = float("19.99")    # Convert string to decimal: 19.99
 count = str(42)            # Convert number to string: "42" """)
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Be careful -- not everything can be converted!
 # int("hello")  # ERROR: Python cannot turn "hello" into a number
 # int("3.14")   # ERROR: Use float() first, then int()
@@ -263,14 +285,14 @@ as_float = float(value)   # "3.14" -> 3.14
 as_int = int(as_float)    # 3.14 -> 3 (drops the decimal part)
 print(as_int)             # Output: 3""")
 
-    nice_work("Data types and type conversion down. You are doing great!")
+        nice_work("Data types and type conversion down. You are doing great!")
 
-    press_enter()
+        press_enter()
 
-    # ── Arithmetic ──
-    sub_header("Arithmetic Operators -- Doing Math")
+        # ── Arithmetic ──
+        sub_header("Arithmetic Operators -- Doing Math")
 
-    code_block("""\
+        code_block("""\
 # Basic math operators
 a = 10
 b = 3
@@ -283,9 +305,9 @@ print(a // b)   # Floor division: 3 (rounds down to whole number)
 print(a % b)    # Modulo:         1 (remainder of 10 / 3)
 print(a ** b)   # Exponent:       1000 (10 to the power of 3)""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Order of operations works like regular math: PEMDAS
 result = 2 + 3 * 4     # 3 * 4 happens first = 14, not 20
 result = (2 + 3) * 4   # Parentheses first = 20
@@ -297,20 +319,20 @@ count += 5      # Same as: count = count + 5    -> count is now 6
 count -= 2      # Same as: count = count - 2    -> count is now 4
 count *= 3      # Same as: count = count * 3    -> count is now 12""")
 
-    press_enter()
+        press_enter()
 
-    # ── Strings ──
-    sub_header("String Basics -- Working with Text")
+        # ── Strings ──
+        sub_header("String Basics -- Working with Text")
 
-    lesson_block(
-        "Strings are one of the most important data types, especially in "
-        "security work where you are constantly dealing with usernames, "
-        "passwords, IP addresses, log entries, URLs, and more."
-    )
+        lesson_block(
+            "Strings are one of the most important data types, especially in "
+            "security work where you are constantly dealing with usernames, "
+            "passwords, IP addresses, log entries, URLs, and more."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # String concatenation (joining strings together)
 first = "Cyber"
 last = "Security"
@@ -327,9 +349,9 @@ print(f"User {name} has the role: {role}")
 port = 443
 print(f"Connecting to port {port + 1}")  # Output: Connecting to port 444""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Useful string methods
 message = "Hello, World!"
 print(message.upper())        # "HELLO, WORLD!"
@@ -337,9 +359,9 @@ print(message.lower())        # "hello, world!"
 print(message.replace("World", "Hacker"))  # "Hello, Hacker!"
 print(len(message))           # 13 (length of the string)""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Checking contents
 email = "admin@company.com"
 print(email.startswith("admin"))   # True
@@ -350,21 +372,21 @@ print("@" in email)                # True (checks if @ appears anywhere)
 raw_input = "  hello  "
 clean = raw_input.strip()     # "hello" (removes spaces from both sides)""")
 
-    nice_work("You now know how to work with strings. That skill comes up everywhere!")
+        nice_work("You now know how to work with strings. That skill comes up everywhere!")
 
-    press_enter()
+        press_enter()
 
-    # ── User Input ──
-    sub_header("Getting Input from the User")
+        # ── User Input ──
+        sub_header("Getting Input from the User")
 
-    lesson_block(
-        "The input() function pauses your program and waits for the user to "
-        "type something. Whatever they type is returned as a string."
-    )
+        lesson_block(
+            "The input() function pauses your program and waits for the user to "
+            "type something. Whatever they type is returned as a string."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Getting input from the user
 name = input("What is your name? ")
 print(f"Hello, {name}!")
@@ -379,106 +401,148 @@ print(f"In 10 years you will be {age + 10}")
 port = int(input("Enter a port number: "))
 print(f"Scanning port {port}...")""")
 
-    pace()
+        pace()
 
-    scenario_block("Social Engineering Awareness Tool", (
-        "You are building a quick training tool that asks employees to enter "
-        "their email address and then checks if it follows the company format. "
-        "Using variables, strings, and input(), you collect the email, check "
-        "if it ends with '@company.com' using .endswith(), and display whether "
-        "it is valid. This simple script helps train employees to recognize "
-        "phishing emails that use look-alike domains."
-    ))
+        scenario_block("Social Engineering Awareness Tool", (
+            "You are building a quick training tool that asks employees to enter "
+            "their email address and then checks if it follows the company format. "
+            "Using variables, strings, and input(), you collect the email, check "
+            "if it ends with '@company.com' using .endswith(), and display whether "
+            "it is valid. This simple script helps train employees to recognize "
+            "phishing emails that use look-alike domains."
+        ))
 
-    tip("You can always come back and re-read this lesson later!")
+        tip("You can always come back and re-read this lesson later!")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python String Formatting - f-Strings - Corey Schafer", "https://www.youtube.com/watch?v=nghuHvKLhJA"),
+                ("Python Tutorial: String Formatting - Corey Schafer", "https://www.youtube.com/watch?v=vTX3IwquFkc"),
+            ])
 
-    # ── Guided Practice ──
-    guided_practice(
-        title="Simple Calculator",
-        intro="Let's build a calculator step by step. Each step builds on the last.",
-        steps=[
-            {
-                "instruction": (
-                    "Get the user's input. Use input() to ask for two numbers "
-                    "and convert them to floats. Store them in num1 and num2."
+        press_enter()
+        cp.save(4)
+
+    if cp.at(5):
+        # ── Live Coding Exercise ──
+        if ask_yes_no("Try a live coding exercise?"):
+            from utils.code_runner import code_exercise
+            code_exercise(
+                instruction=(
+                    "Write a program that creates two variables: 'name' (a string with your name) "
+                    "and 'age' (an integer). Then print them using an f-string in the format: "
+                    "'My name is <name> and I am <age> years old.'"
                 ),
-                "required_keywords": ["input", "float"],
-                "hints": [
-                    "Use float(input('Enter first number: ')) to get a number.",
-                    "You need two separate input() calls — one for each number.",
-                    "Pattern: num1 = float(input('...'))",
+                test_cases=[
+                    {
+                        "input": "",
+                        "expected_output": "My name is",
+                        "description": "Output contains 'My name is'",
+                    },
+                    {
+                        "input": "",
+                        "expected_output": "years old",
+                        "description": "Output contains 'years old'",
+                    },
                 ],
-                "solution": (
-                    'num1 = float(input("Enter first number: "))\n'
-                    'num2 = float(input("Enter second number: "))'
+                starter_code=(
+                    "# Create your variables and print them\n"
+                    "name = \"Alice\"\n"
+                    "age = 25\n"
                 ),
-            },
-            {
-                "instruction": (
-                    "Ask the user for an operator (+, -, *, /). "
-                    "Store it in a variable called operator."
-                ),
-                "context_code": (
-                    'num1 = float(input("Enter first number: "))\n'
-                    'num2 = float(input("Enter second number: "))'
-                ),
-                "required_keywords": ["input", "operator"],
-                "hints": [
-                    "Use input() again — no need to convert to float this time.",
-                    'operator = input("Enter operator (+, -, *, /): ").strip()',
+                hints=[
+                    "Use an f-string: print(f\"My name is {name} and I am {age} years old.\")",
                 ],
-                "solution": 'operator = input("Enter operator (+, -, *, /): ").strip()',
-            },
-            {
-                "instruction": (
-                    "Use if/elif to check the operator and calculate the result. "
-                    "Handle +, -, *, and /. Store the answer in a variable called result."
-                ),
-                "context_code": (
-                    'num1 = float(input("Enter first number: "))\n'
-                    'num2 = float(input("Enter second number: "))\n'
-                    'operator = input("Enter operator (+, -, *, /): ").strip()'
-                ),
-                "required_keywords": ["if", "elif", "result"],
-                "hints": [
-                    'Start with: if operator == "+": result = num1 + num2',
-                    "Add elif branches for -, *, and /.",
-                    "For division, check if num2 == 0 before dividing.",
-                ],
-                "solution": (
-                    'if operator == "+":\n'
-                    '    result = num1 + num2\n'
-                    'elif operator == "-":\n'
-                    '    result = num1 - num2\n'
-                    'elif operator == "*":\n'
-                    '    result = num1 * num2\n'
-                    'elif operator == "/":\n'
-                    '    if num2 == 0:\n'
-                    '        print("Error: Cannot divide by zero!")\n'
-                    '        result = None\n'
-                    '    else:\n'
-                    '        result = num1 / num2'
-                ),
-            },
-            {
-                "instruction": (
-                    "Print the result using an f-string that shows the full "
-                    "equation, like: 15.0 * 4.0 = 60.0"
-                ),
-                "required_keywords": ["print", "result"],
-                "hints": [
-                    'Use an f-string: print(f"{num1} {operator} {num2} = {result}")',
-                    "Check if result is not None before printing.",
-                ],
-                "solution": (
-                    'if result is not None:\n'
-                    '    print(f"Result: {num1} {operator} {num2} = {result}")'
-                ),
-            },
-        ],
-        complete_solution="""\
+                solution='name = "Alice"\nage = 25\nprint(f"My name is {name} and I am {age} years old.")',
+            )
+            press_enter()
+
+        # ── Guided Practice ──
+        guided_practice(
+            title="Simple Calculator",
+            intro="Let's build a calculator step by step. Each step builds on the last.",
+            difficulty=progress.get("difficulty", "beginner"),
+            steps=[
+                {
+                    "instruction": (
+                        "Get the user's input. Use input() to ask for two numbers "
+                        "and convert them to floats. Store them in num1 and num2."
+                    ),
+                    "required_keywords": ["input", "float"],
+                    "hints": [
+                        "Use float(input('Enter first number: ')) to get a number.",
+                        "You need two separate input() calls — one for each number.",
+                        "Pattern: num1 = float(input('...'))",
+                    ],
+                    "solution": (
+                        'num1 = float(input("Enter first number: "))\n'
+                        'num2 = float(input("Enter second number: "))'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Ask the user for an operator (+, -, *, /). "
+                        "Store it in a variable called operator."
+                    ),
+                    "context_code": (
+                        'num1 = float(input("Enter first number: "))\n'
+                        'num2 = float(input("Enter second number: "))'
+                    ),
+                    "required_keywords": ["input", "operator"],
+                    "hints": [
+                        "Use input() again — no need to convert to float this time.",
+                        'operator = input("Enter operator (+, -, *, /): ").strip()',
+                    ],
+                    "solution": 'operator = input("Enter operator (+, -, *, /): ").strip()',
+                },
+                {
+                    "instruction": (
+                        "Use if/elif to check the operator and calculate the result. "
+                        "Handle +, -, *, and /. Store the answer in a variable called result."
+                    ),
+                    "context_code": (
+                        'num1 = float(input("Enter first number: "))\n'
+                        'num2 = float(input("Enter second number: "))\n'
+                        'operator = input("Enter operator (+, -, *, /): ").strip()'
+                    ),
+                    "required_keywords": ["if", "elif", "result"],
+                    "hints": [
+                        'Start with: if operator == "+": result = num1 + num2',
+                        "Add elif branches for -, *, and /.",
+                        "For division, check if num2 == 0 before dividing.",
+                    ],
+                    "solution": (
+                        'if operator == "+":\n'
+                        '    result = num1 + num2\n'
+                        'elif operator == "-":\n'
+                        '    result = num1 - num2\n'
+                        'elif operator == "*":\n'
+                        '    result = num1 * num2\n'
+                        'elif operator == "/":\n'
+                        '    if num2 == 0:\n'
+                        '        print("Error: Cannot divide by zero!")\n'
+                        '        result = None\n'
+                        '    else:\n'
+                        '        result = num1 / num2'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Print the result using an f-string that shows the full "
+                        "equation, like: 15.0 * 4.0 = 60.0"
+                    ),
+                    "required_keywords": ["print", "result"],
+                    "hints": [
+                        'Use an f-string: print(f"{num1} {operator} {num2} = {result}")',
+                        "Check if result is not None before printing.",
+                    ],
+                    "solution": (
+                        'if result is not None:\n'
+                        '    print(f"Result: {num1} {operator} {num2} = {result}")'
+                    ),
+                },
+            ],
+            complete_solution="""\
 # Simple Calculator
 num1 = float(input("Enter first number: "))
 num2 = float(input("Enter second number: "))
@@ -502,11 +566,12 @@ else:
 
 if result is not None:
     print(f"Result: {num1} {operator} {num2} = {result}")""",
-    )
+        )
 
-    mark_lesson_complete(progress, MODULE_KEY, "lesson1")
-    success("Lesson 1 complete: Variables & Data Types")
-    press_enter()
+        cp.clear()
+        mark_lesson_complete(progress, MODULE_KEY, "lesson1")
+        success("Lesson 1 complete: Variables & Data Types")
+        press_enter()
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -514,54 +579,57 @@ if result is not None:
 # ──────────────────────────────────────────────────────────────────────
 def lesson_control_flow(progress):
     section_header("Lesson 2: Control Flow -- Making Decisions")
+    cp = LessonCheckpoint(progress, MODULE_KEY, "lesson2", total_steps=3)
+    cp.offer_resume()
 
-    learning_goal([
-        "Use comparison operators to ask True/False questions",
-        "Write if/elif/else blocks to make decisions",
-        "Combine conditions with and, or, not",
-        "Understand truthiness and falsy values",
-    ])
+    if cp.at(1):
+        learning_goal([
+            "Use comparison operators to ask True/False questions",
+            "Write if/elif/else blocks to make decisions",
+            "Combine conditions with and, or, not",
+            "Understand truthiness and falsy values",
+        ])
 
-    pace()
+        pace()
 
-    lesson_block(
-        "So far, our programs run every line from top to bottom without making "
-        "any choices. But real programs need to make decisions: Is the password "
-        "correct? Is this IP address on the blocklist?"
-    )
+        lesson_block(
+            "So far, our programs run every line from top to bottom without making "
+            "any choices. But real programs need to make decisions: Is the password "
+            "correct? Is this IP address on the blocklist?"
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Control flow lets your program choose different paths depending "
-        "on conditions. Think of it like a security guard at a door. The guard "
-        "checks your badge: if the badge is valid, you get in; if it is expired, "
-        "you are redirected; otherwise, you are turned away."
-    )
+        lesson_block(
+            "Control flow lets your program choose different paths depending "
+            "on conditions. Think of it like a security guard at a door. The guard "
+            "checks your badge: if the badge is valid, you get in; if it is expired, "
+            "you are redirected; otherwise, you are turned away."
+        )
 
-    pace()
+        pace()
 
-    why_it_matters(
-        "Almost every security tool relies on decision-making. Firewalls "
-        "decide whether to allow or block traffic. Intrusion detection systems "
-        "decide whether network activity is suspicious. Login systems decide "
-        "whether credentials are correct. Understanding control flow is the "
-        "foundation for writing any security logic."
-    )
+        why_it_matters(
+            "Almost every security tool relies on decision-making. Firewalls "
+            "decide whether to allow or block traffic. Intrusion detection systems "
+            "decide whether network activity is suspicious. Login systems decide "
+            "whether credentials are correct. Understanding control flow is the "
+            "foundation for writing any security logic."
+        )
 
-    press_enter()
+        press_enter()
 
-    # ── Comparison Operators ──
-    sub_header("Comparison Operators -- Asking Questions")
+        # ── Comparison Operators ──
+        sub_header("Comparison Operators -- Asking Questions")
 
-    lesson_block(
-        "Before you can make decisions, you need to ask questions. Comparison "
-        "operators compare two values and return True or False (a boolean)."
-    )
+        lesson_block(
+            "Before you can make decisions, you need to ask questions. Comparison "
+            "operators compare two values and return True or False (a boolean)."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Comparison operators return True or False
 x = 10
 y = 20
@@ -573,9 +641,9 @@ print(x > y)      # Greater than?       False
 print(x <= 10)    # Less than or equal? True
 print(x >= 15)    # Greater or equal?   False""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Works with strings too!
 name = "Alice"
 print(name == "Alice")     # True
@@ -586,14 +654,14 @@ print(name != "Bob")       # True
 # x = 10     means "store 10 in x" (assignment)
 # x == 10    means "is x equal to 10?" (comparison)""")
 
-    tip("A single = assigns a value. A double == compares two values. Mix them up and you will get bugs!")
+        tip("A single = assigns a value. A double == compares two values. Mix them up and you will get bugs!")
 
-    press_enter()
+        press_enter()
 
-    # ── if / elif / else ──
-    sub_header("if / elif / else -- The Decision Structure")
+        # ── if / elif / else ──
+        sub_header("if / elif / else -- The Decision Structure")
 
-    code_block("""\
+        code_block("""\
 # Basic if statement
 age = 18
 
@@ -613,9 +681,9 @@ else:
     print("Password is too short! Must be at least 8 characters.")
 # Output: Password length is acceptable.""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # if/elif/else -- multiple paths
 score = 75
 
@@ -632,30 +700,38 @@ else:
 
 print(f"Your grade: {grade}")  # Output: Your grade: C""")
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Important: Notice the indentation (the spaces at the beginning of "
-        "lines). Python uses indentation to know which lines belong inside "
-        "the if block. Standard practice is to use 4 spaces for each level."
-    )
+        lesson_block(
+            "Important: Notice the indentation (the spaces at the beginning of "
+            "lines). Python uses indentation to know which lines belong inside "
+            "the if block. Standard practice is to use 4 spaces for each level."
+        )
 
-    nice_work("You can now write programs that make decisions. That is a big deal!")
+        nice_work("You can now write programs that make decisions. That is a big deal!")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: Conditionals and Booleans - Corey Schafer", "https://www.youtube.com/watch?v=DZwmZ8Usvnk"),
+                ("If Statements in Python - CS Dojo", "https://www.youtube.com/watch?v=AWek49wXGzI"),
+            ])
 
-    # ── Logical Operators ──
-    sub_header("Logical Operators -- Combining Conditions")
+        press_enter()
+        cp.save(1)
 
-    lesson_block(
-        "Sometimes one condition is not enough. You might need to check if "
-        "a user is BOTH logged in AND an admin. Or you might want to allow "
-        "access if the user provides a valid password OR a valid token."
-    )
+    if cp.at(2):
+        # ── Logical Operators ──
+        sub_header("Logical Operators -- Combining Conditions")
 
-    pace()
+        lesson_block(
+            "Sometimes one condition is not enough. You might need to check if "
+            "a user is BOTH logged in AND an admin. Or you might want to allow "
+            "access if the user provides a valid password OR a valid token."
+        )
 
-    code_block("""\
+        pace()
+
+        code_block("""\
 # 'and' -- BOTH conditions must be True
 age = 25
 has_id = True
@@ -672,9 +748,9 @@ has_override_key = True
 if is_admin or has_override_key:
     print("Elevated access granted")  # This runs""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # 'not' -- reverses True to False and vice versa
 is_blocked = False
 
@@ -691,27 +767,27 @@ if username == "admin" and password == "secure123" and not is_locked:
 else:
     print("Login failed.")""")
 
-    press_enter()
+        press_enter()
 
-    # ── Truthiness ──
-    sub_header("Truthiness and Falsy Values")
+        # ── Truthiness ──
+        sub_header("Truthiness and Falsy Values")
 
-    lesson_block(
-        "In Python, every value can be treated as True or False, even if it "
-        "is not a boolean. This is called 'truthiness'."
-    )
+        lesson_block(
+            "In Python, every value can be treated as True or False, even if it "
+            "is not a boolean. This is called 'truthiness'."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "The following values "
-        "are considered False (falsy): False, 0, 0.0, empty string '', empty "
-        "list [], empty dict {}, and None. Everything else is True (truthy)."
-    )
+        lesson_block(
+            "The following values "
+            "are considered False (falsy): False, 0, 0.0, empty string '', empty "
+            "list [], empty dict {}, and None. Everything else is True (truthy)."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Falsy values -- these all act as False in an if statement
 if not 0:
     print("0 is falsy")               # Prints
@@ -722,9 +798,9 @@ if not []:
 if not None:
     print("None is falsy")             # Prints""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Truthy values -- these all act as True
 if "hello":
     print("Non-empty string is truthy")  # Prints
@@ -742,14 +818,14 @@ else:
     print("Error: No username entered!")
 # If the user presses Enter without typing, username is "" (falsy)""")
 
-    nice_work("Truthiness is a tricky concept and you just nailed it!")
+        nice_work("Truthiness is a tricky concept and you just nailed it!")
 
-    press_enter()
+        press_enter()
 
-    # ── Nested Conditions ──
-    sub_header("Nested Conditions")
+        # ── Nested Conditions ──
+        sub_header("Nested Conditions")
 
-    code_block("""\
+        code_block("""\
 # You can put if statements inside other if statements
 role = "admin"
 mfa_verified = True
@@ -768,30 +844,30 @@ if role == "admin":
 else:
     print("Standard user access.")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Tip: Deeply nested code (3+ levels) can be hard to read.
 # Consider using 'and' to flatten conditions when possible:
 if role == "admin" and mfa_verified and ip_address.startswith("192.168."):
     print("Internal admin with MFA -- full access.")""")
 
-    tip("If your code is indented more than 3 levels deep, try to simplify with 'and'.")
+        tip("If your code is indented more than 3 levels deep, try to simplify with 'and'.")
 
-    press_enter()
+        press_enter()
 
-    # ── match/case ──
-    sub_header("match/case -- Pattern Matching (Python 3.10+)")
+        # ── match/case ──
+        sub_header("match/case -- Pattern Matching (Python 3.10+)")
 
-    lesson_block(
-        "Python 3.10 introduced match/case, which is similar to a switch "
-        "statement in other languages. It is useful when you have many "
-        "possible values to check against."
-    )
+        lesson_block(
+            "Python 3.10 introduced match/case, which is similar to a switch "
+            "statement in other languages. It is useful when you have many "
+            "possible values to check against."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # match/case for clean multi-way branching
 command = "scan"
 
@@ -808,107 +884,115 @@ match command:
         print(f"Unknown command: {command}")
 # The underscore _ is a wildcard that matches anything (like 'else')""")
 
-    pace()
+        pace()
 
-    scenario_block("Access Control Decision Engine", (
-        "You are writing the logic for a company's internal portal. When an "
-        "employee tries to access a sensitive resource, your Python script "
-        "checks multiple conditions: Is the user authenticated? Is their "
-        "account active? Is their IP from the corporate network? Do they "
-        "have the right role? Each condition is an if/elif check, and the "
-        "script logs every decision for the security team to audit later."
-    ))
+        scenario_block("Access Control Decision Engine", (
+            "You are writing the logic for a company's internal portal. When an "
+            "employee tries to access a sensitive resource, your Python script "
+            "checks multiple conditions: Is the user authenticated? Is their "
+            "account active? Is their IP from the corporate network? Do they "
+            "have the right role? Each condition is an if/elif check, and the "
+            "script logs every decision for the security team to audit later."
+        ))
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Booleans and Conditional Logic - Tech With Tim", "https://www.youtube.com/watch?v=lF74HhSUgFk"),
+            ])
 
-    # ── Guided Practice ──
-    guided_practice(
-        title="Password Validator",
-        intro="Let's build a password strength checker, one rule at a time.",
-        steps=[
-            {
-                "instruction": (
-                    "Define a function called validate_password that takes a "
-                    "password parameter. Inside it, create an empty list called "
-                    "issues, then check if the password is shorter than 8 characters "
-                    "using len(). If it is, append a message to the issues list."
-                ),
-                "required_keywords": ["def", "len", "issues"],
-                "hints": [
-                    "Start with: def validate_password(password):",
-                    "Create the list: issues = []",
-                    'Check: if len(password) < 8: issues.append("Too short")',
-                ],
-                "solution": (
-                    'def validate_password(password):\n'
-                    '    issues = []\n'
-                    '    if len(password) < 8:\n'
-                    '        issues.append("Must be at least 8 characters long")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Add checks for uppercase, lowercase, and digit characters. "
-                    "Loop through each character using a for loop and check with "
-                    ".isupper(), .islower(), and .isdigit()."
-                ),
-                "required_keywords": ["for", "isupper", "isdigit"],
-                "hints": [
-                    "Use a boolean flag: has_upper = False, then set True when found.",
-                    "for char in password: if char.isupper(): has_upper = True; break",
-                    "After the loop, if not has_upper: issues.append('...')",
-                ],
-                "solution": (
-                    '    has_upper = has_lower = has_digit = False\n'
-                    '    for char in password:\n'
-                    '        if char.isupper(): has_upper = True\n'
-                    '        if char.islower(): has_lower = True\n'
-                    '        if char.isdigit(): has_digit = True\n'
-                    '    if not has_upper:\n'
-                    '        issues.append("Must contain an uppercase letter")\n'
-                    '    if not has_lower:\n'
-                    '        issues.append("Must contain a lowercase letter")\n'
-                    '    if not has_digit:\n'
-                    '        issues.append("Must contain a digit")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Check if the password contains the forbidden word 'password' "
-                    "(case-insensitive). Use .lower() to make the comparison work "
-                    "regardless of capitalization."
-                ),
-                "required_keywords": ["password", "lower"],
-                "hints": [
-                    'Use: if "password" in password.lower()',
-                    "This catches Password, PASSWORD, pAsSwOrD, etc.",
-                ],
-                "solution": (
-                    '    if "password" in password.lower():\n'
-                    '        issues.append("Must not contain the word \'password\'")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Print the results: if there are issues, print each one. "
-                    "Otherwise print that the password is accepted."
-                ),
-                "required_keywords": ["print", "issues"],
-                "hints": [
-                    "Check: if issues: ... else: ...",
-                    "Loop through issues with: for issue in issues: print(f'  - {issue}')",
-                ],
-                "solution": (
-                    '    if issues:\n'
-                    '        print("Password REJECTED:")\n'
-                    '        for issue in issues:\n'
-                    '            print(f"  - {issue}")\n'
-                    '    else:\n'
-                    '        print("Password ACCEPTED!")'
-                ),
-            },
-        ],
-        complete_solution="""\
+        press_enter()
+        cp.save(2)
+
+    if cp.at(3):
+        # ── Guided Practice ──
+        guided_practice(
+            title="Password Validator",
+            intro="Let's build a password strength checker, one rule at a time.",
+            difficulty=progress.get("difficulty", "beginner"),
+            steps=[
+                {
+                    "instruction": (
+                        "Define a function called validate_password that takes a "
+                        "password parameter. Inside it, create an empty list called "
+                        "issues, then check if the password is shorter than 8 characters "
+                        "using len(). If it is, append a message to the issues list."
+                    ),
+                    "required_keywords": ["def", "len", "issues"],
+                    "hints": [
+                        "Start with: def validate_password(password):",
+                        "Create the list: issues = []",
+                        'Check: if len(password) < 8: issues.append("Too short")',
+                    ],
+                    "solution": (
+                        'def validate_password(password):\n'
+                        '    issues = []\n'
+                        '    if len(password) < 8:\n'
+                        '        issues.append("Must be at least 8 characters long")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Add checks for uppercase, lowercase, and digit characters. "
+                        "Loop through each character using a for loop and check with "
+                        ".isupper(), .islower(), and .isdigit()."
+                    ),
+                    "required_keywords": ["for", "isupper", "isdigit"],
+                    "hints": [
+                        "Use a boolean flag: has_upper = False, then set True when found.",
+                        "for char in password: if char.isupper(): has_upper = True; break",
+                        "After the loop, if not has_upper: issues.append('...')",
+                    ],
+                    "solution": (
+                        '    has_upper = has_lower = has_digit = False\n'
+                        '    for char in password:\n'
+                        '        if char.isupper(): has_upper = True\n'
+                        '        if char.islower(): has_lower = True\n'
+                        '        if char.isdigit(): has_digit = True\n'
+                        '    if not has_upper:\n'
+                        '        issues.append("Must contain an uppercase letter")\n'
+                        '    if not has_lower:\n'
+                        '        issues.append("Must contain a lowercase letter")\n'
+                        '    if not has_digit:\n'
+                        '        issues.append("Must contain a digit")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Check if the password contains the forbidden word 'password' "
+                        "(case-insensitive). Use .lower() to make the comparison work "
+                        "regardless of capitalization."
+                    ),
+                    "required_keywords": ["password", "lower"],
+                    "hints": [
+                        'Use: if "password" in password.lower()',
+                        "This catches Password, PASSWORD, pAsSwOrD, etc.",
+                    ],
+                    "solution": (
+                        '    if "password" in password.lower():\n'
+                        '        issues.append("Must not contain the word \'password\'")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Print the results: if there are issues, print each one. "
+                        "Otherwise print that the password is accepted."
+                    ),
+                    "required_keywords": ["print", "issues"],
+                    "hints": [
+                        "Check: if issues: ... else: ...",
+                        "Loop through issues with: for issue in issues: print(f'  - {issue}')",
+                    ],
+                    "solution": (
+                        '    if issues:\n'
+                        '        print("Password REJECTED:")\n'
+                        '        for issue in issues:\n'
+                        '            print(f"  - {issue}")\n'
+                        '    else:\n'
+                        '        print("Password ACCEPTED!")'
+                    ),
+                },
+            ],
+            complete_solution="""\
 def validate_password(password):
     issues = []
 
@@ -941,11 +1025,12 @@ def validate_password(password):
 for pw in ["short", "alllowercase1", "NoDigitsHere", "Str0ngP@ss!"]:
     print(f"\\nTesting: '{pw}'")
     validate_password(pw)""",
-    )
+        )
 
-    mark_lesson_complete(progress, MODULE_KEY, "lesson2")
-    success("Lesson 2 complete: Control Flow")
-    press_enter()
+        cp.clear()
+        mark_lesson_complete(progress, MODULE_KEY, "lesson2")
+        success("Lesson 2 complete: Control Flow")
+        press_enter()
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -953,46 +1038,49 @@ for pw in ["short", "alllowercase1", "NoDigitsHere", "Str0ngP@ss!"]:
 # ──────────────────────────────────────────────────────────────────────
 def lesson_loops(progress):
     section_header("Lesson 3: Loops & Iteration")
+    cp = LessonCheckpoint(progress, MODULE_KEY, "lesson3", total_steps=3)
+    cp.offer_resume()
 
-    learning_goal([
-        "Write for loops and while loops",
-        "Use break, continue, and else on loops",
-        "Loop with enumerate() and zip()",
-        "Write list comprehensions for compact code",
-    ])
+    if cp.at(1):
+        learning_goal([
+            "Write for loops and while loops",
+            "Use break, continue, and else on loops",
+            "Loop with enumerate() and zip()",
+            "Write list comprehensions for compact code",
+        ])
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Imagine you need to check 1000 IP addresses to see which ones are "
-        "online. You would not write 1000 separate lines of code. Instead, "
-        "you use a loop -- a way to repeat a block of code over and over."
-    )
+        lesson_block(
+            "Imagine you need to check 1000 IP addresses to see which ones are "
+            "online. You would not write 1000 separate lines of code. Instead, "
+            "you use a loop -- a way to repeat a block of code over and over."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Python has two main types of loops. A 'for' loop repeats a fixed "
-        "number of times. A 'while' loop keeps repeating as long as a "
-        "condition is True."
-    )
+        lesson_block(
+            "Python has two main types of loops. A 'for' loop repeats a fixed "
+            "number of times. A 'while' loop keeps repeating as long as a "
+            "condition is True."
+        )
 
-    pace()
+        pace()
 
-    why_it_matters(
-        "Security work is full of repetitive tasks: scanning every port on a "
-        "server (65,535 of them), checking every line in a million-line log "
-        "file, testing every URL in a wordlist for hidden pages, or trying "
-        "every item in a password list. Without loops, none of this would be "
-        "practical. Loops are the engine of every security tool."
-    )
+        why_it_matters(
+            "Security work is full of repetitive tasks: scanning every port on a "
+            "server (65,535 of them), checking every line in a million-line log "
+            "file, testing every URL in a wordlist for hidden pages, or trying "
+            "every item in a password list. Without loops, none of this would be "
+            "practical. Loops are the engine of every security tool."
+        )
 
-    press_enter()
+        press_enter()
 
-    # ── for loops ──
-    sub_header("for Loops -- Repeating a Known Number of Times")
+        # ── for loops ──
+        sub_header("for Loops -- Repeating a Known Number of Times")
 
-    code_block("""\
+        code_block("""\
 # Looping through a list of items
 ports = [22, 80, 443, 8080, 8443]
 
@@ -1005,9 +1093,9 @@ for port in ports:
 #   Scanning port 8080...
 #   Scanning port 8443...""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # range() generates a sequence of numbers
 for i in range(5):
     print(f"Attempt {i}")
@@ -1019,9 +1107,9 @@ for i in range(1, 11):        # 1 through 10
     print(i, end=" ")
 print()  # Output: 1 2 3 4 5 6 7 8 9 10""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 for i in range(0, 100, 10):   # 0, 10, 20, ... 90
     print(i, end=" ")
 print()  # Output: 0 10 20 30 40 50 60 70 80 90
@@ -1031,24 +1119,24 @@ password = "S3cur3!"
 for char in password:
     print(f"  Character: {char}")""")
 
-    nice_work("For loops are one of the most useful things in all of programming!")
+        nice_work("For loops are one of the most useful things in all of programming!")
 
-    press_enter()
+        press_enter()
 
-    # ── while loops ──
-    sub_header("while Loops -- Repeating Until a Condition Changes")
+        # ── while loops ──
+        sub_header("while Loops -- Repeating Until a Condition Changes")
 
-    lesson_block(
-        "A while loop checks a condition before each iteration. If the "
-        "condition is True, it runs the code inside. Then it checks again. "
-        "This continues until the condition becomes False."
-    )
+        lesson_block(
+            "A while loop checks a condition before each iteration. If the "
+            "condition is True, it runs the code inside. Then it checks again. "
+            "This continues until the condition becomes False."
+        )
 
-    tip("Be careful: if the condition never becomes False, you get an infinite loop!")
+        tip("Be careful: if the condition never becomes False, you get an infinite loop!")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Basic while loop -- counting up
 count = 0
 while count < 5:
@@ -1056,9 +1144,9 @@ while count < 5:
     count += 1  # IMPORTANT: change the variable so the loop eventually stops
 # Output: Count is 0, Count is 1, Count is 2, Count is 3, Count is 4""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Practical example: retry logic for a network connection
 import time
 max_retries = 3
@@ -1075,9 +1163,9 @@ while attempt < max_retries and not connected:
     else:
         print("Failed. Retrying...")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # User input validation loop
 while True:
     user_input = input("Enter a port (1-65535): ")
@@ -1088,26 +1176,34 @@ while True:
     else:
         print("Invalid input. Try again.")""")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: Loops and Iterations - Corey Schafer", "https://www.youtube.com/watch?v=6iF8Xb7Z3wQ"),
+                ("Python for Beginners: For Loops - CS Dojo", "https://www.youtube.com/watch?v=OnDr4J2YCFU"),
+            ])
 
-    # ── break, continue, else ──
-    sub_header("break, continue, and else on Loops")
+        press_enter()
+        cp.save(1)
 
-    lesson_block(
-        "'break' immediately exits the loop -- the loop is done. 'continue' "
-        "skips the rest of the current iteration and jumps to the next one."
-    )
+    if cp.at(2):
+        # ── break, continue, else ──
+        sub_header("break, continue, and else on Loops")
 
-    pace()
+        lesson_block(
+            "'break' immediately exits the loop -- the loop is done. 'continue' "
+            "skips the rest of the current iteration and jumps to the next one."
+        )
 
-    lesson_block(
-        "The 'else' clause on a loop runs only if the loop finished normally "
-        "(was not interrupted by break)."
-    )
+        pace()
 
-    pace()
+        lesson_block(
+            "The 'else' clause on a loop runs only if the loop finished normally "
+            "(was not interrupted by break)."
+        )
 
-    code_block("""\
+        pace()
+
+        code_block("""\
 # break -- stop the loop early
 numbers = [1, 5, 3, 8, 2, 9, 4]
 
@@ -1122,9 +1218,9 @@ for num in numbers:
 #   Checking 3...
 #   Found a number greater than 7: 8""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # continue -- skip this iteration
 log_lines = ["INFO: User logged in", "ERROR: Disk full",
              "INFO: File saved", "ERROR: Connection lost"]
@@ -1138,9 +1234,9 @@ for line in log_lines:
 #   ERROR: Disk full
 #   ERROR: Connection lost""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # else on a loop -- runs only if loop completed without break
 target_ip = "10.0.0.5"
 suspicious_ips = ["192.168.1.100", "10.0.0.99", "172.16.0.50"]
@@ -1153,14 +1249,14 @@ else:
     print(f"{target_ip} is not on the suspicious list.")
 # Output: 10.0.0.5 is not on the suspicious list.""")
 
-    nice_work("break, continue, and else give you fine-grained control over your loops!")
+        nice_work("break, continue, and else give you fine-grained control over your loops!")
 
-    press_enter()
+        press_enter()
 
-    # ── Nested Loops ──
-    sub_header("Nested Loops -- Loops Inside Loops")
+        # ── Nested Loops ──
+        sub_header("Nested Loops -- Loops Inside Loops")
 
-    code_block("""\
+        code_block("""\
 # Scanning multiple hosts on multiple ports
 hosts = ["192.168.1.1", "192.168.1.2", "192.168.1.3"]
 ports = [22, 80, 443]
@@ -1171,9 +1267,9 @@ for host in hosts:
         print(f"  Checking port {port}...")
 # Each host gets all three ports checked""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Generating a multiplication table (just to illustrate)
 for row in range(1, 4):
     for col in range(1, 4):
@@ -1184,12 +1280,12 @@ for row in range(1, 4):
 #    2   4   6
 #    3   6   9""")
 
-    press_enter()
+        press_enter()
 
-    # ── enumerate and zip ──
-    sub_header("enumerate() and zip() -- Loop Helpers")
+        # ── enumerate and zip ──
+        sub_header("enumerate() and zip() -- Loop Helpers")
 
-    code_block("""\
+        code_block("""\
 # enumerate() -- get both the index AND the value
 servers = ["web01", "db01", "mail01", "app01"]
 
@@ -1205,9 +1301,9 @@ for index, server in enumerate(servers):
 for num, server in enumerate(servers, start=1):
     print(f"  {num}. {server}")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # zip() -- loop through two lists in parallel
 usernames = ["alice", "bob", "charlie"]
 roles = ["admin", "user", "auditor"]
@@ -1219,20 +1315,20 @@ for user, role in zip(usernames, roles):
 #   bob -> user
 #   charlie -> auditor""")
 
-    press_enter()
+        press_enter()
 
-    # ── List Comprehensions ──
-    sub_header("List Comprehensions -- Compact Loops")
+        # ── List Comprehensions ──
+        sub_header("List Comprehensions -- Compact Loops")
 
-    lesson_block(
-        "A list comprehension is a shorthand way to create a new list by "
-        "transforming or filtering items from another list. It puts a for "
-        "loop and an optional if condition inside square brackets."
-    )
+        lesson_block(
+            "A list comprehension is a shorthand way to create a new list by "
+            "transforming or filtering items from another list. It puts a for "
+            "loop and an optional if condition inside square brackets."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Regular loop to create a list
 squares = []
 for i in range(10):
@@ -1243,9 +1339,9 @@ print(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 squares = [i ** 2 for i in range(10)]
 print(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # With a filter condition
 numbers = [1, -2, 3, -4, 5, -6, 7]
 positive = [n for n in numbers if n > 0]
@@ -1261,108 +1357,116 @@ words = ["hello", "WORLD", "Python"]
 lower_words = [w.lower() for w in words]
 print(lower_words)  # ['hello', 'world', 'python']""")
 
-    pace()
+        pace()
 
-    scenario_block("Automated Port Scanning", (
-        "A penetration tester needs to check which of the 65,535 TCP ports "
-        "are open on a target server. Using a for loop with range(1, 65536), "
-        "they attempt a connection to each port. For each successful connection "
-        "they add the port to a list. After the scan, they use a list "
-        "comprehension to filter only the 'interesting' ports (those commonly "
-        "associated with vulnerable services). The entire scan is just 15 lines "
-        "of Python."
-    ))
+        scenario_block("Automated Port Scanning", (
+            "A penetration tester needs to check which of the 65,535 TCP ports "
+            "are open on a target server. Using a for loop with range(1, 65536), "
+            "they attempt a connection to each port. For each successful connection "
+            "they add the port to a list. After the scan, they use a list "
+            "comprehension to filter only the 'interesting' ports (those commonly "
+            "associated with vulnerable services). The entire scan is just 15 lines "
+            "of Python."
+        ))
 
-    nice_work("Loops and list comprehensions are now in your toolkit!")
+        nice_work("Loops and list comprehensions are now in your toolkit!")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: Comprehensions - Corey Schafer", "https://www.youtube.com/watch?v=3dt4OGnU5sM"),
+            ])
 
-    # ── Guided Practice ──
-    guided_practice(
-        title="Number Guessing Game",
-        intro="Let's build a guessing game piece by piece.",
-        steps=[
-            {
-                "instruction": (
-                    "Import the random module and use random.randint(1, 100) to "
-                    "pick a secret number. Store it in a variable called secret. "
-                    "Also set up an attempts counter starting at 0."
-                ),
-                "required_keywords": ["import", "random", "randint"],
-                "hints": [
-                    "Start with: import random",
-                    "Then: secret = random.randint(1, 100)",
-                    "And: attempts = 0",
-                ],
-                "solution": (
-                    'import random\n'
-                    '\n'
-                    'secret = random.randint(1, 100)\n'
-                    'attempts = 0'
-                ),
-            },
-            {
-                "instruction": (
-                    "Write a while loop that keeps running. Inside it, use "
-                    "input() to get the user's guess and convert it to an int."
-                ),
-                "context_code": (
-                    'import random\n'
-                    'secret = random.randint(1, 100)\n'
-                    'attempts = 0'
-                ),
-                "required_keywords": ["while", "input", "int"],
-                "hints": [
-                    "Use: while True: (or while attempts < 7:)",
-                    "Get input: guess = int(input('Your guess: '))",
-                    "Increment attempts: attempts += 1",
-                ],
-                "solution": (
-                    'while attempts < 7:\n'
-                    '    guess = int(input("Your guess: "))\n'
-                    '    attempts += 1'
-                ),
-            },
-            {
-                "instruction": (
-                    "Inside the loop, compare the guess to the secret. "
-                    "If equal, print a success message and break. "
-                    "If too low or too high, print a hint."
-                ),
-                "required_keywords": ["if", "elif", "break"],
-                "hints": [
-                    "if guess == secret: print('You got it!'); break",
-                    "elif guess < secret: print('Too low!')",
-                    "else: print('Too high!')",
-                ],
-                "solution": (
-                    '    if guess == secret:\n'
-                    '        print(f"You got it in {attempts} attempts!")\n'
-                    '        break\n'
-                    '    elif guess < secret:\n'
-                    '        print("Too low!")\n'
-                    '    else:\n'
-                    '        print("Too high!")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Add a game-over message if the player runs out of guesses. "
-                    "Use an else clause on the while loop (it runs if the loop "
-                    "ends without a break) to reveal the secret number."
-                ),
-                "required_keywords": ["else", "secret"],
-                "hints": [
-                    "Add else: at the same indent level as while:",
-                    "Inside: print(f'Game over! The number was {secret}.')",
-                ],
-                "solution": (
-                    'else:\n'
-                    '    print(f"Game over! The number was {secret}.")'
-                ),
-            },
-        ],
-        complete_solution="""\
+        press_enter()
+        cp.save(2)
+
+    if cp.at(3):
+        # ── Guided Practice ──
+        guided_practice(
+            title="Number Guessing Game",
+            intro="Let's build a guessing game piece by piece.",
+            difficulty=progress.get("difficulty", "beginner"),
+            steps=[
+                {
+                    "instruction": (
+                        "Import the random module and use random.randint(1, 100) to "
+                        "pick a secret number. Store it in a variable called secret. "
+                        "Also set up an attempts counter starting at 0."
+                    ),
+                    "required_keywords": ["import", "random", "randint"],
+                    "hints": [
+                        "Start with: import random",
+                        "Then: secret = random.randint(1, 100)",
+                        "And: attempts = 0",
+                    ],
+                    "solution": (
+                        'import random\n'
+                        '\n'
+                        'secret = random.randint(1, 100)\n'
+                        'attempts = 0'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Write a while loop that keeps running. Inside it, use "
+                        "input() to get the user's guess and convert it to an int."
+                    ),
+                    "context_code": (
+                        'import random\n'
+                        'secret = random.randint(1, 100)\n'
+                        'attempts = 0'
+                    ),
+                    "required_keywords": ["while", "input", "int"],
+                    "hints": [
+                        "Use: while True: (or while attempts < 7:)",
+                        "Get input: guess = int(input('Your guess: '))",
+                        "Increment attempts: attempts += 1",
+                    ],
+                    "solution": (
+                        'while attempts < 7:\n'
+                        '    guess = int(input("Your guess: "))\n'
+                        '    attempts += 1'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Inside the loop, compare the guess to the secret. "
+                        "If equal, print a success message and break. "
+                        "If too low or too high, print a hint."
+                    ),
+                    "required_keywords": ["if", "elif", "break"],
+                    "hints": [
+                        "if guess == secret: print('You got it!'); break",
+                        "elif guess < secret: print('Too low!')",
+                        "else: print('Too high!')",
+                    ],
+                    "solution": (
+                        '    if guess == secret:\n'
+                        '        print(f"You got it in {attempts} attempts!")\n'
+                        '        break\n'
+                        '    elif guess < secret:\n'
+                        '        print("Too low!")\n'
+                        '    else:\n'
+                        '        print("Too high!")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Add a game-over message if the player runs out of guesses. "
+                        "Use an else clause on the while loop (it runs if the loop "
+                        "ends without a break) to reveal the secret number."
+                    ),
+                    "required_keywords": ["else", "secret"],
+                    "hints": [
+                        "Add else: at the same indent level as while:",
+                        "Inside: print(f'Game over! The number was {secret}.')",
+                    ],
+                    "solution": (
+                        'else:\n'
+                        '    print(f"Game over! The number was {secret}.")'
+                    ),
+                },
+            ],
+            complete_solution="""\
 import random
 
 secret = random.randint(1, 100)
@@ -1384,11 +1488,41 @@ while attempts < 7:
         print("Too high!")
 else:
     print(f"\\nGame over! The number was {secret}.")""",
-    )
+        )
 
-    mark_lesson_complete(progress, MODULE_KEY, "lesson3")
-    success("Lesson 3 complete: Loops & Iteration")
-    press_enter()
+        # ── Live Coding Exercise ──
+        if ask_yes_no("Try a live coding exercise?"):
+            from utils.code_runner import code_exercise
+            code_exercise(
+                instruction=(
+                    "Write a program that uses a for loop to count from 1 to 10 and prints "
+                    "only the even numbers. Use the modulo operator (%) to check for evenness."
+                ),
+                test_cases=[
+                    {
+                        "input": "",
+                        "expected_output": "2",
+                        "description": "Output contains 2",
+                    },
+                    {
+                        "input": "",
+                        "expected_output": "10",
+                        "description": "Output contains 10",
+                    },
+                ],
+                starter_code="# Print even numbers from 1 to 10\n",
+                hints=[
+                    "Use: for i in range(1, 11):",
+                    "Check if a number is even: if i % 2 == 0:",
+                ],
+                solution="for i in range(1, 11):\n    if i % 2 == 0:\n        print(i)",
+            )
+            press_enter()
+
+        cp.clear()
+        mark_lesson_complete(progress, MODULE_KEY, "lesson3")
+        success("Lesson 3 complete: Loops & Iteration")
+        press_enter()
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -1396,48 +1530,51 @@ else:
 # ──────────────────────────────────────────────────────────────────────
 def lesson_data_structures(progress):
     section_header("Lesson 4: Data Structures -- Lists, Dicts, Sets, Tuples")
+    cp = LessonCheckpoint(progress, MODULE_KEY, "lesson4", total_steps=3)
+    cp.offer_resume()
 
-    learning_goal([
-        "Use lists to store ordered collections of items",
-        "Use dictionaries for key-value lookups",
-        "Use sets for unique items and set operations",
-        "Know when to use each data structure",
-    ])
+    if cp.at(1):
+        learning_goal([
+            "Use lists to store ordered collections of items",
+            "Use dictionaries for key-value lookups",
+            "Use sets for unique items and set operations",
+            "Know when to use each data structure",
+        ])
 
-    pace()
+        pace()
 
-    lesson_block(
-        "So far, each variable has held a single value. But in the real world, "
-        "you need to work with collections of data: a list of IP addresses, a "
-        "mapping of usernames to roles, a set of unique ports, and more."
-    )
+        lesson_block(
+            "So far, each variable has held a single value. But in the real world, "
+            "you need to work with collections of data: a list of IP addresses, a "
+            "mapping of usernames to roles, a set of unique ports, and more."
+        )
 
-    pace()
+        pace()
 
-    why_it_matters(
-        "Security tools process large amounts of structured data. A port "
-        "scanner stores results in lists. A user database maps usernames to "
-        "permissions using dictionaries. Deduplicating IP addresses uses sets. "
-        "Choosing the right data structure makes your tools faster, more "
-        "readable, and less error-prone."
-    )
+        why_it_matters(
+            "Security tools process large amounts of structured data. A port "
+            "scanner stores results in lists. A user database maps usernames to "
+            "permissions using dictionaries. Deduplicating IP addresses uses sets. "
+            "Choosing the right data structure makes your tools faster, more "
+            "readable, and less error-prone."
+        )
 
-    press_enter()
+        press_enter()
 
-    # ── Lists ──
-    sub_header("Lists -- Ordered, Changeable Collections")
+        # ── Lists ──
+        sub_header("Lists -- Ordered, Changeable Collections")
 
-    lesson_block(
-        "A list is an ordered collection of items. You can add, remove, and "
-        "change items. Lists are created with square brackets [] and items "
-        "are separated by commas."
-    )
+        lesson_block(
+            "A list is an ordered collection of items. You can add, remove, and "
+            "change items. Lists are created with square brackets [] and items "
+            "are separated by commas."
+        )
 
-    tip("Lists are the most commonly used data structure in Python.")
+        tip("Lists are the most commonly used data structure in Python.")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Creating lists
 ports = [22, 80, 443, 8080]
 names = ["Alice", "Bob", "Charlie"]
@@ -1455,9 +1592,9 @@ print(ports[1:3])   # [80, 443]  (index 1 up to but not including 3)
 print(ports[:2])    # [22, 80]   (from start to index 2)
 print(ports[2:])    # [443, 8080] (from index 2 to end)""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Modifying lists
 servers = ["web01", "db01", "app01"]
 
@@ -1470,9 +1607,9 @@ servers.remove("db01")              # Remove by value
 last = servers.pop()                # Remove and return last item
 specific = servers.pop(0)           # Remove and return item at index 0""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Other useful operations
 numbers = [3, 1, 4, 1, 5, 9, 2, 6]
 numbers.sort()                      # Sort in place: [1, 1, 2, 3, 4, 5, 6, 9]
@@ -1482,29 +1619,37 @@ print(5 in numbers)                 # True (is 5 in the list?)
 print(numbers.count(1))             # 2 (how many times does 1 appear?)
 print(numbers.index(5))             # Index of first occurrence of 5""")
 
-    nice_work("Lists are incredibly versatile. You will use them all the time!")
+        nice_work("Lists are incredibly versatile. You will use them all the time!")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: Lists, Tuples, and Sets - Corey Schafer", "https://www.youtube.com/watch?v=W8KRzm-HUcc"),
+                ("Python Lists - Net Ninja", "https://www.youtube.com/watch?v=ty4eiACTPCU"),
+            ])
 
-    # ── Dictionaries ──
-    sub_header("Dictionaries -- Key-Value Pairs")
+        press_enter()
+        cp.save(1)
 
-    lesson_block(
-        "A dictionary (dict) stores data as key-value pairs, like a real "
-        "dictionary where each word (key) has a definition (value)."
-    )
+    if cp.at(2):
+        # ── Dictionaries ──
+        sub_header("Dictionaries -- Key-Value Pairs")
 
-    pace()
+        lesson_block(
+            "A dictionary (dict) stores data as key-value pairs, like a real "
+            "dictionary where each word (key) has a definition (value)."
+        )
 
-    lesson_block(
-        "Dictionaries are created with curly braces {} and use colons to "
-        "separate keys from values. They are incredibly useful for "
-        "representing structured data."
-    )
+        pace()
 
-    pace()
+        lesson_block(
+            "Dictionaries are created with curly braces {} and use colons to "
+            "separate keys from values. They are incredibly useful for "
+            "representing structured data."
+        )
 
-    code_block("""\
+        pace()
+
+        code_block("""\
 # Creating dictionaries
 user = {
     "username": "alice",
@@ -1521,9 +1666,9 @@ print(user["role"])           # "admin"
 print(user.get("email"))           # None (no error)
 print(user.get("email", "N/A"))    # "N/A" (custom default)""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Adding and modifying entries
 user["email"] = "alice@company.com"   # Add a new key-value pair
 user["login_count"] = 43              # Update an existing value
@@ -1537,9 +1682,9 @@ print(user.keys())     # dict_keys(['username', 'login_count', 'email'])
 print(user.values())   # dict_values(['alice', 43, 'alice@company.com'])
 print(user.items())    # dict_items([('username', 'alice'), ...])""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Looping through dictionaries
 server_status = {
     "web01": "running",
@@ -1557,9 +1702,9 @@ for server, status in server_status.items():
     if status != "running":
         print(f"  ALERT: {server} is {status}!")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Nested dictionaries
 employees = {
     "alice": {"role": "admin", "department": "IT Security"},
@@ -1568,22 +1713,22 @@ employees = {
 }
 print(employees["alice"]["department"])  # "IT Security" """)
 
-    nice_work("Dictionaries are a powerhouse. You just unlocked key-value storage!")
+        nice_work("Dictionaries are a powerhouse. You just unlocked key-value storage!")
 
-    press_enter()
+        press_enter()
 
-    # ── Sets ──
-    sub_header("Sets -- Unique Values Only")
+        # ── Sets ──
+        sub_header("Sets -- Unique Values Only")
 
-    lesson_block(
-        "A set is a collection of unique items -- no duplicates allowed. "
-        "Sets are useful when you need to eliminate duplicates or perform "
-        "mathematical set operations like union, intersection, and difference."
-    )
+        lesson_block(
+            "A set is a collection of unique items -- no duplicates allowed. "
+            "Sets are useful when you need to eliminate duplicates or perform "
+            "mathematical set operations like union, intersection, and difference."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Creating sets
 open_ports = {22, 80, 443, 80, 22}  # Duplicates are removed automatically
 print(open_ports)                    # {80, 443, 22} (order may vary)
@@ -1594,9 +1739,9 @@ unique_ips = set(ip_list)
 print(unique_ips)       # {'10.0.0.1', '10.0.0.2', '10.0.0.3'}
 print(len(unique_ips))  # 3""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Set operations
 set_a = {22, 80, 443, 8080}
 set_b = {80, 443, 3306, 5432}
@@ -1612,27 +1757,27 @@ scan_today = {22, 80, 443, 3306, 8080}
 new_ports = scan_today - scan_yesterday
 print(f"New ports detected: {new_ports}")  # {3306, 8080}""")
 
-    press_enter()
+        press_enter()
 
-    # ── Tuples ──
-    sub_header("Tuples -- Immutable Sequences")
+        # ── Tuples ──
+        sub_header("Tuples -- Immutable Sequences")
 
-    lesson_block(
-        "A tuple is like a list, but it cannot be changed after creation "
-        "(it is immutable). Tuples use parentheses () instead of square "
-        "brackets."
-    )
+        lesson_block(
+            "A tuple is like a list, but it cannot be changed after creation "
+            "(it is immutable). Tuples use parentheses () instead of square "
+            "brackets."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Use tuples for data that should not be modified, like "
-        "coordinates, database records, or function return values."
-    )
+        lesson_block(
+            "Use tuples for data that should not be modified, like "
+            "coordinates, database records, or function return values."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Creating tuples
 coordinates = (40.7128, -74.0060)   # Latitude, longitude of New York
 rgb_red = (255, 0, 0)
@@ -1646,9 +1791,9 @@ print(server_info[2])   # 443
 host, ip, port = server_info
 print(f"Host: {host}, IP: {ip}, Port: {port}")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # You cannot modify a tuple:
 # coordinates[0] = 50.0   # ERROR: tuples do not support assignment
 
@@ -1657,14 +1802,14 @@ print(f"Host: {host}, IP: {ip}, Port: {port}")""")
 quotient, remainder = divmod(17, 5)
 print(f"17 / 5 = {quotient} remainder {remainder}")  # 3 remainder 2""")
 
-    nice_work("You now know all four Python data structures!")
+        nice_work("You now know all four Python data structures!")
 
-    press_enter()
+        press_enter()
 
-    # ── When to Use Which ──
-    sub_header("When to Use Which Data Structure")
+        # ── When to Use Which ──
+        sub_header("When to Use Which Data Structure")
 
-    code_block("""\
+        code_block("""\
 # LIST -- Ordered collection that may change
 #   Use for: log entries, scan results, to-do items
 open_ports = [22, 80, 443]
@@ -1681,115 +1826,124 @@ blocked_ips = {"10.0.0.1", "10.0.0.2"}
 #   Use for: coordinates, database rows, function returns
 address = ("192.168.1.1", 443)""", language="text")
 
-    pace()
+        pace()
 
-    scenario_block("Intrusion Detection Data Model", (
-        "You are building a simple intrusion detection system. You use a "
-        "dictionary to store alerts, where each key is a timestamp and the "
-        "value is a dict with source IP, destination IP, and alert type. "
-        "You use a set to track unique attacking IPs. You use a list to "
-        "maintain the chronological order of events. Choosing the right "
-        "data structure for each job makes your code clean and efficient."
-    ))
+        scenario_block("Intrusion Detection Data Model", (
+            "You are building a simple intrusion detection system. You use a "
+            "dictionary to store alerts, where each key is a timestamp and the "
+            "value is a dict with source IP, destination IP, and alert type. "
+            "You use a set to track unique attacking IPs. You use a list to "
+            "maintain the chronological order of events. Choosing the right "
+            "data structure for each job makes your code clean and efficient."
+        ))
 
-    tip("When in doubt, start with a list. You can always switch later if needed.")
+        tip("When in doubt, start with a list. You can always switch later if needed.")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: Dictionaries - Corey Schafer", "https://www.youtube.com/watch?v=daefaLgNkw0"),
+                ("Python Sets and Set Theory - Corey Schafer", "https://www.youtube.com/watch?v=r3R3h5ly_uE"),
+            ])
 
-    # ── Guided Practice ──
-    guided_practice(
-        title="Contact Book",
-        intro="Let's build a contact book using dictionaries, step by step.",
-        steps=[
-            {
-                "instruction": (
-                    "Create an empty dictionary called contacts. Then write a "
-                    "while True loop that prints a menu with numbered options "
-                    "(Add, Look up, List, Delete, Quit) and gets the user's choice "
-                    "with input()."
-                ),
-                "required_keywords": ["contacts", "while", "input"],
-                "hints": [
-                    "Start with: contacts = {}",
-                    "Use while True: to keep the menu running.",
-                    "Print options with print(), get choice with input().",
-                ],
-                "solution": (
-                    'contacts = {}\n'
-                    '\n'
-                    'while True:\n'
-                    '    print("\\n--- Contact Book ---")\n'
-                    '    print("1. Add  2. Look up  3. List  4. Delete  5. Quit")\n'
-                    '    choice = input("Choice: ").strip()'
-                ),
-            },
-            {
-                "instruction": (
-                    "Handle the 'Add contact' option. Use input() to get the name, "
-                    "phone, and email. Store them as a nested dictionary inside contacts."
-                ),
-                "required_keywords": ["name", "phone", "email"],
-                "hints": [
-                    "Get each field: name = input('Name: ').strip()",
-                    "Store as nested dict: contacts[name] = {'phone': phone, 'email': email}",
-                    "Print confirmation: print(f'Added {name}!')",
-                ],
-                "solution": (
-                    '    if choice == "1":\n'
-                    '        name = input("Name: ").strip()\n'
-                    '        phone = input("Phone: ").strip()\n'
-                    '        email = input("Email: ").strip()\n'
-                    '        contacts[name] = {"phone": phone, "email": email}\n'
-                    '        print(f"Added {name}!")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Handle 'Look up'. Ask for a name, use .get() to safely look "
-                    "it up (returns None if not found), and print the contact details."
-                ),
-                "required_keywords": ["get", "print"],
-                "hints": [
-                    "Use contacts.get(name) — returns None if the key doesn't exist.",
-                    "if contact: print details, else: print 'not found'.",
-                ],
-                "solution": (
-                    '    elif choice == "2":\n'
-                    '        name = input("Name: ").strip()\n'
-                    '        contact = contacts.get(name)\n'
-                    '        if contact:\n'
-                    '            print(f"  {name}: {contact}")\n'
-                    '        else:\n'
-                    '            print("Not found.")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Handle 'List all' and 'Delete'. For listing, loop through "
-                    "contacts.items(). For deleting, use del contacts[name]. "
-                    "Also handle the Quit option with break."
-                ),
-                "required_keywords": ["for", "items", "del"],
-                "hints": [
-                    "for name, info in contacts.items(): print(...)",
-                    "del contacts[name] removes a key from the dictionary.",
-                    "if choice == '5': break",
-                ],
-                "solution": (
-                    '    elif choice == "3":\n'
-                    '        for name, info in contacts.items():\n'
-                    '            print(f"  {name}: {info}")\n'
-                    '    elif choice == "4":\n'
-                    '        name = input("Name: ").strip()\n'
-                    '        if name in contacts:\n'
-                    '            del contacts[name]\n'
-                    '            print(f"Deleted {name}.")\n'
-                    '    elif choice == "5":\n'
-                    '        break'
-                ),
-            },
-        ],
-        complete_solution="""\
+        press_enter()
+        cp.save(2)
+
+    if cp.at(3):
+        # ── Guided Practice ──
+        guided_practice(
+            title="Contact Book",
+            intro="Let's build a contact book using dictionaries, step by step.",
+            difficulty=progress.get("difficulty", "beginner"),
+            steps=[
+                {
+                    "instruction": (
+                        "Create an empty dictionary called contacts. Then write a "
+                        "while True loop that prints a menu with numbered options "
+                        "(Add, Look up, List, Delete, Quit) and gets the user's choice "
+                        "with input()."
+                    ),
+                    "required_keywords": ["contacts", "while", "input"],
+                    "hints": [
+                        "Start with: contacts = {}",
+                        "Use while True: to keep the menu running.",
+                        "Print options with print(), get choice with input().",
+                    ],
+                    "solution": (
+                        'contacts = {}\n'
+                        '\n'
+                        'while True:\n'
+                        '    print("\\n--- Contact Book ---")\n'
+                        '    print("1. Add  2. Look up  3. List  4. Delete  5. Quit")\n'
+                        '    choice = input("Choice: ").strip()'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Handle the 'Add contact' option. Use input() to get the name, "
+                        "phone, and email. Store them as a nested dictionary inside contacts."
+                    ),
+                    "required_keywords": ["name", "phone", "email"],
+                    "hints": [
+                        "Get each field: name = input('Name: ').strip()",
+                        "Store as nested dict: contacts[name] = {'phone': phone, 'email': email}",
+                        "Print confirmation: print(f'Added {name}!')",
+                    ],
+                    "solution": (
+                        '    if choice == "1":\n'
+                        '        name = input("Name: ").strip()\n'
+                        '        phone = input("Phone: ").strip()\n'
+                        '        email = input("Email: ").strip()\n'
+                        '        contacts[name] = {"phone": phone, "email": email}\n'
+                        '        print(f"Added {name}!")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Handle 'Look up'. Ask for a name, use .get() to safely look "
+                        "it up (returns None if not found), and print the contact details."
+                    ),
+                    "required_keywords": ["get", "print"],
+                    "hints": [
+                        "Use contacts.get(name) — returns None if the key doesn't exist.",
+                        "if contact: print details, else: print 'not found'.",
+                    ],
+                    "solution": (
+                        '    elif choice == "2":\n'
+                        '        name = input("Name: ").strip()\n'
+                        '        contact = contacts.get(name)\n'
+                        '        if contact:\n'
+                        '            print(f"  {name}: {contact}")\n'
+                        '        else:\n'
+                        '            print("Not found.")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Handle 'List all' and 'Delete'. For listing, loop through "
+                        "contacts.items(). For deleting, use del contacts[name]. "
+                        "Also handle the Quit option with break."
+                    ),
+                    "required_keywords": ["for", "items", "del"],
+                    "hints": [
+                        "for name, info in contacts.items(): print(...)",
+                        "del contacts[name] removes a key from the dictionary.",
+                        "if choice == '5': break",
+                    ],
+                    "solution": (
+                        '    elif choice == "3":\n'
+                        '        for name, info in contacts.items():\n'
+                        '            print(f"  {name}: {info}")\n'
+                        '    elif choice == "4":\n'
+                        '        name = input("Name: ").strip()\n'
+                        '        if name in contacts:\n'
+                        '            del contacts[name]\n'
+                        '            print(f"Deleted {name}.")\n'
+                        '    elif choice == "5":\n'
+                        '        break'
+                    ),
+                },
+            ],
+            complete_solution="""\
 contacts = {}
 
 while True:
@@ -1820,11 +1974,12 @@ while True:
             print(f"Deleted {name}.")
     elif choice == "5":
         break""",
-    )
+        )
 
-    mark_lesson_complete(progress, MODULE_KEY, "lesson4")
-    success("Lesson 4 complete: Data Structures")
-    press_enter()
+        cp.clear()
+        mark_lesson_complete(progress, MODULE_KEY, "lesson4")
+        success("Lesson 4 complete: Data Structures")
+        press_enter()
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -1832,48 +1987,51 @@ while True:
 # ──────────────────────────────────────────────────────────────────────
 def lesson_functions_modules(progress):
     section_header("Lesson 5: Functions & Modules")
+    cp = LessonCheckpoint(progress, MODULE_KEY, "lesson5", total_steps=3)
+    cp.offer_resume()
 
-    learning_goal([
-        "Define and call your own functions",
-        "Use return values, default parameters, and keyword arguments",
-        "Understand variable scope (local vs global)",
-        "Import and use Python's built-in modules",
-    ])
+    if cp.at(1):
+        learning_goal([
+            "Define and call your own functions",
+            "Use return values, default parameters, and keyword arguments",
+            "Understand variable scope (local vs global)",
+            "Import and use Python's built-in modules",
+        ])
 
-    pace()
+        pace()
 
-    lesson_block(
-        "As your programs get bigger, you need a way to organize your code "
-        "into reusable pieces. A function is a named block of code that "
-        "performs a specific task. You define it once and can call it as many "
-        "times as you want."
-    )
+        lesson_block(
+            "As your programs get bigger, you need a way to organize your code "
+            "into reusable pieces. A function is a named block of code that "
+            "performs a specific task. You define it once and can call it as many "
+            "times as you want."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Functions have three big benefits. First, they avoid repetition. "
-        "Second, they make code readable. Third, they make testing easier: "
-        "you can test each function independently."
-    )
+        lesson_block(
+            "Functions have three big benefits. First, they avoid repetition. "
+            "Second, they make code readable. Third, they make testing easier: "
+            "you can test each function independently."
+        )
 
-    pace()
+        pace()
 
-    why_it_matters(
-        "Professional security tools are built from functions and modules. "
-        "A port scanner might have functions like scan_port(), grab_banner(), "
-        "and generate_report(). A log analyzer might import the 're' module "
-        "for regex and the 'datetime' module for timestamps. Knowing how to "
-        "write functions and use modules is what takes you from writing "
-        "scripts to building real tools."
-    )
+        why_it_matters(
+            "Professional security tools are built from functions and modules. "
+            "A port scanner might have functions like scan_port(), grab_banner(), "
+            "and generate_report(). A log analyzer might import the 're' module "
+            "for regex and the 'datetime' module for timestamps. Knowing how to "
+            "write functions and use modules is what takes you from writing "
+            "scripts to building real tools."
+        )
 
-    press_enter()
+        press_enter()
 
-    # ── Defining Functions ──
-    sub_header("Defining Functions with def")
+        # ── Defining Functions ──
+        sub_header("Defining Functions with def")
 
-    code_block("""\
+        code_block("""\
 # A simple function with no parameters
 def greet():
     print("Hello, welcome to JJ's LAB!")
@@ -1882,9 +2040,9 @@ def greet():
 greet()           # Output: Hello, welcome to JJ's LAB!
 greet()           # You can call it as many times as you want""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # A function with a parameter (input)
 def greet_user(name):
     print(f"Hello, {name}! Welcome to JJ's LAB.")
@@ -1899,22 +2057,22 @@ def check_port(host, port):
 check_port("192.168.1.1", 80)
 check_port("10.0.0.5", 443)""")
 
-    nice_work("You just wrote your first functions!")
+        nice_work("You just wrote your first functions!")
 
-    press_enter()
+        press_enter()
 
-    # ── Return Values ──
-    sub_header("Return Values -- Getting Results Back")
+        # ── Return Values ──
+        sub_header("Return Values -- Getting Results Back")
 
-    lesson_block(
-        "A function can send a result back to the code that called it using "
-        "the 'return' statement. Think of it as the function handing you an "
-        "answer."
-    )
+        lesson_block(
+            "A function can send a result back to the code that called it using "
+            "the 'return' statement. Think of it as the function handing you an "
+            "answer."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # A function that returns a value
 def add(a, b):
     return a + b
@@ -1931,9 +2089,9 @@ def is_valid_port(port):
 print(is_valid_port(80))       # True
 print(is_valid_port(99999))    # False""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # A function can return multiple values (as a tuple)
 def analyze_password(password):
     \"\"\"Return length and whether it has digits.\"\"\"
@@ -1945,9 +2103,9 @@ pw_length, pw_has_digits = analyze_password("Hello123")
 print(f"Length: {pw_length}, Has digits: {pw_has_digits}")
 # Output: Length: 8, Has digits: True""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Early return -- exit a function immediately
 def divide(a, b):
     if b == 0:
@@ -1957,12 +2115,12 @@ def divide(a, b):
 print(divide(10, 3))    # 3.333...
 print(divide(10, 0))    # None""")
 
-    press_enter()
+        press_enter()
 
-    # ── Parameters Deep Dive ──
-    sub_header("Parameters: Default Values, Keyword Arguments")
+        # ── Parameters Deep Dive ──
+        sub_header("Parameters: Default Values, Keyword Arguments")
 
-    code_block("""\
+        code_block("""\
 # Default parameter values
 def scan_host(host, port=80, timeout=5):
     \"\"\"Scan a host. Port defaults to 80, timeout to 5 seconds.\"\"\"
@@ -1978,29 +2136,37 @@ scan_host("192.168.1.1", timeout=2, port=8080)
 # Mixing positional and keyword arguments
 scan_host("10.0.0.1", 22, timeout=3)""")
 
-    tip("Default parameters are great for making functions easy to call with common settings.")
+        tip("Default parameters are great for making functions easy to call with common settings.")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: Functions - Corey Schafer", "https://www.youtube.com/watch?v=9Os0o3wzS_I"),
+                ("Python Functions - Programming with Mosh", "https://www.youtube.com/watch?v=u-OmVr_fT4s"),
+            ])
 
-    # ── Scope ──
-    sub_header("Scope -- Where Variables Live")
+        press_enter()
+        cp.save(1)
 
-    lesson_block(
-        "A variable created inside a function only exists inside that "
-        "function. This is called 'local scope'."
-    )
+    if cp.at(2):
+        # ── Scope ──
+        sub_header("Scope -- Where Variables Live")
 
-    pace()
+        lesson_block(
+            "A variable created inside a function only exists inside that "
+            "function. This is called 'local scope'."
+        )
 
-    lesson_block(
-        "A variable created outside all functions exists everywhere and is "
-        "called 'global scope'. This separation prevents functions from "
-        "accidentally changing each other's data."
-    )
+        pace()
 
-    pace()
+        lesson_block(
+            "A variable created outside all functions exists everywhere and is "
+            "called 'global scope'. This separation prevents functions from "
+            "accidentally changing each other's data."
+        )
 
-    code_block("""\
+        pace()
+
+        code_block("""\
 # Global vs local scope
 message = "I am global"     # Global variable
 
@@ -2013,9 +2179,9 @@ my_function()
 print(message)              # "I am global" (unchanged!)
 # print(secret)             # ERROR: secret does not exist outside the function""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Accessing global variables inside a function (read only)
 app_name = "JJ's LAB"
 
@@ -2024,14 +2190,14 @@ def show_app():
 
 show_app()  # Output: App: JJ's LAB""")
 
-    nice_work("Scope can be confusing at first, but you handled it!")
+        nice_work("Scope can be confusing at first, but you handled it!")
 
-    press_enter()
+        press_enter()
 
-    # ── *args and **kwargs ──
-    sub_header("*args and **kwargs -- Flexible Parameters")
+        # ── *args and **kwargs ──
+        sub_header("*args and **kwargs -- Flexible Parameters")
 
-    code_block("""\
+        code_block("""\
 # *args -- accept any number of positional arguments
 def scan_ports(host, *ports):
     \"\"\"Scan multiple ports on a host.\"\"\"
@@ -2042,9 +2208,9 @@ def scan_ports(host, *ports):
 scan_ports("192.168.1.1", 22, 80, 443, 8080)
 # ports becomes a tuple: (22, 80, 443, 8080)""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # **kwargs -- accept any number of keyword arguments
 def create_user(**kwargs):
     \"\"\"Create a user from keyword arguments.\"\"\"
@@ -2055,12 +2221,12 @@ def create_user(**kwargs):
 create_user(name="Alice", role="admin", department="Security")
 # kwargs becomes a dict: {"name": "Alice", "role": "admin", ...}""")
 
-    press_enter()
+        press_enter()
 
-    # ── Lambda Functions ──
-    sub_header("Lambda Functions -- Quick One-Liners")
+        # ── Lambda Functions ──
+        sub_header("Lambda Functions -- Quick One-Liners")
 
-    code_block("""\
+        code_block("""\
 # Lambda: a mini-function defined in a single line
 # Useful for simple operations, especially with sort() and map()
 
@@ -2080,20 +2246,20 @@ for s in servers:
     print(f"  {s['name']}: {s['load']}%")
 # Output: db01: 42%, app01: 67%, web01: 85%""")
 
-    press_enter()
+        press_enter()
 
-    # ── Importing Modules ──
-    sub_header("Importing Modules -- Using Python's Built-in Libraries")
+        # ── Importing Modules ──
+        sub_header("Importing Modules -- Using Python's Built-in Libraries")
 
-    lesson_block(
-        "Python comes with a huge standard library -- hundreds of modules "
-        "that provide pre-built functionality. Instead of writing everything "
-        "from scratch, you import what you need."
-    )
+        lesson_block(
+            "Python comes with a huge standard library -- hundreds of modules "
+            "that provide pre-built functionality. Instead of writing everything "
+            "from scratch, you import what you need."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Different ways to import
 import os                     # Import the entire module
 print(os.getcwd())            # Use as: module.function()
@@ -2108,9 +2274,9 @@ print(f"Current time: {now}")
 import random as rng           # Import with an alias (nickname)
 print(rng.randint(1, 100))""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Common modules for security work:
 import os          # Operating system interface (files, paths, env vars)
 import sys         # System info (Python version, command line args)
@@ -2122,9 +2288,9 @@ import json        # JSON parsing and creation
 import re          # Regular expressions (pattern matching)
 import socket      # Network connections""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Quick examples of common modules
 
 # os -- file and system operations
@@ -2133,9 +2299,9 @@ print(f"Current directory: {os.getcwd()}")
 print(f"Home directory: {os.path.expanduser('~')}")
 print(f"File exists: {os.path.exists('/etc/passwd')}")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # math -- mathematical operations
 import math
 print(f"Square root of 144: {math.sqrt(144)}")     # 12.0
@@ -2147,9 +2313,9 @@ import random
 print(f"Random int 1-100: {random.randint(1, 100)}")
 print(f"Random choice: {random.choice(['red', 'blue', 'green'])}")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # datetime -- working with dates and times
 from datetime import datetime, timedelta
 now = datetime.now()
@@ -2157,107 +2323,116 @@ print(f"Now: {now.strftime('%Y-%m-%d %H:%M:%S')}")
 yesterday = now - timedelta(days=1)
 print(f"Yesterday: {yesterday.strftime('%Y-%m-%d')}")""")
 
-    pace()
+        pace()
 
-    scenario_block("Building a Security Toolkit", (
-        "A security analyst creates a Python file called sec_utils.py that "
-        "contains utility functions: hash_string() for computing SHA-256 "
-        "hashes, validate_ip() for checking IP address format, and "
-        "timestamp_log() for adding timestamps to log entries. Other scripts "
-        "in the project import these functions with 'from sec_utils import "
-        "hash_string, validate_ip'. This modular approach means the team "
-        "writes each utility once and reuses it across dozens of scripts."
-    ))
+        scenario_block("Building a Security Toolkit", (
+            "A security analyst creates a Python file called sec_utils.py that "
+            "contains utility functions: hash_string() for computing SHA-256 "
+            "hashes, validate_ip() for checking IP address format, and "
+            "timestamp_log() for adding timestamps to log entries. Other scripts "
+            "in the project import these functions with 'from sec_utils import "
+            "hash_string, validate_ip'. This modular approach means the team "
+            "writes each utility once and reuses it across dozens of scripts."
+        ))
 
-    nice_work("Functions and modules are how real software is built. Great job!")
+        nice_work("Functions and modules are how real software is built. Great job!")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: args and kwargs - Corey Schafer", "https://www.youtube.com/watch?v=c0x5gRXG8Mw"),
+                ("Python Import System - Corey Schafer", "https://www.youtube.com/watch?v=CqvZ3vGoGs0"),
+            ])
 
-    # ── Guided Practice ──
-    guided_practice(
-        title="Utility Function Library",
-        intro="Let's write three useful functions, one at a time.",
-        steps=[
-            {
-                "instruction": (
-                    "Write a function called is_valid_ip(ip) that checks if a "
-                    "string is a valid IPv4 address. Split the string by '.', "
-                    "check there are 4 parts, and each part is a number between "
-                    "0 and 255. Return True or False."
-                ),
-                "required_keywords": ["def", "split", "255"],
-                "hints": [
-                    "Start: def is_valid_ip(ip): parts = ip.split('.')",
-                    "Check: if len(parts) != 4: return False",
-                    "Loop: for part in parts — check isdigit() and 0 <= int(part) <= 255",
-                ],
-                "solution": (
-                    'def is_valid_ip(ip):\n'
-                    '    parts = ip.split(".")\n'
-                    '    if len(parts) != 4:\n'
-                    '        return False\n'
-                    '    for part in parts:\n'
-                    '        if not part.isdigit():\n'
-                    '            return False\n'
-                    '        if int(part) < 0 or int(part) > 255:\n'
-                    '            return False\n'
-                    '    return True'
-                ),
-            },
-            {
-                "instruction": (
-                    "Write a function called generate_password(length) that "
-                    "creates a random password. Import random, define a charset "
-                    "string of letters and digits, then use random.choice() in "
-                    "a loop to pick random characters."
-                ),
-                "required_keywords": ["def", "random", "choice"],
-                "hints": [
-                    "import random",
-                    "charset = 'abcdefghijklmnopqrstuvwxyzABCDEF...0123456789!@#'",
-                    "Loop: for _ in range(length): password += random.choice(charset)",
-                ],
-                "solution": (
-                    'import random\n'
-                    'import string\n'
-                    '\n'
-                    'def generate_password(length=16):\n'
-                    '    charset = string.ascii_letters + string.digits + "!@#$%^&*"\n'
-                    '    password = ""\n'
-                    '    for _ in range(length):\n'
-                    '        password += random.choice(charset)\n'
-                    '    return password'
-                ),
-            },
-            {
-                "instruction": (
-                    "Write a function called caesar_cipher(text, shift) that "
-                    "shifts each letter by the shift amount. Use ord() to get "
-                    "the character code and chr() to convert back. Non-letter "
-                    "characters should stay unchanged."
-                ),
-                "required_keywords": ["def", "ord", "chr"],
-                "hints": [
-                    "Loop through each char in text.",
-                    "Check char.isalpha() — only shift letters.",
-                    "base = ord('A') if char.isupper() else ord('a'); "
-                    "shifted = (ord(char) - base + shift) % 26 + base; chr(shifted)",
-                ],
-                "solution": (
-                    'def caesar_cipher(text, shift):\n'
-                    '    result = ""\n'
-                    '    for char in text:\n'
-                    '        if char.isalpha():\n'
-                    '            base = ord("A") if char.isupper() else ord("a")\n'
-                    '            shifted = (ord(char) - base + shift) % 26 + base\n'
-                    '            result += chr(shifted)\n'
-                    '        else:\n'
-                    '            result += char\n'
-                    '    return result'
-                ),
-            },
-        ],
-        complete_solution="""\
+        press_enter()
+        cp.save(2)
+
+    if cp.at(3):
+        # ── Guided Practice ──
+        guided_practice(
+            title="Utility Function Library",
+            intro="Let's write three useful functions, one at a time.",
+            difficulty=progress.get("difficulty", "beginner"),
+            steps=[
+                {
+                    "instruction": (
+                        "Write a function called is_valid_ip(ip) that checks if a "
+                        "string is a valid IPv4 address. Split the string by '.', "
+                        "check there are 4 parts, and each part is a number between "
+                        "0 and 255. Return True or False."
+                    ),
+                    "required_keywords": ["def", "split", "255"],
+                    "hints": [
+                        "Start: def is_valid_ip(ip): parts = ip.split('.')",
+                        "Check: if len(parts) != 4: return False",
+                        "Loop: for part in parts — check isdigit() and 0 <= int(part) <= 255",
+                    ],
+                    "solution": (
+                        'def is_valid_ip(ip):\n'
+                        '    parts = ip.split(".")\n'
+                        '    if len(parts) != 4:\n'
+                        '        return False\n'
+                        '    for part in parts:\n'
+                        '        if not part.isdigit():\n'
+                        '            return False\n'
+                        '        if int(part) < 0 or int(part) > 255:\n'
+                        '            return False\n'
+                        '    return True'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Write a function called generate_password(length) that "
+                        "creates a random password. Import random, define a charset "
+                        "string of letters and digits, then use random.choice() in "
+                        "a loop to pick random characters."
+                    ),
+                    "required_keywords": ["def", "random", "choice"],
+                    "hints": [
+                        "import random",
+                        "charset = 'abcdefghijklmnopqrstuvwxyzABCDEF...0123456789!@#'",
+                        "Loop: for _ in range(length): password += random.choice(charset)",
+                    ],
+                    "solution": (
+                        'import random\n'
+                        'import string\n'
+                        '\n'
+                        'def generate_password(length=16):\n'
+                        '    charset = string.ascii_letters + string.digits + "!@#$%^&*"\n'
+                        '    password = ""\n'
+                        '    for _ in range(length):\n'
+                        '        password += random.choice(charset)\n'
+                        '    return password'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Write a function called caesar_cipher(text, shift) that "
+                        "shifts each letter by the shift amount. Use ord() to get "
+                        "the character code and chr() to convert back. Non-letter "
+                        "characters should stay unchanged."
+                    ),
+                    "required_keywords": ["def", "ord", "chr"],
+                    "hints": [
+                        "Loop through each char in text.",
+                        "Check char.isalpha() — only shift letters.",
+                        "base = ord('A') if char.isupper() else ord('a'); "
+                        "shifted = (ord(char) - base + shift) % 26 + base; chr(shifted)",
+                    ],
+                    "solution": (
+                        'def caesar_cipher(text, shift):\n'
+                        '    result = ""\n'
+                        '    for char in text:\n'
+                        '        if char.isalpha():\n'
+                        '            base = ord("A") if char.isupper() else ord("a")\n'
+                        '            shifted = (ord(char) - base + shift) % 26 + base\n'
+                        '            result += chr(shifted)\n'
+                        '        else:\n'
+                        '            result += char\n'
+                        '    return result'
+                    ),
+                },
+            ],
+            complete_solution="""\
 import random
 import string
 
@@ -2294,11 +2469,12 @@ def caesar_cipher(text, shift):
 print(is_valid_ip("192.168.1.1"))   # True
 print(generate_password(20))         # Random password
 print(caesar_cipher("Hello", 3))     # Khoor""",
-    )
+        )
 
-    mark_lesson_complete(progress, MODULE_KEY, "lesson5")
-    success("Lesson 5 complete: Functions & Modules")
-    press_enter()
+        cp.clear()
+        mark_lesson_complete(progress, MODULE_KEY, "lesson5")
+        success("Lesson 5 complete: Functions & Modules")
+        press_enter()
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -2306,56 +2482,59 @@ print(caesar_cipher("Hello", 3))     # Khoor""",
 # ──────────────────────────────────────────────────────────────────────
 def lesson_error_handling_files(progress):
     section_header("Lesson 6: Error Handling & File Basics")
+    cp = LessonCheckpoint(progress, MODULE_KEY, "lesson6", total_steps=3)
+    cp.offer_resume()
 
-    learning_goal([
-        "Use try/except to catch and handle errors",
-        "Know the most common exception types",
-        "Read and write files safely with the 'with' statement",
-        "Work with file paths using os.path",
-    ])
+    if cp.at(1):
+        learning_goal([
+            "Use try/except to catch and handle errors",
+            "Know the most common exception types",
+            "Read and write files safely with the 'with' statement",
+            "Work with file paths using os.path",
+        ])
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Things go wrong. A lot. The file you are trying to read does not "
-        "exist. The user types 'abc' when you expected a number. The network "
-        "connection times out."
-    )
+        lesson_block(
+            "Things go wrong. A lot. The file you are trying to read does not "
+            "exist. The user types 'abc' when you expected a number. The network "
+            "connection times out."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Good programs do not crash when things go wrong -- they handle errors "
-        "gracefully. Python's try/except system lets you catch errors and "
-        "decide what to do about them."
-    )
+        lesson_block(
+            "Good programs do not crash when things go wrong -- they handle errors "
+            "gracefully. Python's try/except system lets you catch errors and "
+            "decide what to do about them."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "In Python, errors are called 'exceptions'. When an error occurs, "
-        "Python 'raises' (throws) an exception. If you do not catch it, your "
-        "program crashes. But if you wrap the risky code in a try/except block, "
-        "you can catch the exception and handle it."
-    )
+        lesson_block(
+            "In Python, errors are called 'exceptions'. When an error occurs, "
+            "Python 'raises' (throws) an exception. If you do not catch it, your "
+            "program crashes. But if you wrap the risky code in a try/except block, "
+            "you can catch the exception and handle it."
+        )
 
-    pace()
+        pace()
 
-    why_it_matters(
-        "Security tools MUST handle errors well. A port scanner that crashes "
-        "on the first unreachable host is useless. A log parser that stops "
-        "at the first malformed line misses everything after it. Error "
-        "handling is also a security concern: poor error messages can leak "
-        "sensitive information (file paths, database details, stack traces) "
-        "to attackers."
-    )
+        why_it_matters(
+            "Security tools MUST handle errors well. A port scanner that crashes "
+            "on the first unreachable host is useless. A log parser that stops "
+            "at the first malformed line misses everything after it. Error "
+            "handling is also a security concern: poor error messages can leak "
+            "sensitive information (file paths, database details, stack traces) "
+            "to attackers."
+        )
 
-    press_enter()
+        press_enter()
 
-    # ── try/except ──
-    sub_header("try / except -- Catching Errors")
+        # ── try/except ──
+        sub_header("try / except -- Catching Errors")
 
-    code_block("""\
+        code_block("""\
 # Without error handling -- this crashes!
 # number = int("hello")  # ValueError: invalid literal for int()
 
@@ -2370,9 +2549,9 @@ except ValueError:
 # The program continues running after the except block
 print("Program continues...")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Catching the error details
 try:
     result = 10 / 0
@@ -2389,14 +2568,14 @@ except KeyError as e:
 except TypeError as e:
     print(f"Type error: {e}")""")
 
-    nice_work("You can now prevent your programs from crashing!")
+        nice_work("You can now prevent your programs from crashing!")
 
-    press_enter()
+        press_enter()
 
-    # ── Common Exceptions ──
-    sub_header("Common Exception Types")
+        # ── Common Exceptions ──
+        sub_header("Common Exception Types")
 
-    code_block("""\
+        code_block("""\
 # ValueError -- wrong type of value
 try:
     age = int("twenty")
@@ -2416,9 +2595,9 @@ try:
 except KeyError:
     print("KeyError: 'email' not found in dictionary")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # IndexError -- list index out of range
 try:
     items = [1, 2, 3]
@@ -2440,14 +2619,14 @@ try:
 except Exception as e:
     print(f"Something went wrong: {type(e).__name__}: {e}")""")
 
-    tip("Always catch specific exceptions when you can. Catching everything with 'except Exception' can hide real bugs.")
+        tip("Always catch specific exceptions when you can. Catching everything with 'except Exception' can hide real bugs.")
 
-    press_enter()
+        press_enter()
 
-    # ── try/except/else/finally ──
-    sub_header("The Full try/except/else/finally Structure")
+        # ── try/except/else/finally ──
+        sub_header("The Full try/except/else/finally Structure")
 
-    code_block("""\
+        code_block("""\
 # The complete error handling structure
 try:
     # Code that might raise an exception
@@ -2467,28 +2646,36 @@ finally:
     # Great for cleanup (closing files, network connections, etc.)
     print("Operation complete.")""")
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Example flow if user enters '5': "
-        "try block runs, no error, then else block runs, then finally runs. "
-        "Output: Result: 20.0, Operation complete."
-    )
+        lesson_block(
+            "Example flow if user enters '5': "
+            "try block runs, no error, then else block runs, then finally runs. "
+            "Output: Result: 20.0, Operation complete."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Example flow if user enters 'abc': "
-        "try block raises ValueError, except block runs, then finally runs. "
-        "Output: Error: Please enter a valid number. Operation complete."
-    )
+        lesson_block(
+            "Example flow if user enters 'abc': "
+            "try block raises ValueError, except block runs, then finally runs. "
+            "Output: Error: Please enter a valid number. Operation complete."
+        )
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: Using Try/Except Blocks - Corey Schafer", "https://www.youtube.com/watch?v=NIWwJbo-9_8"),
+                ("Python Exceptions - Socratica", "https://www.youtube.com/watch?v=nlCKrKGHSSk"),
+            ])
 
-    # ── Raising Exceptions ──
-    sub_header("Raising Exceptions -- Signaling Your Own Errors")
+        press_enter()
+        cp.save(1)
 
-    code_block("""\
+    if cp.at(2):
+        # ── Raising Exceptions ──
+        sub_header("Raising Exceptions -- Signaling Your Own Errors")
+
+        code_block("""\
 # You can raise exceptions in your own code
 def set_port(port):
     \"\"\"Set a port number, raising an error if invalid.\"\"\"
@@ -2504,9 +2691,9 @@ try:
 except ValueError as e:
     print(f"Invalid port: {e}")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Custom exceptions (brief introduction)
 class AuthenticationError(Exception):
     \"\"\"Raised when authentication fails.\"\"\"
@@ -2522,23 +2709,23 @@ try:
 except AuthenticationError as e:
     print(f"Auth error: {e}")""")
 
-    nice_work("You can now raise your own exceptions and create custom error types!")
+        nice_work("You can now raise your own exceptions and create custom error types!")
 
-    press_enter()
+        press_enter()
 
-    # ── Reading Files ──
-    sub_header("Reading Files")
+        # ── Reading Files ──
+        sub_header("Reading Files")
 
-    lesson_block(
-        "Python makes it easy to read and write files. The most important "
-        "thing to remember is to use the 'with' statement (called a context "
-        "manager). It automatically closes the file when you are done, even "
-        "if an error occurs."
-    )
+        lesson_block(
+            "Python makes it easy to read and write files. The most important "
+            "thing to remember is to use the 'with' statement (called a context "
+            "manager). It automatically closes the file when you are done, even "
+            "if an error occurs."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Reading an entire file at once
 with open("example.txt", "r") as f:
     content = f.read()
@@ -2550,9 +2737,9 @@ with open("log.txt", "r") as f:
     for line in f:
         print(line.strip())  # strip() removes the newline at the end""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Reading all lines into a list
 with open("targets.txt", "r") as f:
     lines = f.readlines()
@@ -2568,12 +2755,12 @@ except FileNotFoundError:
 except PermissionError:
     print("Permission denied. Cannot read config file.")""")
 
-    press_enter()
+        press_enter()
 
-    # ── Writing Files ──
-    sub_header("Writing Files")
+        # ── Writing Files ──
+        sub_header("Writing Files")
 
-    code_block("""\
+        code_block("""\
 # Writing to a file (creates it if it doesn't exist, overwrites if it does)
 with open("report.txt", "w") as f:
     f.write("Security Scan Report\\n")
@@ -2586,9 +2773,9 @@ with open("report.txt", "w") as f:
     for port in ports:
         f.write(f"  - Port {port}\\n")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Appending to a file (adds to the end, doesn't overwrite)
 with open("report.txt", "a") as f:
     f.write("\\n--- Scan Complete ---\\n")
@@ -2598,33 +2785,33 @@ lines = ["Line 1\\n", "Line 2\\n", "Line 3\\n"]
 with open("output.txt", "w") as f:
     f.writelines(lines)""")
 
-    pace()
+        pace()
 
-    lesson_block(
-        "File modes explained: 'r' = read (file must exist), 'w' = write "
-        "(creates new or overwrites existing), 'a' = append (adds to end "
-        "of existing file), 'x' = exclusive create (fails if file exists)."
-    )
+        lesson_block(
+            "File modes explained: 'r' = read (file must exist), 'w' = write "
+            "(creates new or overwrites existing), 'a' = append (adds to end "
+            "of existing file), 'x' = exclusive create (fails if file exists)."
+        )
 
-    pace()
+        pace()
 
-    lesson_block(
-        "Add 'b' for binary mode: 'rb' reads binary files, 'wb' writes them."
-    )
+        lesson_block(
+            "Add 'b' for binary mode: 'rb' reads binary files, 'wb' writes them."
+        )
 
-    press_enter()
+        press_enter()
 
-    # ── Context Managers ──
-    sub_header("Context Managers -- The 'with' Statement")
+        # ── Context Managers ──
+        sub_header("Context Managers -- The 'with' Statement")
 
-    lesson_block(
-        "The 'with' statement is not just for files. It is a general pattern "
-        "for managing resources that need to be cleaned up."
-    )
+        lesson_block(
+            "The 'with' statement is not just for files. It is a general pattern "
+            "for managing resources that need to be cleaned up."
+        )
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # WITHOUT 'with' -- you must close manually (error-prone)
 f = open("data.txt", "r")
 try:
@@ -2637,22 +2824,22 @@ with open("data.txt", "r") as f:
     content = f.read()
 # File is closed automatically here, even if an error occurred""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # You can open multiple files at once
 with open("input.txt", "r") as infile, open("output.txt", "w") as outfile:
     for line in infile:
         outfile.write(line.upper())  # Convert each line to uppercase""")
 
-    tip("Always use 'with' when working with files. It is the safest and cleanest approach.")
+        tip("Always use 'with' when working with files. It is the safest and cleanest approach.")
 
-    press_enter()
+        press_enter()
 
-    # ── Working with Paths ──
-    sub_header("Working with File Paths using os.path")
+        # ── Working with Paths ──
+        sub_header("Working with File Paths using os.path")
 
-    code_block("""\
+        code_block("""\
 import os
 
 # Building file paths safely (works on all operating systems)
@@ -2666,9 +2853,9 @@ print(os.path.exists("/tmp"))            # True (on macOS/Linux)
 print(os.path.isfile("/etc/passwd"))     # True if it is a file
 print(os.path.isdir("/tmp"))             # True if it is a directory""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Getting file information
 if os.path.exists(report):
     size = os.path.getsize(report)       # Size in bytes
@@ -2681,132 +2868,141 @@ filename = os.path.basename(path)        # "auth.log"
 name, ext = os.path.splitext(filename)   # ("auth", ".log")
 print(f"Dir: {directory}, File: {filename}, Extension: {ext}")""")
 
-    pace()
+        pace()
 
-    code_block("""\
+        code_block("""\
 # Listing files in a directory
 for item in os.listdir("/tmp"):
     full_path = os.path.join("/tmp", item)
     if os.path.isfile(full_path):
         print(f"  File: {item}")""")
 
-    pace()
+        pace()
 
-    scenario_block("Log File Analysis During Incident Response", (
-        "During a security incident at 2 AM, you need to quickly analyze "
-        "server logs. Your Python script uses error handling to gracefully "
-        "skip corrupted log lines, reads files line-by-line to handle the "
-        "500 MB file without running out of memory, and writes a summary "
-        "report. The try/except blocks ensure that a single malformed line "
-        "does not crash the entire analysis. The with statement guarantees "
-        "all files are properly closed even under pressure."
-    ))
+        scenario_block("Log File Analysis During Incident Response", (
+            "During a security incident at 2 AM, you need to quickly analyze "
+            "server logs. Your Python script uses error handling to gracefully "
+            "skip corrupted log lines, reads files line-by-line to handle the "
+            "500 MB file without running out of memory, and writes a summary "
+            "report. The try/except blocks ensure that a single malformed line "
+            "does not crash the entire analysis. The with statement guarantees "
+            "all files are properly closed even under pressure."
+        ))
 
-    nice_work("Error handling and file I/O are essential skills. You have got them both now!")
+        nice_work("Error handling and file I/O are essential skills. You have got them both now!")
 
-    press_enter()
+        if ask_yes_no("See recommended video resources?"):
+            learn_more([
+                ("Python Tutorial: File Objects - Corey Schafer", "https://www.youtube.com/watch?v=Uh2ebFW8OYM"),
+                ("Reading and Writing Files in Python - Corey Schafer", "https://www.youtube.com/watch?v=Uh2ebFW8OYM"),
+            ])
 
-    # ── Guided Practice ──
-    guided_practice(
-        title="Note-Taking App",
-        intro="Let's build an app that saves notes to a file, with error handling.",
-        steps=[
-            {
-                "instruction": (
-                    "Write a function called add_note() that gets a note from "
-                    "the user with input(), then opens a file in append mode ('a') "
-                    "and writes the note. Wrap the file operation in try/except "
-                    "to catch errors."
-                ),
-                "required_keywords": ["open", "write", "try", "except"],
-                "hints": [
-                    "def add_note(): note = input('Enter your note: ')",
-                    "Use: with open('notes.txt', 'a') as f: f.write(note + '\\n')",
-                    "Wrap in try/except to catch PermissionError or OSError.",
-                ],
-                "solution": (
-                    'def add_note():\n'
-                    '    note = input("Enter your note: ").strip()\n'
-                    '    try:\n'
-                    '        with open("notes.txt", "a") as f:\n'
-                    '            f.write(note + "\\n")\n'
-                    '        print("Note saved!")\n'
-                    '    except OSError as e:\n'
-                    '        print(f"Error: {e}")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Write a function called view_notes() that opens the file "
-                    "in read mode, reads all lines, and prints each one. "
-                    "Handle FileNotFoundError for when the file doesn't exist yet."
-                ),
-                "required_keywords": ["open", "read", "FileNotFoundError"],
-                "hints": [
-                    "Use: with open('notes.txt', 'r') as f: notes = f.readlines()",
-                    "except FileNotFoundError: print('No notes yet!')",
-                    "Loop and print: for i, note in enumerate(notes, 1): print(...)",
-                ],
-                "solution": (
-                    'def view_notes():\n'
-                    '    try:\n'
-                    '        with open("notes.txt", "r") as f:\n'
-                    '            notes = f.readlines()\n'
-                    '        for i, note in enumerate(notes, 1):\n'
-                    '            print(f"  {i}. {note.strip()}")\n'
-                    '    except FileNotFoundError:\n'
-                    '        print("No notes yet! Add one first.")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Write a function called search_notes(keyword) that reads "
-                    "the file and prints only lines that contain the keyword. "
-                    "Use .lower() on both to make it case-insensitive."
-                ),
-                "required_keywords": ["for", "if", "lower"],
-                "hints": [
-                    "Read the file, then loop through lines.",
-                    "if keyword.lower() in line.lower(): print the match.",
-                    "Don't forget to handle FileNotFoundError.",
-                ],
-                "solution": (
-                    'def search_notes(keyword):\n'
-                    '    try:\n'
-                    '        with open("notes.txt", "r") as f:\n'
-                    '            for line in f:\n'
-                    '                if keyword.lower() in line.lower():\n'
-                    '                    print(f"  - {line.strip()}")\n'
-                    '    except FileNotFoundError:\n'
-                    '        print("No notes file found.")'
-                ),
-            },
-            {
-                "instruction": (
-                    "Write the main menu loop: a while True loop that shows "
-                    "options (Add, View, Search, Quit), gets the user's choice "
-                    "with input(), and calls the right function."
-                ),
-                "required_keywords": ["while", "input", "choice"],
-                "hints": [
-                    "while True: print the menu, choice = input('Choice: ')",
-                    "if choice == '1': add_note() elif choice == '2': view_notes()",
-                    "Break out of the loop for the quit option.",
-                ],
-                "solution": (
-                    'while True:\n'
-                    '    print("\\n1. Add  2. View  3. Search  4. Quit")\n'
-                    '    choice = input("Choice: ").strip()\n'
-                    '    if choice == "1": add_note()\n'
-                    '    elif choice == "2": view_notes()\n'
-                    '    elif choice == "3":\n'
-                    '        kw = input("Search for: ")\n'
-                    '        search_notes(kw)\n'
-                    '    elif choice == "4": break'
-                ),
-            },
-        ],
-        complete_solution="""\
+        press_enter()
+        cp.save(2)
+
+    if cp.at(3):
+        # ── Guided Practice ──
+        guided_practice(
+            title="Note-Taking App",
+            intro="Let's build an app that saves notes to a file, with error handling.",
+            difficulty=progress.get("difficulty", "beginner"),
+            steps=[
+                {
+                    "instruction": (
+                        "Write a function called add_note() that gets a note from "
+                        "the user with input(), then opens a file in append mode ('a') "
+                        "and writes the note. Wrap the file operation in try/except "
+                        "to catch errors."
+                    ),
+                    "required_keywords": ["open", "write", "try", "except"],
+                    "hints": [
+                        "def add_note(): note = input('Enter your note: ')",
+                        "Use: with open('notes.txt', 'a') as f: f.write(note + '\\n')",
+                        "Wrap in try/except to catch PermissionError or OSError.",
+                    ],
+                    "solution": (
+                        'def add_note():\n'
+                        '    note = input("Enter your note: ").strip()\n'
+                        '    try:\n'
+                        '        with open("notes.txt", "a") as f:\n'
+                        '            f.write(note + "\\n")\n'
+                        '        print("Note saved!")\n'
+                        '    except OSError as e:\n'
+                        '        print(f"Error: {e}")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Write a function called view_notes() that opens the file "
+                        "in read mode, reads all lines, and prints each one. "
+                        "Handle FileNotFoundError for when the file doesn't exist yet."
+                    ),
+                    "required_keywords": ["open", "read", "FileNotFoundError"],
+                    "hints": [
+                        "Use: with open('notes.txt', 'r') as f: notes = f.readlines()",
+                        "except FileNotFoundError: print('No notes yet!')",
+                        "Loop and print: for i, note in enumerate(notes, 1): print(...)",
+                    ],
+                    "solution": (
+                        'def view_notes():\n'
+                        '    try:\n'
+                        '        with open("notes.txt", "r") as f:\n'
+                        '            notes = f.readlines()\n'
+                        '        for i, note in enumerate(notes, 1):\n'
+                        '            print(f"  {i}. {note.strip()}")\n'
+                        '    except FileNotFoundError:\n'
+                        '        print("No notes yet! Add one first.")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Write a function called search_notes(keyword) that reads "
+                        "the file and prints only lines that contain the keyword. "
+                        "Use .lower() on both to make it case-insensitive."
+                    ),
+                    "required_keywords": ["for", "if", "lower"],
+                    "hints": [
+                        "Read the file, then loop through lines.",
+                        "if keyword.lower() in line.lower(): print the match.",
+                        "Don't forget to handle FileNotFoundError.",
+                    ],
+                    "solution": (
+                        'def search_notes(keyword):\n'
+                        '    try:\n'
+                        '        with open("notes.txt", "r") as f:\n'
+                        '            for line in f:\n'
+                        '                if keyword.lower() in line.lower():\n'
+                        '                    print(f"  - {line.strip()}")\n'
+                        '    except FileNotFoundError:\n'
+                        '        print("No notes file found.")'
+                    ),
+                },
+                {
+                    "instruction": (
+                        "Write the main menu loop: a while True loop that shows "
+                        "options (Add, View, Search, Quit), gets the user's choice "
+                        "with input(), and calls the right function."
+                    ),
+                    "required_keywords": ["while", "input", "choice"],
+                    "hints": [
+                        "while True: print the menu, choice = input('Choice: ')",
+                        "if choice == '1': add_note() elif choice == '2': view_notes()",
+                        "Break out of the loop for the quit option.",
+                    ],
+                    "solution": (
+                        'while True:\n'
+                        '    print("\\n1. Add  2. View  3. Search  4. Quit")\n'
+                        '    choice = input("Choice: ").strip()\n'
+                        '    if choice == "1": add_note()\n'
+                        '    elif choice == "2": view_notes()\n'
+                        '    elif choice == "3":\n'
+                        '        kw = input("Search for: ")\n'
+                        '        search_notes(kw)\n'
+                        '    elif choice == "4": break'
+                    ),
+                },
+            ],
+            complete_solution="""\
 def add_note():
     note = input("Enter your note: ").strip()
     try:
@@ -2843,13 +3039,14 @@ while True:
         kw = input("Search for: ")
         search_notes(kw)
     elif choice == "4": break""",
-    )
+        )
 
-    mark_lesson_complete(progress, MODULE_KEY, "lesson6")
-    success("Lesson 6 complete: Error Handling & File Basics")
-    success("You have completed all lessons in Module 0!")
-    info("You now have the Python foundation needed for the security modules.")
-    press_enter()
+        cp.clear()
+        mark_lesson_complete(progress, MODULE_KEY, "lesson6")
+        success("Lesson 6 complete: Error Handling & File Basics")
+        success("You have completed all lessons in Module 0!")
+        info("You now have the Python foundation needed for the security modules.")
+        press_enter()
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -3017,6 +3214,12 @@ QUIZ_QUESTIONS = [
 # ──────────────────────────────────────────────────────────────────────
 def run(progress):
     """Main entry point called from the menu system."""
+    difficulty = progress.get("difficulty", "beginner")
+    if difficulty != "beginner":
+        info("Module 0 covers Python basics. You can skip it if you already know Python.")
+        if not ask_yes_no("Continue with Module 0?"):
+            return
+
     # Ensure module0 exists in progress
     if MODULE_KEY not in progress.get("modules", {}):
         progress.setdefault("modules", {})[MODULE_KEY] = {
@@ -3024,6 +3227,8 @@ def run(progress):
             "quiz_scores": {},
             "challenges_done": [],
         }
+
+    show_case_study("module0")
 
     while True:
         choice = show_menu("Module 0: Python Fundamentals", [

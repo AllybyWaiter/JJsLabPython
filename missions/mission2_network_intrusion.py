@@ -32,6 +32,8 @@ MAX_SCORE = 100
 
 def run(progress: dict):
     """Entry point for Mission 2."""
+    difficulty = progress.get("difficulty", "beginner")
+
     mission_briefing(
         mission_num=2,
         title="Shadow on the Wire",
@@ -42,14 +44,14 @@ def run(progress: dict):
     dossier_path = generate_dossier(2)
 
     score = 0
-    score += stage_1_network_analysis()
+    score += stage_1_network_analysis(difficulty)
     score += maybe_random_event(2)
-    score += stage_2_packet_investigation()
+    score += stage_2_packet_investigation(difficulty)
     score += maybe_random_event(2)
-    score += stage_3_backdoor_discovery()
+    score += stage_3_backdoor_discovery(difficulty)
     score += _easter_egg_exfil_path(progress)
     score += maybe_random_event(2)
-    score += stage_4_containment()
+    score += stage_4_containment(difficulty)
 
     mission_complete(2, "Shadow on the Wire", score, MAX_SCORE)
     show_epilogue(2, score, MAX_SCORE)
@@ -60,7 +62,7 @@ def run(progress: dict):
 # Stage 1 — Network Analysis
 # ---------------------------------------------------------------------------
 
-def stage_1_network_analysis() -> int:
+def stage_1_network_analysis(difficulty: str = "beginner") -> int:
     stage_intro(1, "NETWORK ANALYSIS")
     score = 0
 
@@ -108,6 +110,7 @@ def stage_1_network_analysis() -> int:
             "tcpdump uses -i to specify the interface and -w to write to a file",
             "tcpdump -i eth0 -w hospital_capture.pcap",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -149,6 +152,7 @@ def stage_1_network_analysis() -> int:
             "Look at the source IP in the packet log — the left side of the arrow",
             "The IP starts with 10.10.4.",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -168,7 +172,7 @@ def stage_1_network_analysis() -> int:
 # Stage 2 — Packet Investigation
 # ---------------------------------------------------------------------------
 
-def stage_2_packet_investigation() -> int:
+def stage_2_packet_investigation(difficulty: str = "beginner") -> int:
     stage_intro(2, "PACKET INVESTIGATION")
     score = 0
 
@@ -218,6 +222,7 @@ def stage_2_packet_investigation() -> int:
             "\n"
             "print('Payload extraction complete.')"
         ),
+        difficulty=difficulty,
     )
 
     narrator(
@@ -257,6 +262,7 @@ def stage_2_packet_investigation() -> int:
             "known as 'living off the land' at the network layer."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -274,7 +280,7 @@ def stage_2_packet_investigation() -> int:
 # Stage 3 — Backdoor Discovery
 # ---------------------------------------------------------------------------
 
-def stage_3_backdoor_discovery() -> int:
+def stage_3_backdoor_discovery(difficulty: str = "beginner") -> int:
     stage_intro(3, "BACKDOOR DISCOVERY")
     score = 0
 
@@ -315,6 +321,7 @@ def stage_3_backdoor_discovery() -> int:
             "Use a Base64 decoder: echo 'aHR0cHM6Ly8...' | base64 -d",
             "The decoded string starts with 'https://'",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -385,7 +392,7 @@ def stage_3_backdoor_discovery() -> int:
 # Stage 4 — Containment & Debrief
 # ---------------------------------------------------------------------------
 
-def stage_4_containment() -> int:
+def stage_4_containment(difficulty: str = "beginner") -> int:
     stage_intro(4, "CONTAINMENT & DEBRIEF")
     score = 0
 
@@ -422,6 +429,7 @@ def stage_4_containment() -> int:
             "Use iptables -A to append a rule, -d for destination, -j for action",
             "iptables -A OUTPUT -d 185.243.115.42 -j DROP",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -465,6 +473,7 @@ def stage_4_containment() -> int:
             "after the scope of the breach is determined."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -512,6 +521,7 @@ def stage_4_containment() -> int:
             "entry point: email."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     narrator(

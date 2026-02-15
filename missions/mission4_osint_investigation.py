@@ -36,6 +36,8 @@ MAX_SCORE = 100
 
 def run(progress: dict):
     """Entry point for Mission 4."""
+    difficulty = progress.get("difficulty", "beginner")
+
     mission_briefing(
         mission_num=4,
         title="Ghost Protocol",
@@ -48,16 +50,16 @@ def run(progress: dict):
     dossier_path = generate_dossier(4)
 
     score = 0
-    score += stage_1_anonymous_tip()
+    score += stage_1_anonymous_tip(difficulty)
     score += maybe_random_event(4)
-    score += stage_2_digital_footprint()
+    score += stage_2_digital_footprint(difficulty)
     score += _easter_egg_nameserver(progress)
     score += maybe_random_event(4)
-    score += stage_3_domain_recon()
+    score += stage_3_domain_recon(difficulty)
     score += maybe_random_event(4)
-    score += stage_4_metadata_analysis()
+    score += stage_4_metadata_analysis(difficulty)
     score += maybe_random_event(4)
-    score += stage_5_reveal_and_debrief()
+    score += stage_5_reveal_and_debrief(difficulty)
 
     mission_complete(4, "Ghost Protocol", score, MAX_SCORE)
     show_epilogue(4, score, MAX_SCORE)
@@ -68,7 +70,7 @@ def run(progress: dict):
 # Stage 1 — The Anonymous Tip
 # ---------------------------------------------------------------------------
 
-def stage_1_anonymous_tip() -> int:
+def stage_1_anonymous_tip(difficulty: str = "beginner") -> int:
     stage_intro(1, "THE ANONYMOUS TIP")
     score = 0
 
@@ -106,6 +108,7 @@ def stage_1_anonymous_tip() -> int:
             "Or on the command line: echo 'VmFudGFnZUNvcnAtTGVha1NvdXJjZQ==' | base64 -d",
         ],
         case_sensitive=False,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -165,7 +168,7 @@ def stage_1_anonymous_tip() -> int:
 # Stage 2 — Digital Footprint
 # ---------------------------------------------------------------------------
 
-def stage_2_digital_footprint() -> int:
+def stage_2_digital_footprint(difficulty: str = "beginner") -> int:
     stage_intro(2, "DIGITAL FOOTPRINT")
     score = 0
 
@@ -195,6 +198,7 @@ def stage_2_digital_footprint() -> int:
             "The whois command takes a domain name as an argument",
             "whois vantagecorp.io",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -237,6 +241,7 @@ def stage_2_digital_footprint() -> int:
             "The 'ANY' query type requests all record types at once",
             "dig vantagecorp.io ANY",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -278,6 +283,7 @@ def stage_2_digital_footprint() -> int:
             "OSINT is strictly limited to publicly available information."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     return score
@@ -287,7 +293,7 @@ def stage_2_digital_footprint() -> int:
 # Stage 3 — Domain Recon
 # ---------------------------------------------------------------------------
 
-def stage_3_domain_recon() -> int:
+def stage_3_domain_recon(difficulty: str = "beginner") -> int:
     stage_intro(3, "DOMAIN RECON")
     score = 0
 
@@ -321,6 +327,7 @@ def stage_3_domain_recon() -> int:
             "The host command is straightforward: host <domain>",
             "host vantagecorp.io",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -347,6 +354,7 @@ def stage_3_domain_recon() -> int:
             "dnsrecon uses -d to specify the domain and -t for the scan type",
             "dnsrecon -d vantagecorp.io -t std",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -396,6 +404,7 @@ def stage_3_domain_recon() -> int:
             "They share the same registrar (NameSilo), same registration timeframe, and same country (Panama)",
         ],
         case_sensitive=False,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -415,7 +424,7 @@ def stage_3_domain_recon() -> int:
 # Stage 4 — Metadata Analysis
 # ---------------------------------------------------------------------------
 
-def stage_4_metadata_analysis() -> int:
+def stage_4_metadata_analysis(difficulty: str = "beginner") -> int:
     stage_intro(4, "METADATA ANALYSIS")
     score = 0
 
@@ -477,6 +486,7 @@ def stage_4_metadata_analysis() -> int:
             "    tag_name = TAGS.get(tag_id, tag_id)\n"
             "    print(f'{tag_name}: {value}')"
         ),
+        difficulty=difficulty,
     )
 
     narrator(
@@ -526,6 +536,7 @@ def stage_4_metadata_analysis() -> int:
             "Longitude: -(122 + (5/60) + (12.44/3600)) = -(122 + 0.0833 + 0.003456) = -122.0868 -> -122.09",
         ],
         case_sensitive=False,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -546,7 +557,7 @@ def stage_4_metadata_analysis() -> int:
 # Stage 5 — The Reveal & Debrief
 # ---------------------------------------------------------------------------
 
-def stage_5_reveal_and_debrief() -> int:
+def stage_5_reveal_and_debrief(difficulty: str = "beginner") -> int:
     stage_intro(5, "THE REVEAL & DEBRIEF")
     score = 0
 
@@ -639,6 +650,7 @@ def stage_5_reveal_and_debrief() -> int:
             "operate within your legal authority and scope of engagement."
         ),
         points=5,
+        difficulty=difficulty,
     )
 
     narrator(

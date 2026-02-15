@@ -15,8 +15,9 @@ from utils.display import (
 def guided_practice(
     title: str,
     intro: str,
-    steps: list[dict],
-    complete_solution: str | None = None,
+    steps: list = None,
+    complete_solution: str = None,
+    difficulty: str = "beginner",
 ) -> dict:
     """Run a multi-step guided practice challenge.
 
@@ -31,6 +32,9 @@ def guided_practice(
         Optional: context_code (str) shown before the prompt.
     complete_solution : str or None
         Full solution shown at end. If None, assembled from step solutions.
+    difficulty : str
+        Difficulty level: "beginner" (3 attempts), "intermediate" (2),
+        "advanced" (1).
 
     Returns
     -------
@@ -41,11 +45,13 @@ def guided_practice(
     info(f"This challenge has {len(steps)} steps. Let's build it one piece at a time.\n")
     press_enter()
 
+    max_attempts = {"beginner": 3, "intermediate": 2, "advanced": 1}.get(difficulty, 3)
+
     steps_passed = 0
     collected_code = []
 
     for i, step in enumerate(steps, 1):
-        passed, code = _run_step(i, len(steps), step)
+        passed, code = _run_step(i, len(steps), step, max_attempts=max_attempts, difficulty=difficulty)
         collected_code.append(code)
         if passed:
             steps_passed += 1
@@ -60,6 +66,7 @@ def _run_step(
     total_steps: int,
     step: dict,
     max_attempts: int = 3,
+    difficulty: str = "beginner",
 ) -> tuple[bool, str]:
     """Run a single guided practice step. Returns (passed, code)."""
     print(f"\n{C}{BRIGHT}  Step {step_num}/{total_steps}{RESET}")
@@ -107,7 +114,7 @@ def _run_step(
 
         if remaining > 0:
             error(f"Not quite — missing: {', '.join(missing)}. {remaining} attempt(s) left.")
-            if hint_idx < len(hints):
+            if difficulty != "advanced" and hint_idx < len(hints):
                 hint_text(hints[hint_idx])
                 hint_idx += 1
         else:
@@ -125,8 +132,8 @@ def _show_summary(
     title: str,
     steps_passed: int,
     total_steps: int,
-    collected_code: list[str],
-    complete_solution: str | None,
+    collected_code: list,
+    complete_solution: str,
 ):
     """Show results and the full assembled solution."""
     sub_header(f"Practice Complete: {title}")

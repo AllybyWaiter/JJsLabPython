@@ -47,6 +47,15 @@ DEFAULT_PROGRESS = {
     "site_tests_run": 0,
     "cheat_sheets_unlocked": [],
     "easter_eggs_found": [],
+    "quiz_reviews": {},
+    "analytics": {
+        "lesson_timing": {},
+        "task_attempts": {},
+        "days_active": [],
+        "total_time_seconds": 0,
+        "session_count": 0,
+        "attempts": {},
+    },
 }
 
 MODULE_NAMES = {
@@ -107,6 +116,30 @@ def load_progress() -> dict:
             progress["cheat_sheets_unlocked"] = []
         if "easter_eggs_found" not in progress:
             progress["easter_eggs_found"] = []
+        # Backfill quiz_reviews for spaced repetition
+        if "quiz_reviews" not in progress:
+            progress["quiz_reviews"] = {}
+        # Backfill analytics for progress analytics module
+        if "analytics" not in progress:
+            progress["analytics"] = {
+                "lesson_timing": {},
+                "task_attempts": {},
+                "days_active": [],
+            }
+        else:
+            progress["analytics"].setdefault("lesson_timing", {})
+            progress["analytics"].setdefault("task_attempts", {})
+            progress["analytics"].setdefault("days_active", [])
+            # Backfill session-timer and attempt-tracking keys
+            progress["analytics"].setdefault("total_time_seconds", 0)
+            progress["analytics"].setdefault("session_count", 0)
+            progress["analytics"].setdefault("attempts", {})
+        # Backfill CTF progress
+        progress.setdefault("ctf", {"challenges": {}, "total_flags": 0, "total_score": 0})
+        # Backfill lesson checkpoints for each module
+        for mod_key in MODULE_NAMES:
+            if mod_key in progress.get("modules", {}):
+                progress["modules"][mod_key].setdefault("lesson_checkpoints", {})
         return progress
     return DEFAULT_PROGRESS.copy()
 
@@ -114,6 +147,16 @@ def load_progress() -> dict:
 def save_progress(progress: dict):
     """Persist progress to disk."""
     progress["last_active"] = datetime.now().isoformat()
+    # Auto-track today's date in days_active for streak analytics
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    analytics = progress.setdefault("analytics", {
+        "lesson_timing": {},
+        "task_attempts": {},
+        "days_active": [],
+    })
+    days_active = analytics.setdefault("days_active", [])
+    if today_str not in days_active:
+        days_active.insert(0, today_str)
     with open(PROGRESS_FILE, "w") as f:
         json.dump(progress, f, indent=2)
 
@@ -170,6 +213,36 @@ def mark_mission_complete(progress: dict, mission_key: str, score: int, max_scor
     if mission_key not in unlocked:
         unlocked.append(mission_key)
     save_progress(progress)
+
+
+def save_checkpoint(progress, module_key, lesson_id, step, qc_data=None):
+    """Save a mid-lesson checkpoint."""
+    mod = progress["modules"][module_key]
+    checkpoints = mod.setdefault("lesson_checkpoints", {})
+    data = {
+        "step": step,
+        "qc_correct": qc_data.get("correct", 0) if qc_data else 0,
+        "qc_total": qc_data.get("total", 0) if qc_data else 0,
+        "timestamp": datetime.now().isoformat(),
+    }
+    checkpoints[lesson_id] = data
+    save_progress(progress)
+
+
+def load_checkpoint(progress, module_key, lesson_id):
+    """Load a saved checkpoint, or return None."""
+    mod = progress.get("modules", {}).get(module_key, {})
+    checkpoints = mod.get("lesson_checkpoints", {})
+    return checkpoints.get(lesson_id)
+
+
+def clear_checkpoint(progress, module_key, lesson_id):
+    """Remove a checkpoint after lesson completion."""
+    mod = progress.get("modules", {}).get(module_key, {})
+    checkpoints = mod.get("lesson_checkpoints", {})
+    if lesson_id in checkpoints:
+        del checkpoints[lesson_id]
+        save_progress(progress)
 
 
 def get_overall_stats(progress: dict) -> dict:

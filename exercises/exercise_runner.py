@@ -10,6 +10,7 @@ from utils.display import (
     C, G, Y, R, RESET, BRIGHT, DIM
 )
 from utils.progress import mark_challenge_complete
+from utils.sandbox import _free_code as test_code_interactive
 
 
 CHALLENGES = {
@@ -294,6 +295,33 @@ CHALLENGES = {
                         print(f"    ⚠ {f}")
             """),
             "test_instructions": "Run the strength checker with various passwords and verify scoring.",
+            "test_cases": [
+                {
+                    "input": "",
+                    "expected_output": "Very Weak",
+                    "description": "Weak password 'password' scores Very Weak",
+                },
+                {
+                    "input": "",
+                    "expected_output": "Strong",
+                    "description": "Complex password scores Strong",
+                },
+            ],
+            "starter_code": (
+                "# Build a password strength checker\n"
+                "# It should print the rating: Very Weak, Weak, Moderate, or Strong\n"
+                "# Test with: 'password' (should be Very Weak) and 'C0mpl3x!Pass#2026' (should be Strong)\n"
+                "\n"
+                "def check_strength(password):\n"
+                "    # Your code here\n"
+                "    pass\n"
+                "\n"
+                "# Test cases\n"
+                "result1 = check_strength('password')\n"
+                "print(result1['rating'])\n"
+                "result2 = check_strength('C0mpl3x!Pass#2026')\n"
+                "print(result2['rating'])\n"
+            ),
         },
     ],
     "module5": [
@@ -514,6 +542,32 @@ CHALLENGES = {
                     print(f"         Last:  {alert['last_seen']}")
             """),
             "test_instructions": "Run with the embedded sample logs. IP 192.168.1.50 should trigger an alert.",
+            "test_cases": [
+                {
+                    "input": "",
+                    "expected_output": "192.168.1.50",
+                    "description": "Detects brute force IP 192.168.1.50",
+                },
+                {
+                    "input": "",
+                    "expected_output": "ALERT",
+                    "description": "Outputs ALERT for offending IPs",
+                },
+            ],
+            "starter_code": (
+                "# Build a brute force detector\n"
+                "# Parse auth logs and flag IPs with 5+ failed logins in 60 seconds\n"
+                "# Print: ALERT: <ip> -- <count> failed attempts\n"
+                "\n"
+                "SAMPLE_LOGS = \"\"\"\n"
+                "2026-02-13 10:00:01 auth FAILED login for user admin from 192.168.1.50\n"
+                "2026-02-13 10:00:03 auth FAILED login for user admin from 192.168.1.50\n"
+                "2026-02-13 10:00:05 auth FAILED login for user root from 192.168.1.50\n"
+                "2026-02-13 10:00:10 auth FAILED login for user admin from 192.168.1.50\n"
+                "2026-02-13 10:00:15 auth FAILED login for user test from 192.168.1.50\n"
+                "2026-02-13 10:00:20 auth FAILED login for user admin from 192.168.1.50\n"
+                "\"\"\".strip()\n"
+            ),
         },
     ],
     "module8": [
@@ -597,6 +651,35 @@ CHALLENGES = {
                 config.safe_dump()
             """),
             "test_instructions": "Run and verify that secret values are properly masked in the output.",
+            "test_cases": [
+                {
+                    "input": "",
+                    "expected_output": "localhost",
+                    "description": "Config loads APP_DB_HOST correctly",
+                },
+                {
+                    "input": "",
+                    "expected_output": "****",
+                    "description": "Secret values are masked in output",
+                },
+            ],
+            "starter_code": (
+                "# Build a secure configuration loader\n"
+                "# It should mask secret values when printing\n"
+                "# Mask: show first 2 and last 2 chars, replace middle with *\n"
+                "\n"
+                "class SecureConfig:\n"
+                "    def __init__(self):\n"
+                "        self._config = {}\n"
+                "        self._secret_keys = set()\n"
+                "\n"
+                "    # Add your methods here\n"
+                "\n"
+                "config = SecureConfig()\n"
+                "config._config = {'APP_DB_HOST': 'localhost', 'APP_DB_PASSWORD': 'super_secret_password_123'}\n"
+                "config._secret_keys = {'APP_DB_PASSWORD'}\n"
+                "config.safe_dump()\n"
+            ),
         },
     ],
 }
@@ -612,6 +695,23 @@ def run_challenge(challenge: dict, module_key: str, progress: dict):
     if challenge.get("test_instructions"):
         info(f"Testing: {challenge['test_instructions']}")
         print()
+
+    # Offer live code execution if test_cases are available
+    if challenge.get("test_cases"):
+        if ask_yes_no("Try writing and running the code live?"):
+            from utils.code_runner import code_exercise
+            passed = code_exercise(
+                instruction=challenge["description"],
+                test_cases=challenge["test_cases"],
+                starter_code=challenge.get("starter_code", ""),
+                hints=challenge["hints"],
+                solution=challenge["solution"],
+            )
+            if passed and ask_yes_no("Mark this challenge as completed?"):
+                mark_challenge_complete(progress, module_key, challenge["id"])
+                success("Challenge marked as complete!")
+            press_enter()
+            return
 
     # Offer hints
     for i, hint in enumerate(challenge["hints"], 1):
@@ -644,11 +744,16 @@ def exercises_menu(progress: dict):
                     (f"{mod_key}:{ch['id']}", f"{status} M{mod_num}: {ch['title']} ({ch['difficulty']})")
                 )
 
+        options.append(("sandbox", f"{C}Test Your Code — open the code sandbox{RESET}"))
+
         choice = show_menu("Practice Challenges", options)
         if choice == "back":
             return
         if choice == "quit":
             raise SystemExit
+        if choice == "sandbox":
+            test_code_interactive()
+            continue
 
         mod_key, challenge_id = choice.split(":", 1)
         challenge = next(c for c in CHALLENGES[mod_key] if c["id"] == challenge_id)

@@ -17,6 +17,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.case_studies import show_case_study
 
 
 # ---------------------------------------------------------------------------
@@ -1740,6 +1741,16 @@ if __name__ == "__main__":
         mark_challenge_complete(progress, module_key, "config_auditing_challenge")
         success("Challenge marked complete!")
 
+    scenario_block("Real-World Breach: WannaCry Ransomware (2017)", (
+        "WannaCry exploited MS17-010 (EternalBlue), a vulnerability in Windows SMB "
+        "that Microsoft had patched two months earlier. Organizations that hadn't run "
+        "vulnerability scans or applied patches were devastated — the NHS lost access "
+        "to medical records, FedEx halted shipments, and Renault shut down factories. "
+        "Total damage exceeded $4 billion. Regular vulnerability scanning and patch "
+        "management — the core skills from this module — would have flagged MS17-010 "
+        "as critical and prevented infection entirely."
+    ))
+
     press_enter()
     mark_lesson_complete(progress, module_key, lesson_id)
     success("Lesson 4 complete: Configuration Auditing")
@@ -1882,6 +1893,7 @@ def _run_module_quiz(progress):
 def run(progress):
     """Main entry point called from the menu system."""
     module_key = "module6"
+    show_case_study("module6")
     while True:
         choice = show_menu("Module 6: Vulnerability Scanning", [
             ("understanding_vulns", "Lesson 1: Understanding Vulnerabilities"),

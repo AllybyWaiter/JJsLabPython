@@ -35,6 +35,7 @@ def command_task(
     points: int = 20,
     hints: list[str] | None = None,
     case_sensitive: bool = False,
+    difficulty: str = "beginner",
 ) -> int:
     """Ask the user to type a command.  Returns points earned."""
     sub_header("COMMAND TASK")
@@ -44,7 +45,7 @@ def command_task(
     hints = hints or []
     hint_idx = 0
     attempts = 0
-    max_attempts = 3
+    max_attempts = {"beginner": 3, "intermediate": 2, "advanced": 1}.get(difficulty, 3)
 
     while attempts < max_attempts:
         answer = input(f"  {G}{BRIGHT}root@target:~${RESET} ").strip()
@@ -61,12 +62,18 @@ def command_task(
         remaining = max_attempts - attempts
         if remaining > 0:
             error(f"Not quite. {remaining} attempt(s) remaining.")
-            if hint_idx < len(hints):
+            info(f"  You typed:  {answer}")
+            if difficulty != "advanced" and hint_idx < len(hints):
                 hint_text(hints[hint_idx])
                 hint_idx += 1
+            elif difficulty != "advanced":
+                info(f"  Expected something like:  {accepted[0]}")
         else:
             error("Out of attempts.")
-            info(f"The expected command was:  {accepted[0]}")
+            info(f"  You typed:  {answer}")
+            info(f"  The expected command was:  {accepted[0]}")
+            if difficulty == "advanced" and hint_idx < len(hints):
+                hint_text(hints[hint_idx])
             half = points // 2
             info(f"Partial credit: +{half} pts")
             print()
@@ -85,6 +92,7 @@ def code_task(
     points: int = 25,
     hints: list[str] | None = None,
     example_solution: str = "",
+    difficulty: str = "beginner",
 ) -> int:
     """Ask the user to write a code snippet.  Returns points earned."""
     sub_header("CODE TASK")
@@ -95,7 +103,7 @@ def code_task(
     hints = hints or []
     hint_idx = 0
     attempts = 0
-    max_attempts = 3
+    max_attempts = {"beginner": 3, "intermediate": 2, "advanced": 1}.get(difficulty, 3)
 
     while attempts < max_attempts:
         lines = []
@@ -121,11 +129,13 @@ def code_task(
         missing = [kw for kw in required_keywords if kw.lower() not in code.lower()]
         if remaining > 0:
             error(f"Missing key elements: {', '.join(missing)}. {remaining} attempt(s) left.")
-            if hint_idx < len(hints):
+            if difficulty != "advanced" and hint_idx < len(hints):
                 hint_text(hints[hint_idx])
                 hint_idx += 1
         else:
             error("Out of attempts.")
+            if difficulty == "advanced" and hint_idx < len(hints):
+                hint_text(hints[hint_idx])
             if example_solution:
                 info("Here's one approach:")
                 code_block(example_solution, "python")
@@ -147,6 +157,7 @@ def puzzle_task(
     points: int = 20,
     hints: list[str] | None = None,
     case_sensitive: bool = False,
+    difficulty: str = "beginner",
 ) -> int:
     """Present a puzzle (decode hash, find vuln, read log). Returns points."""
     sub_header("PUZZLE TASK")
@@ -156,7 +167,7 @@ def puzzle_task(
     hints = hints or []
     hint_idx = 0
     attempts = 0
-    max_attempts = 3
+    max_attempts = {"beginner": 3, "intermediate": 2, "advanced": 1}.get(difficulty, 3)
 
     while attempts < max_attempts:
         answer = input(f"  {M}{BRIGHT}Answer:{RESET} ").strip()
@@ -173,12 +184,18 @@ def puzzle_task(
         remaining = max_attempts - attempts
         if remaining > 0:
             error(f"Not quite. {remaining} attempt(s) remaining.")
-            if hint_idx < len(hints):
+            info(f"  You answered:  {answer}")
+            if difficulty != "advanced" and hint_idx < len(hints):
                 hint_text(hints[hint_idx])
                 hint_idx += 1
+            elif difficulty != "advanced":
+                info(f"  Expected something like:  {accepted[0]}")
         else:
             error("Out of attempts.")
-            info(f"The answer was:  {accepted[0]}")
+            info(f"  You answered:  {answer}")
+            info(f"  The answer was:  {accepted[0]}")
+            if difficulty == "advanced" and hint_idx < len(hints):
+                hint_text(hints[hint_idx])
             half = points // 2
             info(f"Partial credit: +{half} pts")
             print()
@@ -238,6 +255,7 @@ def quiz_task(
     correct_index: int,
     explanation: str = "",
     points: int = 10,
+    difficulty: str = "beginner",
 ) -> int:
     """Quick inline quiz question.  Returns points earned."""
     sub_header("KNOWLEDGE CHECK")
@@ -249,8 +267,9 @@ def quiz_task(
         print(f"  {C}{labels[i]}.{RESET} {opt}")
     print()
 
+    max_attempts = {"beginner": 2, "intermediate": 1, "advanced": 1}.get(difficulty, 2)
     attempts = 0
-    while attempts < 2:
+    while attempts < max_attempts:
         raw = input(f"  {C}  ▶ Your answer: {RESET}").strip().upper()
         if not raw:
             continue
@@ -265,12 +284,16 @@ def quiz_task(
             print()
             return points
         attempts += 1
-        if attempts < 2:
+        if attempts < max_attempts:
             error("Not quite — try once more.")
         else:
             error(f"The answer was {labels[correct_index]}.")
             if explanation:
                 info(explanation)
+            if difficulty == "advanced":
+                info(f"+0 pts")
+                print()
+                return 0
             half = points // 2
             info(f"Partial credit: +{half} pts")
             print()

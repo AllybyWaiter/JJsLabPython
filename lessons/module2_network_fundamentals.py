@@ -12,6 +12,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.case_studies import show_case_study
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -1789,6 +1790,16 @@ def combined_discovery(network_cidr):
 # combined_discovery("192.168.1.0/24")""")
     press_enter()
 
+    scenario_block("Real-World Breach: Target Corporation (2013)", (
+        "Attackers gained access to Target's network through an HVAC vendor's VPN "
+        "credentials. Once inside, they moved laterally across network segments that "
+        "were not properly isolated, reaching the point-of-sale systems. They stole "
+        "40 million credit card numbers and 70 million customer records. The breach "
+        "cost Target over $200 million. Proper network segmentation and monitoring "
+        "— the skills you just learned — would have contained the attack to a single "
+        "VLAN instead of letting it spread across the entire network."
+    ))
+
     mark_lesson_complete(progress, MODULE_KEY, "lesson4")
     mark_challenge_complete(progress, MODULE_KEY, "network_mapper")
     success("Lesson 4 complete: Network Mapping")
@@ -1875,6 +1886,7 @@ QUIZ_QUESTIONS = [
 def run(progress):
     """Main entry point called from the menu system."""
     module_key = MODULE_KEY
+    show_case_study("module2")
     while True:
         choice = show_menu("Module 2: Network Fundamentals", [
             ("lesson1", "Lesson 1: TCP/UDP Deep Dive"),

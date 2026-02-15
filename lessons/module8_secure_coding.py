@@ -15,6 +15,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.case_studies import show_case_study
 
 
 # ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -1912,6 +1913,16 @@ def _lesson_secrets_management(progress):
         print(f"       {G}Fix: Add .env to .dockerignore. Never embed secrets in images.{RESET}")
         mark_challenge_complete(progress, "module8", "audit_config_challenge")
 
+    scenario_block("Real-World Breach: Log4Shell / Log4j (2021)", (
+        "A critical vulnerability in Apache Log4j (CVE-2021-44228) allowed remote code "
+        "execution via a simple log message. Because Log4j was embedded in thousands of "
+        "Java applications, the blast radius was enormous — Minecraft servers, iCloud, "
+        "Twitter, and Steam were all affected. The root cause: the library performed "
+        "JNDI lookups on untrusted input written to logs. Secure coding practices from "
+        "this module — input validation, dependency auditing, and never trusting user "
+        "input — are the exact defenses against this class of vulnerability."
+    ))
+
     mark_lesson_complete(progress, "module8", "secrets_management")
     success("Lesson 4 complete: Secrets Management")
     press_enter()
@@ -2041,6 +2052,7 @@ MODULE8_QUIZ = [
 def run(progress):
     """Main entry point called from the menu system."""
     module_key = "module8"
+    show_case_study("module8")
     while True:
         choice = show_menu("Module 8: Secure Coding Practices", [
             ("python_vulns",        "Lesson 1: Common Python Vulnerabilities"),

@@ -15,6 +15,7 @@ from utils.display import (
 )
 from utils.progress import mark_lesson_complete, mark_challenge_complete
 from utils.quiz import run_quiz
+from utils.case_studies import show_case_study
 
 # ---------------------------------------------------------------------------
 # Sample log data used across lessons and exercises
@@ -1410,6 +1411,16 @@ def _lesson_automating_checks(progress):
         print("      - Block all Tor exit nodes if not needed for business")
         mark_challenge_complete(progress, "module7", "ir_checklist_challenge")
 
+    scenario_block("Real-World Breach: SolarWinds (2020)", (
+        "Russian state hackers compromised SolarWinds' Orion build system and injected "
+        "a backdoor into software updates sent to 18,000 organizations including the "
+        "US Treasury and Department of Homeland Security. The attack went undetected "
+        "for 9 months because log analysis and monitoring were insufficient. FireEye "
+        "finally caught it by noticing anomalous authentication logs. The automated "
+        "log monitoring and anomaly detection you learned in this module are exactly "
+        "what separates a 9-month dwell time from a same-day detection."
+    ))
+
     mark_lesson_complete(progress, "module7", "automating_checks")
     success("Lesson 4 complete: Automating Security Checks")
     press_enter()
@@ -1537,6 +1548,7 @@ MODULE7_QUIZ = [
 def run(progress):
     """Main entry point called from the menu system."""
     module_key = "module7"
+    show_case_study("module7")
     while True:
         choice = show_menu("Module 7: Log Analysis & Incident Response", [
             ("log_fundamentals",  "Lesson 1: Log Fundamentals"),

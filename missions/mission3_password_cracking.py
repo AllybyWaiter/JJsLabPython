@@ -32,6 +32,8 @@ MAX_SCORE = 100
 
 def run(progress: dict):
     """Entry point for Mission 3."""
+    difficulty = progress.get("difficulty", "beginner")
+
     mission_briefing(
         mission_num=3,
         title="The Vault",
@@ -42,14 +44,14 @@ def run(progress: dict):
     dossier_path = generate_dossier(3)
 
     score = 0
-    score += stage_1_hash_identification()
+    score += stage_1_hash_identification(difficulty)
     score += _easter_egg_legacy_hash(progress)
     score += maybe_random_event(3)
-    score += stage_2_dictionary_attack()
+    score += stage_2_dictionary_attack(difficulty)
     score += maybe_random_event(3)
-    score += stage_3_advanced_cracking()
+    score += stage_3_advanced_cracking(difficulty)
     score += maybe_random_event(3)
-    score += stage_4_debrief()
+    score += stage_4_debrief(difficulty)
 
     mission_complete(3, "The Vault", score, MAX_SCORE)
     show_epilogue(3, score, MAX_SCORE)
@@ -60,7 +62,7 @@ def run(progress: dict):
 # Stage 1 — Hash Identification
 # ---------------------------------------------------------------------------
 
-def stage_1_hash_identification() -> int:
+def stage_1_hash_identification(difficulty: str = "beginner") -> int:
     stage_intro(1, "HASH IDENTIFICATION")
     score = 0
 
@@ -102,6 +104,7 @@ def stage_1_hash_identification() -> int:
             "Count the characters -- 32 hex digits is a signature length for a very common hash",
             "It's one of the most widely known (and weakest) hash algorithms",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -126,6 +129,7 @@ def stage_1_hash_identification() -> int:
             "It's in the SHA-2 family -- 256 bits = 64 hex characters",
             "SHA-___  (fill in the number of bits)",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -150,6 +154,7 @@ def stage_1_hash_identification() -> int:
             "The $2b$ prefix is a dead giveaway for this adaptive hash function",
             "It starts with $2b$ — a password hashing function named after a fish cipher",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -184,6 +189,7 @@ def stage_1_hash_identification() -> int:
             "This makes precomputed attacks (rainbow tables) useless."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     return score
@@ -193,7 +199,7 @@ def stage_1_hash_identification() -> int:
 # Stage 2 — Dictionary Attack
 # ---------------------------------------------------------------------------
 
-def stage_2_dictionary_attack() -> int:
+def stage_2_dictionary_attack(difficulty: str = "beginner") -> int:
     stage_intro(2, "DICTIONARY ATTACK")
     score = 0
 
@@ -246,6 +252,7 @@ def stage_2_dictionary_attack() -> int:
             "            print(f'Cracked: {word}')\n"
             "            break"
         ),
+        difficulty=difficulty,
     )
 
     narrator(
@@ -280,6 +287,7 @@ def stage_2_dictionary_attack() -> int:
             "The syntax is: john --wordlist=<path_to_wordlist> <hash_file>",
             "john --wordlist=rockyou.txt hashes.txt",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -300,7 +308,7 @@ def stage_2_dictionary_attack() -> int:
 # Stage 3 — Advanced Cracking
 # ---------------------------------------------------------------------------
 
-def stage_3_advanced_cracking() -> int:
+def stage_3_advanced_cracking(difficulty: str = "beginner") -> int:
     stage_intro(3, "ADVANCED CRACKING")
     score = 0
 
@@ -338,6 +346,7 @@ def stage_3_advanced_cracking() -> int:
             "It's the word people use when they can't think of a password",
         ],
         case_sensitive=True,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -397,7 +406,7 @@ def stage_3_advanced_cracking() -> int:
 # Stage 4 — Debrief
 # ---------------------------------------------------------------------------
 
-def stage_4_debrief() -> int:
+def stage_4_debrief(difficulty: str = "beginner") -> int:
     stage_intro(4, "MISSION DEBRIEF")
     score = 0
 
@@ -436,6 +445,7 @@ def stage_4_debrief() -> int:
             "not suitable — if the key is compromised, all passwords are exposed."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -462,6 +472,7 @@ def stage_4_debrief() -> int:
             "table for every possible salt value."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     narrator(

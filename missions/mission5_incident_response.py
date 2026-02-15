@@ -37,6 +37,8 @@ MAX_SCORE = 115  # 100 base + up to 15 from timed bonuses
 
 def run(progress: dict):
     """Entry point for Mission 5."""
+    difficulty = progress.get("difficulty", "beginner")
+
     mission_briefing(
         mission_num=5,
         title="Code Red",
@@ -47,16 +49,16 @@ def run(progress: dict):
     dossier_path = generate_dossier(5)
 
     score = 0
-    score += stage_1_the_alert()
+    score += stage_1_the_alert(difficulty)
     score += maybe_random_event(5)
-    score += stage_2_log_analysis()
+    score += stage_2_log_analysis(difficulty)
     score += _easter_egg_attack_rate(progress)
     score += maybe_random_event(5)
-    score += stage_3_containment()
+    score += stage_3_containment(difficulty)
     score += maybe_random_event(5)
-    score += stage_4_forensics()
+    score += stage_4_forensics(difficulty)
     score += maybe_random_event(5)
-    score += stage_5_recovery()
+    score += stage_5_recovery(difficulty)
 
     mission_complete(5, "Code Red", score, MAX_SCORE)
     show_epilogue(5, score, MAX_SCORE)
@@ -67,7 +69,7 @@ def run(progress: dict):
 # Stage 1 -- The Alert: 2:47 AM
 # ---------------------------------------------------------------------------
 
-def stage_1_the_alert() -> int:
+def stage_1_the_alert(difficulty: str = "beginner") -> int:
     stage_intro(1, "THE ALERT -- 2:47 AM")
     score = 0
 
@@ -164,6 +166,7 @@ def stage_1_the_alert() -> int:
             "and (4) Post-Incident Activity. You are currently in phase 2."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     return score
@@ -173,7 +176,7 @@ def stage_1_the_alert() -> int:
 # Stage 2 -- Log Analysis
 # ---------------------------------------------------------------------------
 
-def stage_2_log_analysis() -> int:
+def stage_2_log_analysis(difficulty: str = "beginner") -> int:
     stage_intro(2, "LOG ANALYSIS")
     score = 0
 
@@ -223,6 +226,7 @@ def stage_2_log_analysis() -> int:
             '        if "500" in line or "401" in line:\n'
             '            print("[ERROR]", line.strip())'
         ),
+        difficulty=difficulty,
     )
 
     narrator(
@@ -261,6 +265,7 @@ def stage_2_log_analysis() -> int:
             "The IP starts with 203 and appears 47+12+3+8+847 times",
         ],
         case_sensitive=False,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -286,7 +291,7 @@ def stage_2_log_analysis() -> int:
 # Stage 3 -- Containment
 # ---------------------------------------------------------------------------
 
-def stage_3_containment() -> int:
+def stage_3_containment(difficulty: str = "beginner") -> int:
     stage_intro(3, "CONTAINMENT")
     score = 0
 
@@ -324,6 +329,7 @@ def stage_3_containment() -> int:
         ],
         time_limit=30,
         bonus=5,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -397,7 +403,7 @@ def stage_3_containment() -> int:
 # Stage 4 -- Forensics & Evidence Preservation
 # ---------------------------------------------------------------------------
 
-def stage_4_forensics() -> int:
+def stage_4_forensics(difficulty: str = "beginner") -> int:
     stage_intro(4, "FORENSICS & EVIDENCE")
     score = 0
 
@@ -438,6 +444,7 @@ def stage_4_forensics() -> int:
         ],
         time_limit=40,
         bonus=5,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -463,6 +470,7 @@ def stage_4_forensics() -> int:
             "The sha256sum command computes SHA-256 hashes",
             "sha256sum cdn_server.img",
         ],
+        difficulty=difficulty,
     )
 
     narrator(
@@ -501,6 +509,7 @@ def stage_4_forensics() -> int:
             "inadmissible in court."
         ),
         points=5,
+        difficulty=difficulty,
     )
 
     narrator(
@@ -529,7 +538,7 @@ def stage_4_forensics() -> int:
 # Stage 5 -- Recovery & Lessons Learned
 # ---------------------------------------------------------------------------
 
-def stage_5_recovery() -> int:
+def stage_5_recovery(difficulty: str = "beginner") -> int:
     stage_intro(5, "RECOVERY & LESSONS LEARNED")
     score = 0
 
@@ -576,6 +585,7 @@ def stage_5_recovery() -> int:
             "doesn't stop automated attacks."
         ),
         points=10,
+        difficulty=difficulty,
     )
 
     narrator(
